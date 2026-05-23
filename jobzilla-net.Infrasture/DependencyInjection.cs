@@ -1,6 +1,8 @@
 using jobzilla_net.Application.Common.Interfaces;
+using jobzilla_net.Application.Jobs;
 using jobzilla_net.Infrasture.Identity;
 using jobzilla_net.Infrasture.Persistence;
+using jobzilla_net.Infrasture.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,9 @@ public static class DependencyInjection
         // — avoids a second DbContext lifetime and keeps a single scoped instance.
         services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());
+
+        // ── Application services ──────────────────────────────────────────────
+        services.AddScoped<IJobService, JobService>();
 
         return services;
     }

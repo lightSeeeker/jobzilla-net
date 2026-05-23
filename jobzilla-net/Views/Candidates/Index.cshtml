@@ -1,0 +1,257 @@
+@model jobzilla_net.Models.Candidates.CandidateSearchViewModel
+@using jobzilla_net.Application.Candidates.Dtos
+@{
+    ViewData["Title"] = "Candidate List";
+}
+
+<!-- INNER PAGE BANNER -->
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(images/banner/1.jpg);">
+    <div class="overlay-main site-bg-white opacity-01"></div>
+    <div class="container">
+        <div class="wt-bnr-inr-entry">
+            <div class="banner-title-outer">
+                <div class="banner-title-name">
+                    <h2 class="wt-title">Candidate List</h2>
+                </div>
+            </div>
+            <div>
+                <ul class="wt-breadcrumb breadcrumb-style-2">
+                    <li><a href="index.html">Home</a></li>
+                    <li>Candidate List</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- INNER PAGE BANNER END -->
+
+<!-- OUR BLOG START -->
+<div class="section-full p-t120  p-b90 site-bg-white">
+
+    <div class="container">
+        <div class="row">
+
+            <!-- ── SIDEBAR ──────────────────────────────────────────────────── -->
+            <div class="col-lg-4 col-md-12 rightSidebar">
+
+                <div class="side-bar">
+
+                    <div class="sidebar-elements search-bx">
+                        <form action="/Candidates" method="get">
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Keyword</h4>
+                                <div class="input-group">
+                                    <input type="text" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Name or Job Title">
+                                    <button class="btn" type="submit"><i class="feather-search"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Location</h4>
+                                <div class="input-group">
+                                    <input type="text" name="location" value="@Model.Location" class="form-control" placeholder="Search location">
+                                    <button class="btn" type="submit"><i class="feather-map-pin"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Min. Experience (years)</h4>
+                                <div class="input-group">
+                                    <input type="number" name="minExperienceYears" value="@Model.MinExperienceYears" class="form-control" placeholder="e.g. 2" min="0">
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Max Expected Salary</h4>
+                                <div class="input-group">
+                                    <input type="number" name="maxExpectedSalary" value="@Model.MaxExpectedSalary" class="form-control" placeholder="e.g. 5000">
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="page" value="1" />
+                            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+
+                            <button type="submit" class="site-button">Search Candidates</button>
+
+                        </form>
+                    </div>
+
+                    <div class="widget tw-sidebar-tags-wrap">
+                        <h4 class="section-head-small mb-4">Tags</h4>
+                        <div class="tagcloud">
+                            <a href="javascript:;">General</a>
+                            <a href="javascript:;">Jobs </a>
+                            <a href="javascript:;">Payment</a>
+                            <a href="javascript:;">Application </a>
+                            <a href="javascript:;">Work</a>
+                            <a href="javascript:;">Recruiting</a>
+                            <a href="javascript:;">Employer</a>
+                            <a href="javascript:;">Income</a>
+                            <a href="javascript:;">Tips</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="twm-advertisment" style="background-image:url(images/add-bg.jpg);">
+                    <div class="overlay"></div>
+                    <h4 class="twm-title">Recruiting?</h4>
+                    <p>Get Best Matched Jobs On your <br>
+                        Email. Add Resume NOW!</p>
+                    <a href="about-1.html" class="site-button white">Read More</a>
+                </div>
+
+            </div>
+            <!-- ── SIDEBAR END ────────────────────────────────────────────── -->
+
+            <!-- ── MAIN COLUMN ──────────────────────────────────────────────── -->
+            <div class="col-lg-8 col-md-12">
+                <!--Filter Short By-->
+                <div class="product-filter-wrap d-flex justify-content-between align-items-center m-b30">
+                    <span class="woocommerce-result-count-left">
+                        Showing @Model.Result.TotalCount Candidate@(Model.Result.TotalCount == 1 ? "" : "s")
+                    </span>
+
+                    <form class="woocommerce-ordering twm-filter-select" method="get">
+                        <span class="woocommerce-result-count">Short By</span>
+                        <select class="wt-select-bar-2 selectpicker" data-live-search="true" data-bv-field="size">
+                            <option>Most Recent</option>
+                            <option>Experience</option>
+                            <option>Salary</option>
+                        </select>
+                        <select class="wt-select-bar-2 selectpicker" data-live-search="true" data-bv-field="size">
+                            <option>Show 10</option>
+                            <option>Show 20</option>
+                            <option>Show 30</option>
+                            <option>Show 40</option>
+                            <option>Show 50</option>
+                            <option>Show 60</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- ── DYNAMIC CANDIDATE CARDS — only this <ul> is replaced ── -->
+                <div class="twm-candidates-list-wrap">
+                    <ul>
+                        @if (!Model.Result.Items.Any())
+                        {
+                            <li>
+                                <div class="twm-candidates-list-style1 mb-5 text-center p-4">
+                                    <p>No candidates found.</p>
+                                </div>
+                            </li>
+                        }
+                        @foreach (CandidateSummaryDto candidate in Model.Result.Items)
+                        {
+                            var salaryText = candidate.ExpectedSalary.HasValue
+                                ? candidate.ExpectedSalary.Value.ToString("C0")
+                                : "Negotiable";
+
+                            var expText = candidate.ExperienceYears.HasValue
+                                ? $"{candidate.ExperienceYears} yr{(candidate.ExperienceYears == 1 ? "" : "s")}"
+                                : null;
+
+                            <li>
+                                <div class="twm-candidates-list-style1 mb-5">
+                                    <div class="twm-media">
+                                        <div class="twm-media-pic">
+                                            @if (!string.IsNullOrEmpty(candidate.ProfileImagePath))
+                                            {
+                                                <img src="@candidate.ProfileImagePath" alt="@candidate.FullName">
+                                            }
+                                            else
+                                            {
+                                                <img src="~/images/candidates/pic1.jpg" alt="@candidate.FullName">
+                                            }
+                                        </div>
+                                        @if (expText != null)
+                                        {
+                                            <div class="twm-candidates-tag"><span>@expText exp</span></div>
+                                        }
+                                    </div>
+                                    <div class="twm-mid-content">
+                                        <a asp-controller="Candidates" asp-action="Details" asp-route-id="@candidate.Id" class="twm-job-title">
+                                            <h4>@candidate.FullName</h4>
+                                        </a>
+                                        @if (!string.IsNullOrEmpty(candidate.ProfessionalTitle))
+                                        {
+                                            <p>@candidate.ProfessionalTitle</p>
+                                        }
+                                        <div class="twm-fot-content">
+                                            <div class="twm-left-info">
+                                                @if (!string.IsNullOrEmpty(candidate.Location))
+                                                {
+                                                    <p class="twm-candidate-address">
+                                                        <i class="feather-map-pin"></i>@candidate.Location
+                                                    </p>
+                                                }
+                                                <div class="twm-jobs-vacancies">
+                                                    @salaryText<span>/ Month</span>
+                                                </div>
+                                            </div>
+                                            <div class="twm-right-btn">
+                                                <a asp-controller="Candidates" asp-action="Details" asp-route-id="@candidate.Id"
+                                                   class="twm-view-prifile site-text-primary">View Profile</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <!-- ── END DYNAMIC CANDIDATE CARDS ─────────────────────────── -->
+
+                @if (Model.Result.TotalPages > 1)
+                {
+                    string PageUrl(int p) =>
+                        $"?page={p}&pageSize={Model.PageSize}" +
+                        (string.IsNullOrEmpty(Model.Keyword)           ? "" : $"&keyword={Uri.EscapeDataString(Model.Keyword)}") +
+                        (string.IsNullOrEmpty(Model.Location)          ? "" : $"&location={Uri.EscapeDataString(Model.Location)}") +
+                        (Model.MinExperienceYears.HasValue              ? $"&minExperienceYears={Model.MinExperienceYears}" : "") +
+                        (Model.MaxExpectedSalary.HasValue               ? $"&maxExpectedSalary={Model.MaxExpectedSalary}" : "");
+
+                    int totalPages = Model.Result.TotalPages;
+                    int currPage   = Model.Result.Page;
+                    int start      = Math.Max(1, currPage - 2);
+                    int end        = Math.Min(totalPages, start + 4);
+                    start          = Math.Max(1, end - 4);
+
+                    <div class="pagination-outer">
+                        <div class="pagination-style1">
+                            <ul class="clearfix">
+                                <li class="prev">
+                                    <a href="@(Model.Result.HasPreviousPage ? PageUrl(currPage - 1) : "javascript:;")">
+                                        <span> <i class="fa fa-angle-left"></i> </span>
+                                    </a>
+                                </li>
+                                @for (int p = start; p <= end; p++)
+                                {
+                                    <li class="@(p == currPage ? "active" : "")">
+                                        <a href="@PageUrl(p)">@p</a>
+                                    </li>
+                                }
+                                @if (end < totalPages)
+                                {
+                                    <li><a href="javascript:;"><i class="fa fa-ellipsis-h"></i></a></li>
+                                    <li><a href="@PageUrl(totalPages)">@totalPages</a></li>
+                                }
+                                <li class="next">
+                                    <a href="@(Model.Result.HasNextPage ? PageUrl(currPage + 1) : "javascript:;")">
+                                        <span> <i class="fa fa-angle-right"></i> </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+            </div>
+            <!-- ── MAIN COLUMN END ──────────────────────────────────────────── -->
+
+        </div>
+    </div>
+
+</div>
+<!-- OUR BLOG END -->

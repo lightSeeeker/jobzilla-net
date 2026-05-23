@@ -1,3 +1,4 @@
+using jobzilla_net.Application.Candidates;
 using jobzilla_net.Application.Common.Interfaces;
 using jobzilla_net.Application.Jobs;
 using jobzilla_net.Infrasture.Identity;
@@ -37,6 +38,7 @@ public static class DependencyInjection
 
         // ── Application services ──────────────────────────────────────────────
         services.AddScoped<IJobService, JobService>();
+        services.AddScoped<ICandidateService, CandidateService>();
 
         return services;
     }

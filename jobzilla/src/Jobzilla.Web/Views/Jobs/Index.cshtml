@@ -1,0 +1,28 @@
+@model JobSearchViewModel
+@{
+    ViewData["Title"] = "Jobs";
+}
+
+<div class="section-full p-t120 p-b90 site-bg-white">
+    <div class="container">
+        <form class="twm-sidebar-ele-filter" method="get">
+            <div class="row">
+                <div class="col-md-5 mb-3">
+                    <input asp-for="Keyword" class="form-control" placeholder="Job title or keyword" />
+                </div>
+                <div class="col-md-5 mb-3">
+                    <input asp-for="Location" class="form-control" placeholder="Search location" />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button class="site-button w-100" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+        <div class="twm-jobs-list-wrap">
+            @foreach (var job in Model.Jobs)
+            {
+                <partial name="_JobSummary" model="job" />
+            }
+        </div>
+    </div>
+</div>

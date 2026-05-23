@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Application/">
+    <Project Path="jobzilla-net.Application/jobzilla-net.Application.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="jobzilla-net.Core/jobzilla-net.Core.csproj" />
+  </Folder>
+  <Folder Name="/Persistence/">
+    <Project Path="jobzilla-net.Infrasture/jobzilla-net.Infrasture.csproj" />
+    <Project Path="jobzilla-net.Persistence/jobzilla-net.Persistence.csproj" />
+  </Folder>
+  <Project Path="jobzilla-net/jobzilla-net.csproj" />
+</Solution>

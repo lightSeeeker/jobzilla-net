@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Jobzilla.Application/Jobzilla.Application.csproj" />
+    <Project Path="src/Jobzilla.Domain/Jobzilla.Domain.csproj" />
+    <Project Path="src/Jobzilla.Infrastructure/Jobzilla.Infrastructure.csproj" />
+    <Project Path="src/Jobzilla.Web/Jobzilla.Web.csproj" />
+  </Folder>
+</Solution>

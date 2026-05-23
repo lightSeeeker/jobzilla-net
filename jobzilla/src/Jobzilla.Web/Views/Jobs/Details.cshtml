@@ -1,0 +1,24 @@
+@model Jobzilla.Application.Jobs.JobSummaryDto
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="section-full p-t120 p-b90 site-bg-white">
+    <div class="container">
+        <div class="twm-job-self-wrap">
+            <div class="twm-job-self-info">
+                <h2 class="wt-title">@Model.Title</h2>
+                <p>@Model.CompanyName - @Model.Location</p>
+                <div class="twm-job-self-bottom">
+                    <a class="site-button" asp-controller="Jobs" asp-action="Index">Back to Jobs</a>
+                </div>
+            </div>
+        </div>
+        <div class="section-content">
+            <h4 class="twm-s-title">Job Information</h4>
+            <p>Category: @Model.CategoryName</p>
+            <p>Employment: @Model.EmploymentType</p>
+            <p>Salary: @((Model.MinimumSalary ?? 0).ToString("C0")) - @((Model.MaximumSalary ?? 0).ToString("C0"))</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+@model Jobzilla.Application.Jobs.JobSummaryDto
+
+<div class="twm-jobs-list-style1 mb-4">
+    <div class="twm-media">
+        <img src="~/images/jobs-company/pic1.jpg" alt="@Model.CompanyName" />
+    </div>
+    <div class="twm-mid-content">
+        <a asp-controller="Jobs" asp-action="Details" asp-route-id="@Model.Id" class="twm-job-title">
+            <h4>@Model.Title <span class="twm-job-post-duration">/ @Model.CreatedAtUtc.ToLocalTime().ToString("MMM d")</span></h4>
+        </a>
+        <p class="twm-job-address">@Model.CompanyName - @Model.Location</p>
+        <span class="twm-job-websites site-text-primary">@Model.CategoryName</span>
+    </div>
+    <div class="twm-right-content">
+        <div class="twm-jobs-category"><span class="twm-bg-green">@Model.EmploymentType</span></div>
+        <div class="twm-jobs-amount">@((Model.MinimumSalary ?? 0).ToString("C0")) <span>/ Month</span></div>
+        <a asp-controller="Jobs" asp-action="Details" asp-route-id="@Model.Id" class="twm-jobs-browse site-text-primary">Browse Job</a>
+    </div>
+</div>

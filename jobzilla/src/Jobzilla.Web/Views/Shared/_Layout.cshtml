@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Jobzilla</title>
+    <link rel="icon" href="~/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/css/feather.css" />
+    <link rel="stylesheet" href="~/css/flaticon.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/skins-type/skin-6.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="page-wraper">
+        <header class="site-header header-style-3 mobile-sider-drawer-menu">
+            <div class="sticky-header main-bar-wraper navbar-expand-lg">
+                <div class="main-bar">
+                    <div class="container-fluid clearfix">
+                        <div class="logo-header">
+                            <div class="logo-header-inner logo-header-one">
+                                <a asp-controller="Home" asp-action="Index"><img src="~/images/logo-dark.png" alt="Jobzilla" /></a>
+                            </div>
+                        </div>
+                        <button id="mobile-side-drawer" data-target=".header-nav" data-toggle="collapse" type="button" class="navbar-toggler collapsed">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar icon-bar-first"></span>
+                            <span class="icon-bar icon-bar-two"></span>
+                            <span class="icon-bar icon-bar-three"></span>
+                        </button>
+                        <div class="nav-animation header-nav navbar-collapse collapse d-flex justify-content-center">
+                            <ul class="nav navbar-nav">
+                                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                <li><a asp-controller="Jobs" asp-action="Index">Find Jobs</a></li>
+                                <li><a asp-controller="Modules" asp-action="Index">HTML Modules</a></li>
+                                <li><a asp-controller="EmployerJobs" asp-action="Index">Employer Dashboard</a></li>
+                            </ul>
+                        </div>
+                        <div class="extra-nav header-2-nav">
+                            <div class="extra-cell">
+                                <partial name="_LoginPartial" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-content">
+            @RenderBody()
+        </main>
+
+        <footer class="footer-dark">
+            <div class="container">
+                <div class="ftr-nw-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="ftr-title">Jobzilla</h3>
+                            <p>Dynamic job board powered by ASP.NET Core, Identity, and SQL Server.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a class="site-button" asp-controller="EmployerJobs" asp-action="Create">Post a Job</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT  FILES ========================================= -->
+    <script src="~/js/jquery-3.6.0.min.js"></script><!-- JQUERY.MIN JS -->
+    <script src="~/js/popper.min.js"></script><!-- POPPER.MIN JS -->
+    <script src="~/js/bootstrap.min.js"></script><!-- BOOTSTRAP.MIN JS -->
+    <script src="~/js/magnific-popup.min.js"></script><!-- MAGNIFIC-POPUP JS -->
+    <script src="~/js/waypoints.min.js"></script><!-- WAYPOINTS JS -->
+    <script src="~/js/counterup.min.js"></script><!-- COUNTERUP JS -->
+    <script src="~?js/waypoints-sticky.min.js"></script><!-- STICKY HEADER -->
+    <script src="~/js/isotope.pkgd.min.js"></script><!-- MASONRY  -->
+    <script src="~/js/imagesloaded.pkgd.min.js"></script><!-- MASONRY  -->
+    <script src="~/js/owl.carousel.min.js"></script><!-- OWL  SLIDER  -->
+    <script src="~/js/theia-sticky-sidebar.js"></script><!-- STICKY SIDEBAR  -->
+    <script src="~/js/lc_lightbox.lite.js"></script><!-- IMAGE POPUP -->
+    <script src="~/js/bootstrap-select.min.js"></script><!-- Form js -->
+    <script src="~/js/dropzone.js"></script><!-- IMAGE UPLOAD  -->
+    <script src="~/js/jquery.scrollbar.js"></script><!-- scroller -->
+    <script src="~/js/bootstrap-datepicker.js"></script><!-- scroller -->
+    <script src="~/js/jquery.dataTables.min.js"></script><!-- Datatable -->
+    <script src="~/js/dataTables.bootstrap5.min.js"></script><!-- Datatable -->
+    <script src="~/js/chart.js"></script><!-- Chart -->
+    <script src="~/js/bootstrap-slider.min.js"></script><!-- Price range slider -->
+    <script src="~/js/swiper-bundle.min.js"></script><!-- Swiper JS -->
+    <script src="~/js/custom.js"></script><!-- CUSTOM FUCTIONS  -->
+    <script src="~/js/switcher.js"></script><!-- SHORTCODE FUCTIONS  -->
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

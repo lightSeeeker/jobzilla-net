@@ -1,0 +1,34 @@
+@model ModulesIndexViewModel
+@{
+    ViewData["Title"] = "HTML Modules";
+    var groups = Model.Modules.GroupBy(module => module.Category).OrderBy(group => group.Key);
+}
+
+<section class="section-full p-t120 p-b90 site-bg-white">
+    <div class="container">
+        <div class="section-head wt-small-separator-outer">
+            <div class="wt-small-separator site-text-primary"><div>Original HTML Template</div></div>
+            <h2 class="wt-title">All Jobzilla Modules</h2>
+            <p>These pages are preserved as static template modules while the .NET dynamic implementation grows page by page.</p>
+        </div>
+
+        @foreach (var group in groups)
+        {
+            <div class="m-b40">
+                <h3 class="section-head-small mb-4">@group.Key</h3>
+                <div class="row">
+                    @foreach (var module in group)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6 m-b30">
+                            <div class="twm-jobs-category green h-100">
+                                <div class="twm-media"><i class="flaticon-dashboard"></i></div>
+                                <span>@module.Title</span>
+                                <a class="site-button mt-3" href="@module.Url" target="_blank" rel="noopener">Open</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>

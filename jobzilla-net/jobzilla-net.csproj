@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>jobzilla_net</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\jobzilla-net.Application\jobzilla-net.Application.csproj" />
+    <ProjectReference Include="..\jobzilla-net.Core\jobzilla-net.Core.csproj" />
+    <ProjectReference Include="..\jobzilla-net.Infrasture\jobzilla-net.Infrasture.csproj" />
+  </ItemGroup>
+
+</Project>

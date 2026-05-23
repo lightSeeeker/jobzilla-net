@@ -1,0 +1,57 @@
+@model PostJobViewModel
+@{
+    ViewData["Title"] = "Post Job";
+}
+
+<div class="section-full p-t120 p-b90 site-bg-white">
+    <div class="container">
+        <h2 class="wt-title">Post a Job</h2>
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Title"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="JobCategoryId">Category</label>
+                    <select asp-for="JobCategoryId" class="form-control">
+                        <option value="1">Web Development</option>
+                        <option value="2">Design</option>
+                        <option value="3">Marketing</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Location"></label>
+                    <input asp-for="Location" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="EmploymentType"></label>
+                    <select asp-for="EmploymentType" asp-items="Html.GetEnumSelectList<EmploymentType>()" class="form-control"></select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="MinimumSalary"></label>
+                    <input asp-for="MinimumSalary" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="MaximumSalary"></label>
+                    <input asp-for="MaximumSalary" class="form-control" />
+                </div>
+                <div class="col-12 mb-3">
+                    <label asp-for="Description"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                </div>
+                <div class="col-12 mb-3">
+                    <label asp-for="Requirements"></label>
+                    <textarea asp-for="Requirements" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="col-12 mb-3">
+                    <label asp-for="Responsibilities"></label>
+                    <textarea asp-for="Responsibilities" class="form-control" rows="4"></textarea>
+                </div>
+            </div>
+            <button class="site-button" type="submit">Submit for Approval</button>
+        </form>
+    </div>
+</div>

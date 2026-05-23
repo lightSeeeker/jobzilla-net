@@ -1,3 +1,4 @@
+using jobzilla_net.Application.Common.Interfaces;
 using jobzilla_net.Infrasture.Identity;
 using jobzilla_net.Infrasture.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -27,8 +28,9 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-        // Expose ApplicationDbContext via IApplicationDbContext without double-registering
-        services.AddScoped(sp =>
+        // Bind IApplicationDbContext to the already-registered ApplicationDbContext
+        // — avoids a second DbContext lifetime and keeps a single scoped instance.
+        services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());
 
         return services;

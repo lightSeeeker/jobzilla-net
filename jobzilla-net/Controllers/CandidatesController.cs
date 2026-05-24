@@ -1,6 +1,8 @@
 using jobzilla_net.Application.Candidates;
+using jobzilla_net.Application.Common.Interfaces;
 using jobzilla_net.Models.Candidates;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace jobzilla_net.Controllers;
 
@@ -11,10 +13,12 @@ namespace jobzilla_net.Controllers;
 public sealed class CandidatesController : Controller
 {
     private readonly ICandidateService _candidateService;
+    private readonly IApplicationDbContext _db;
 
-    public CandidatesController(ICandidateService candidateService)
+    public CandidatesController(ICandidateService candidateService, IApplicationDbContext db)
     {
         _candidateService = candidateService;
+        _db = db;
     }
 
     /// <summary>
@@ -26,6 +30,19 @@ public sealed class CandidatesController : Controller
         CandidateSearchViewModel model,
         CancellationToken cancellationToken)
     {
+        // Load filter dropdowns
+        model.Categories = await _db.JobCategories
+            .AsNoTracking()
+            .Where(c => !c.IsDeleted)
+            .OrderBy(c => c.Name)
+            .ToListAsync(cancellationToken);
+
+        model.Skills = await _db.Skills
+            .AsNoTracking()
+            .Where(s => !s.IsDeleted)
+            .OrderBy(s => s.Name)
+            .ToListAsync(cancellationToken);
+
         model.Result = await _candidateService.SearchAsync(
             model.ToQuery(),
             cancellationToken);

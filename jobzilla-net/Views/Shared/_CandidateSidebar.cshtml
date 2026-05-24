@@ -8,7 +8,7 @@
     <div class="side-bar-st-1">
         
         <div class="twm-candidate-profile-pic">
-            <img src="@(string.IsNullOrEmpty(Model.Overview.RecentApplications.FirstOrDefault()?.CompanyLogoPath) ? "/images/user-avtar/pic4.jpg" : Model.Overview.RecentApplications.FirstOrDefault()?.CompanyLogoPath)" alt="">
+            <img src="@(Model?.Overview?.RecentApplications?.FirstOrDefault()?.CompanyLogoPath ?? "/images/user-avtar/pic4.jpg")" alt="">
             <div class="upload-btn-wrapper">
                 <div id="upload-image-grid"></div>
                 <button class="site-button button-sm">Upload Photo</button>
@@ -29,9 +29,9 @@
                 <li class="@(activePage == "AppliedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="AppliedJobs"><i class="fa fa-suitcase"></i> Applied Jobs</a></li>
                 <li class="@(activePage == "Resumes" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-receipt"></i> My Resume (CV Manager)</a></li>
                 <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
-                <li><a href="javascript:;"><i class="fa fa-bell"></i> Job Alerts</a></li>
-                <li><a href="javascript:;"><i class="fa fa-fingerprint"></i> Change Password</a></li>
-                <li><a href="javascript:;"><i class="fa fa-comments"></i> Chat</a></li>
+                <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-bell"></i> Job Alerts</a></li>
+                <li><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-fingerprint"></i> Change Password</a></li>
+                <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-comments"></i> Chat</a></li>
             </ul>
         </div>
         

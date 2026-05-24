@@ -1,4 +1,4 @@
-@model jobzilla_net.Application.Jobs.Dtos.JobSummaryDto
+﻿@model jobzilla_net.Application.Jobs.Dtos.JobSummaryDto
 @{
     ViewData["Title"] = Model.Title + " - Job Detail";
 
@@ -16,7 +16,7 @@
 }
 
 <!-- INNER PAGE BANNER -->
-<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(images/banner/1.jpg);">
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
     <div class="overlay-main site-bg-white opacity-01"></div>
     <div class="container">
         <div class="wt-bnr-inr-entry">
@@ -27,7 +27,7 @@
             </div>
             <div>
                 <ul class="wt-breadcrumb breadcrumb-style-2">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
                     <li>Job Detail</li>
                 </ul>
             </div>
@@ -42,7 +42,7 @@
         <div class="section-content">
             <div class="row d-flex justify-content-center">
 
-                <!-- ── MAIN COLUMN ─────────────────────────────────────────── -->
+                <!-- â”€â”€ MAIN COLUMN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
                 <div class="col-lg-8 col-md-12">
                     <div class="cabdidate-de-info">
                         <div class="twm-job-self-wrap">
@@ -76,7 +76,7 @@
                                         </p>
                                         <div class="twm-job-self-mid">
                                             <div class="twm-job-self-mid-left">
-                                                <a href="#" class="twm-job-websites site-text-primary">@Model.CompanyName</a>
+                                                <a asp-controller="Employers" asp-action="Details" class="twm-job-websites site-text-primary">@Model.CompanyName</a>
                                                 <div class="twm-jobs-amount">@salaryText <span>/ Month</span></div>
                                             </div>
                                             @if (Model.ExpiresAtUtc.HasValue)
@@ -99,7 +99,7 @@
                             </div>
                         </div>
 
-                        <!-- ── DYNAMIC SECTIONS ONLY ─────────────────────── -->
+                        <!-- â”€â”€ DYNAMIC SECTIONS ONLY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
                         <h4 class="twm-s-title">Job Description:</h4>
                         @if (!string.IsNullOrWhiteSpace(Model.Description))
@@ -135,7 +135,7 @@
                             </ul>
                         }
 
-                        <!-- ── STATIC SECTIONS (preserved from template) ─── -->
+                        <!-- â”€â”€ STATIC SECTIONS (preserved from template) â”€â”€â”€ -->
 
                         <h4 class="twm-s-title">Share Profile</h4>
                         <div class="twm-social-tags">
@@ -161,18 +161,18 @@
                                     <h4 class="twm-s-title">Office Photos</h4>
                                     <div class="tw-sidebar-gallery">
                                         <ul>
-                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="images/gallery/pic1.jpg" title="Title 1" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic1.jpg"><img src="images/gallery/thumb/pic1.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
-                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="images/gallery/pic2.jpg" title="Title 2" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic2.jpg"><img src="images/gallery/thumb/pic2.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
-                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="images/gallery/pic3.jpg" title="Title 3" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic3.jpg"><img src="images/gallery/thumb/pic3.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
-                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="images/gallery/pic4.jpg" title="Title 4" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic4.jpg"><img src="images/gallery/thumb/pic4.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
-                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="images/gallery/pic5.jpg" title="Title 5" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic5.jpg"><img src="images/gallery/thumb/pic5.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
-                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="images/gallery/pic6.jpg" title="Title 6" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic6.jpg"><img src="images/gallery/thumb/pic6.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
+                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="~/images/gallery/pic1.jpg" title="Title 1" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic1.jpg"><img src="~/images/gallery/thumb/pic1.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
+                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="~/images/gallery/pic2.jpg" title="Title 2" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic2.jpg"><img src="~/images/gallery/thumb/pic2.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
+                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="~/images/gallery/pic3.jpg" title="Title 3" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic3.jpg"><img src="~/images/gallery/thumb/pic3.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
+                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="~/images/gallery/pic4.jpg" title="Title 4" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic4.jpg"><img src="~/images/gallery/thumb/pic4.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
+                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="~/images/gallery/pic5.jpg" title="Title 5" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic5.jpg"><img src="~/images/gallery/thumb/pic5.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
+                                            <li><div class="tw-service-gallery-thumb"><a class="elem" href="~/images/gallery/pic6.jpg" title="Title 6" data-lcl-author="" data-lcl-thumb="images/gallery/thumb/pic6.jpg"><img src="~/images/gallery/thumb/pic6.jpg" alt=""><i class="fa fa-file-image"></i></a></div></li>
                                         </ul>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-12">
                                     <h4 class="twm-s-title">Video</h4>
-                                    <div class="video-section-first" style="background-image: url(images/video-bg.jpg);">
+                                    <div class="video-section-first" style="background-image: url(/images/video-bg.jpg);">
                                         <a href="https://www.youtube.com/watch?v=c1XNqw2gSbU" class="mfp-video play-now-video">
                                             <i class="icon feather-play"></i>
                                             <span class="ripple"></span>
@@ -184,9 +184,9 @@
 
                     </div>
                 </div>
-                <!-- ── MAIN COLUMN END ──────────────────────────────────────── -->
+                <!-- â”€â”€ MAIN COLUMN END â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
-                <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+                <!-- â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
                 <div class="col-lg-4 col-md-12 rightSidebar">
 
                     <div class="side-bar mb-4">
@@ -287,15 +287,15 @@
                         </div>
                     </div>
 
-                    <div class="twm-advertisment" style="background-image:url(images/add-bg.jpg);">
+                    <div class="twm-advertisment" style="background-image:url(/images/add-bg.jpg);">
                         <div class="overlay"></div>
                         <h4 class="twm-title">Recruiting?</h4>
                         <p>Get Best Matched Jobs On your <br> Email. Add Resume NOW!</p>
-                        <a href="javascript:;" class="site-button white">Read More</a>
+                        <a asp-controller="Jobs" asp-action="Index" class="site-button white">Read More</a>
                     </div>
 
                 </div>
-                <!-- ── SIDEBAR END ──────────────────────────────────────────── -->
+                <!-- â”€â”€ SIDEBAR END â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
             </div>
         </div>
@@ -303,7 +303,7 @@
 </div>
 <!-- OUR BLOG END -->
 
-<!-- Apply Job Popup (static — preserved from template) -->
+<!-- Apply Job Popup (static â€” preserved from template) -->
 <div class="modal fade" id="apply_job_popup" aria-hidden="true" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -353,3 +353,6 @@
         </div>
     </div>
 </div>
+
+
+

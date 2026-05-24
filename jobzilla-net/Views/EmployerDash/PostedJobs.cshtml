@@ -1,4 +1,4 @@
-@model jobzilla_net.Models.EmployerDash.EmployerDashJobsViewModel
+﻿@model jobzilla_net.Models.EmployerDash.EmployerDashJobsViewModel
 @{
     ViewData["Title"] = "Manage Jobs";
     Layout = "~/Views/Shared/_EmployerLayout.cshtml";
@@ -38,7 +38,7 @@
                                 <td>
                                     <div class="twm-bookmark-list">
                                         <div class="twm-mid-content">
-                                            <a href="#" class="twm-job-title">
+                                            <a asp-controller="Jobs" asp-action="Details" class="twm-job-title">
                                                 <h4>@job.Title</h4>
                                                 <p class="twm-bookmark-address">
                                                     <i class="feather-map-pin"></i>@job.Location
@@ -47,7 +47,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><a href="javascript:;" class="site-text-primary">@job.ApplicationsCount Applied</a></td>
+                                <td><a asp-controller="Candidates" asp-action="Index" class="site-text-primary">@job.ApplicationsCount Applied</a></td>
                                 <td>@job.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
                                 <td>
                                     @if(job.Status == "Active")
@@ -130,3 +130,4 @@
 
     </div>
 </div>
+

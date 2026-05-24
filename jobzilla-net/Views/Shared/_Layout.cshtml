@@ -35,7 +35,11 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    <partial name="_SiteHeader" />
+
     @RenderBody()
+
+    <partial name="_SiteFooter" />
 
     <script src="~/js/jquery-3.6.0.min.js"></script>
     <script src="~/js/popper.min.js"></script>

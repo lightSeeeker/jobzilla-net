@@ -1,4 +1,4 @@
-@model jobzilla_net.Models.EmployerDash.EmployerDashApplicationsViewModel
+﻿@model jobzilla_net.Models.EmployerDash.EmployerDashApplicationsViewModel
 @{
     ViewData["Title"] = "Candidates";
     Layout = "~/Views/Shared/_EmployerLayout.cshtml";
@@ -61,7 +61,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="twm-mid-content">
-                                                    <a href="#" class="twm-job-title">
+                                                    <a asp-controller="Jobs" asp-action="Details" class="twm-job-title">
                                                         <h4>@app.CandidateName</h4>
                                                         <p class="twm-candidate-address">
                                                             <i class="feather-map-pin"></i>@app.CandidateLocation
@@ -171,3 +171,4 @@
         </div>
     </div>
 </div>
+

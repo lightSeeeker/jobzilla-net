@@ -1,11 +1,11 @@
-@model jobzilla_net.Models.Blogs.BlogSearchViewModel
+﻿@model jobzilla_net.Models.Blogs.BlogSearchViewModel
 @using jobzilla_net.Application.Blogs.Dtos
 @{
     ViewData["Title"] = "Blog List";
 }
 
 <!-- INNER PAGE BANNER -->
-<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(images/banner/1.jpg);">
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
     <div class="overlay-main site-bg-white opacity-01"></div>
     <div class="container">
         <div class="wt-bnr-inr-entry">
@@ -17,7 +17,7 @@
             <!-- BREADCRUMB ROW -->                            
             <div>
                 <ul class="wt-breadcrumb breadcrumb-style-2">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
                     <li>Blog List</li>
                 </ul>
             </div>
@@ -116,7 +116,7 @@
                                 }
                                 @if (end < totalPages)
                                 {
-                                    <li><a href="javascript:;"><i class="fa fa-ellipsis-h"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
                                     <li><a href="@PageUrl(totalPages)">@totalPages</a></li>
                                 }
                                 <li class="next">
@@ -205,15 +205,15 @@
                         <h4 class="section-head-small mb-4">Tags</h4>
                         
                         <div class="tagcloud">
-                            <a href="javascript:;">General</a>
-                            <a href="javascript:;">Jobs </a>
-                            <a href="javascript:;">Payment</a>                                            
-                            <a href="javascript:;">Application </a>
-                            <a href="javascript:;">Work</a>
-                            <a href="javascript:;">Recruiting</a>
-                            <a href="javascript:;">Employer</a>
-                            <a href="javascript:;">Income</a>
-                            <a href="javascript:;">Tips</a>
+                            <a asp-controller="Jobs" asp-action="Index">General</a>
+                            <a asp-controller="Jobs" asp-action="Index">Jobs </a>
+                            <a asp-controller="Jobs" asp-action="Index">Payment</a>                                            
+                            <a asp-controller="Jobs" asp-action="Index">Application </a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Work</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Recruiting</a>
+                            <a asp-controller="Employers" asp-action="Index">Employer</a>
+                            <a asp-controller="Jobs" asp-action="Index">Income</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Tips</a>
                         </div>
                     </div>
                     
@@ -225,3 +225,7 @@
     </div>
 </div>   
 <!-- OUR BLOG END -->
+
+
+
+

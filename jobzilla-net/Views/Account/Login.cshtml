@@ -1,4 +1,4 @@
-@model jobzilla_net.Models.Account.LoginViewModel
+﻿@model jobzilla_net.Models.Account.LoginViewModel
 @{
     ViewData["Title"] = "Log In";
     // We can use a bare layout without headers/footers if we want, but the template 
@@ -77,7 +77,7 @@
                                                         <div class="form-group mb-3">
                                                             <div class="form-check">
                                                                 <input asp-for="RememberMe" class="form-check-input" id="Password4">
-                                                                <label class="form-check-label rem-forgot" for="Password4">Remember me <a href="javascript:;" class="site-text-primary">Forgot Password</a></label>
+                                                                <label class="form-check-label rem-forgot" for="Password4">Remember me <a asp-controller="Candidates" asp-action="Index" class="site-text-primary">Forgot Password</a></label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -137,3 +137,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+

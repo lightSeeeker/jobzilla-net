@@ -1,0 +1,204 @@
+        <!-- HEADER START -->
+        <header  class="site-header header-style-3 mobile-sider-drawer-menu">
+
+            <div class="sticky-header main-bar-wraper  navbar-expand-lg">
+                <div class="main-bar">  
+                                    
+                    <div class="container-fluid clearfix"> 
+                
+                        <div class="logo-header">
+                            <div class="logo-header-inner logo-header-one">
+                                <a href="@Url.Action("Index", "Home")">
+                                <img src="~/images/logo-dark.png" alt="">
+                                </a>
+                            </div>
+                        </div>  
+                        
+                        <!-- NAV Toggle Button -->
+                        <button id="mobile-side-drawer" data-target=".header-nav" data-toggle="collapse" type="button" class="navbar-toggler collapsed">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar icon-bar-first"></span>
+                            <span class="icon-bar icon-bar-two"></span>
+                            <span class="icon-bar icon-bar-three"></span>
+                        </button> 
+
+                        <!-- MAIN Vav -->
+                        <div class="nav-animation header-nav navbar-collapse collapse d-flex justify-content-center">
+ 
+                            <ul class=" nav navbar-nav">
+                                <li class="has-mega-menu"><a href="javascript:;">Home</a>
+                                    <ul class="mega-menu">
+                                        <li>
+                                            <ul>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-1</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-2</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-3</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-4</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-5</a></li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <ul>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-6</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-7</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-8</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-9</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-10</a></li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <ul>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-11</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-12</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-13</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-14</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-15</a></li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <ul>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-16</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-17</a></li>
+                                                <li><a href="@Url.Action("Index", "Home")">Home-18</a></li>
+                                            </ul>
+                                        </li>
+                                   </ul>                                                                 
+                                </li>
+                                <li class="has-child"><a href="javascript:;">Jobs</a>
+                                    <ul class="sub-menu">
+                                        <li><a asp-controller="Jobs" asp-action="Index">Jobs Grid</a></li>
+                                        <li><a asp-controller="Jobs" asp-action="Index">Jobs Grid with Map</a></li>
+                                        <li><a asp-controller="Jobs" asp-action="Index">Jobs List</a></li>
+                                        <li class="has-child"><a href="javascript:;">Job Detail</a>
+                                            <ul class="sub-menu">
+                                                <li><a asp-controller="Jobs" asp-action="Details">Detail 1</a>
+                                                <li><a asp-controller="Jobs" asp-action="Details">Detail 2 </a>
+                                            </ul> 
+                                        </li>
+                                        <li><a asp-controller="Jobs" asp-action="Details">Apply Jobs</a></li>
+                                    </ul>                                                                 
+                                </li>
+                                <li class="has-child"><a href="javascript:;">Employers</a>
+                                    <ul class="sub-menu">
+                                        <li><a asp-controller="Employers" asp-action="Index">Employers Grid</a></li>
+                                        <li><a asp-controller="Employers" asp-action="Index">Employers List</a></li>
+                                        <li class="has-child"><a href="javascript:;">Employers Detail</a>
+                                            <ul class="sub-menu">
+                                                <li><a asp-controller="Employers" asp-action="Details">Detail 1</a>
+                                                <li><a asp-controller="Employers" asp-action="Details">Detail 2</a>
+                                            </ul> 
+                                        </li>
+                                        <li><a asp-controller="EmployerDash" asp-action="Profile">Profile</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="Applications">Resume</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="PostedJobs">Manage Jobs</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="PostedJobs">Post A Jobs</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="Index">Transaction</a></li>
+                                        <li><a asp-controller="Candidates" asp-action="Index">Browse Candidates</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="Profile">Change Password</a></li>
+                                        <li><a asp-controller="Account" asp-action="Register">Register Fresher</a></li>
+                                        <li><a asp-controller="Account" asp-action="Register">Register Professionals</a></li>
+                                    </ul>                                                                 
+                                </li>
+                                <li class="has-child"><a href="javascript:;">Pages</a>
+                                    <ul class="sub-menu">
+                                        <li><a asp-controller="Home" asp-action="Index">About Us</a></li> 
+                                        <li><a asp-controller="Home" asp-action="Index">Pricing</a></li> 
+                                        <li><a asp-controller="Home" asp-action="Index">Error-404</a></li>
+                                        <li><a asp-controller="Home" asp-action="Index">FAQ's</a></li>
+                                        <li><a asp-controller="Home" asp-action="Index">Contact Us</a></li>
+                                        <li><a asp-controller="Home" asp-action="Index">Under Maintenance</a></li>
+                                        <li><a asp-controller="Home" asp-action="Index">Coming soon</a></li>
+                                        <li><a asp-controller="Account" asp-action="Login">Login</a></li>
+                                        <li><a asp-controller="Home" asp-action="Index">After Login</a></li>
+                                        <li><a asp-controller="Home" asp-action="Index">Icons</a></li> 
+                                    </ul>                                                                
+                                </li>
+                                <li class="has-child"><a href="javascript:;">Candidates</a>
+                                    <ul class="sub-menu">
+                                        <li><a asp-controller="Candidates" asp-action="Index">Candidates Grid</a></li>
+                                        <li><a asp-controller="Candidates" asp-action="Index">Candidates List</a></li>
+                                        <li class="has-child"><a href="javascript:;">Candidate Detail</a>
+                                            <ul class="sub-menu">
+                                                <li><a asp-controller="Candidates" asp-action="Details">Detail 1</a>
+                                                <li><a asp-controller="Candidates" asp-action="Details">Detail 2</a>
+                                            </ul> 
+                                        </li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Index">Dashboard</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Profile">My Pfofile</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="AppliedJobs">Applied Jobs</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Resumes">My Resume</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="SavedJobs">Saved Jobs</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Resumes">CV Manager</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Index">Job Alerts</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Profile">Change Passeord</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Index">Chat</a></li>
+                                    </ul>                                                                
+                                </li>
+                                <li class="has-child"><a href="javascript:;">Blog</a>
+                                    <ul class="sub-menu">
+                                        <li><a asp-controller="Blogs" asp-action="Index">Blog</a></li>                                        
+                                        <li><a asp-controller="Blogs" asp-action="Index">Blog Grid</a></li>
+                                        <li><a asp-controller="Blogs" asp-action="Index">Blog Grid-2</a></li>                                        
+                                        <li><a asp-controller="Blogs" asp-action="Index">Blog List</a></li>
+                                        <li><a asp-controller="Blogs" asp-action="Details">Blog Detail</a></li>                                        
+                                    </ul>                                
+                                </li>
+                            </ul>
+
+                        </div>
+                        
+                        <!-- Header Right Section-->
+                        <div class="extra-nav header-2-nav">
+                            <div class="extra-cell">
+                                <div class="header-search">
+                                    <a href="#search" class="header-search-icon"><i class="feather-search"></i></a>
+                                </div>                                
+                            </div>
+                            <div class="extra-cell">
+                                <div class="header-nav-btn-section">
+                                    <div class="twm-nav-btn-left">
+                                        <a class="twm-nav-sign-up" data-bs-toggle="modal" href="#sign_up_popup" role="button">
+                                            <i class="feather-log-in"></i> Sign Up
+                                        </a>
+                                    </div>
+                                    <div class="twm-nav-btn-right">
+                                        <a asp-controller="EmployerDash" asp-action="PostedJobs" class="twm-nav-post-a-job">
+                                            <i class="feather-briefcase"></i> Post a job
+                                        </a>
+                                    </div>
+                                </div>
+                            </div> 
+                                
+                        </div>                            
+                    
+                                                    
+                        
+                    </div>    
+                
+                
+                </div>
+
+                <!-- SITE Search -->
+                <div id="search"> 
+                    <span class="close"></span>
+                    <form role="search" id="searchform" asp-controller="Jobs" asp-action="Index" method="get" class="radius-xl">
+                        <input class="form-control" value="" name="q" type="search" placeholder="Type to search"/>
+                        <span class="input-group-append">
+                            <button type="button" class="search-btn">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        </span>
+                    </form>
+                </div> 
+            </div>
+
+
+
+            
+             
+
+
+            
+        </header>
+        <!-- HEADER END -->
+

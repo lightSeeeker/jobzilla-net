@@ -18,9 +18,9 @@
             </li>
 
             <li>
-                <a href="javascript:;"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
+                <a asp-controller="EmployerDash" asp-action="PostedJobs"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
                 <ul class="sub-menu">
-                    <li> <a href="#"><span class="admin-nav-text">Post a New Jobs</span></a></li>
+                    <li> <a asp-controller="EmployerDash" asp-action="PostedJobs"><span class="admin-nav-text">Post a New Jobs</span></a></li>
                     <li class="@(currentAction == "PostedJobs" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostedJobs"><span class="admin-nav-text">Manage Jobs</span></a></li>
                 </ul>
             </li>

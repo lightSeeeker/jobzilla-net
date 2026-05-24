@@ -1,4 +1,4 @@
-@model jobzilla_net.Models.Account.RegisterViewModel
+﻿@model jobzilla_net.Models.Account.RegisterViewModel
 @{
     ViewData["Title"] = "Sign Up";
 }
@@ -95,7 +95,7 @@
                                                     <div class="form-group mb-3">
                                                         <div class="form-check">
                                                             <input asp-for="AgreeToTerms" class="form-check-input" id="agree1">
-                                                            <label class="form-check-label" for="agree1">I agree to the <a href="javascript:;">Terms and conditions</a></label>
+                                                            <label class="form-check-label" for="agree1">I agree to the <a asp-controller="Home" asp-action="Index">Terms and conditions</a></label>
                                                             <span asp-validation-for="AgreeToTerms" class="text-danger d-block"></span>
                                                         </div>
                                                     </div>
@@ -146,3 +146,4 @@
         });
     </script>
 }
+

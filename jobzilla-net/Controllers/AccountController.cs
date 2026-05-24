@@ -29,7 +29,12 @@ public class AccountController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         if (_signInManager.IsSignedIn(User))
+        {
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+                
             return RedirectToDashboard();
+        }
 
         return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
@@ -46,7 +51,7 @@ public class AccountController : Controller
             model.Email,
             model.Password,
             model.RememberMe,
-            lockoutOnFailure: false);
+            lockoutOnFailure: true);
 
         if (result.Succeeded)
         {

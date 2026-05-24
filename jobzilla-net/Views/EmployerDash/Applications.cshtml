@@ -1,0 +1,173 @@
+@model jobzilla_net.Models.EmployerDash.EmployerDashApplicationsViewModel
+@{
+    ViewData["Title"] = "Candidates";
+    Layout = "~/Views/Shared/_EmployerLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Candidates</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="EmployerDash" asp-action="Index">Dashboard</a>
+        <span>Candidates</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="twm-pro-view-chart-wrap">
+    <div class="col-lg-12 col-md-12 mb-4">
+        <div class="panel panel-default site-bg-white m-t30">
+            <div class="panel-heading wt-panel-heading p-a20">
+                <h4 class="panel-tittle m-a0"><i class="far fa-list-alt"></i>All Candidates</h4>
+            </div>
+            <div class="panel-body wt-panel-body">
+                <div class="twm-D_table p-a20 table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Applied for</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Applications.Items.Any())
+                            {
+                                foreach (var app in Model.Applications.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="twm-DT-candidates-list">
+                                                <div class="twm-media">
+                                                    <div class="twm-media-pic">
+                                                       <img src="~/images/candidates/pic1.jpg" alt="#">
+                                                    </div>
+                                                </div>
+                                                <div class="twm-mid-content">
+                                                    <a href="#" class="twm-job-title">
+                                                        <h4>@app.CandidateName</h4>
+                                                        <p class="twm-candidate-address">
+                                                            <i class="feather-map-pin"></i>@app.CandidateLocation
+                                                        </p>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@app.JobTitle</td>
+                                        <td>@app.AppliedAtUtc.ToString("dd/MM/yyyy 'at' hh:mm tt")</td>
+                                        <td>
+                                            <div class="twm-jobs-category">
+                                                @if(app.Status == "Pending")
+                                                {
+                                                    <span class="twm-bg-golden">@app.Status</span>
+                                                }
+                                                else if(app.Status == "Approved")
+                                                {
+                                                    <span class="twm-bg-green">@app.Status</span>
+                                                }
+                                                else if(app.Status == "Rejected")
+                                                {
+                                                    <span class="twm-bg-red">@app.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="twm-bg-sky">@app.Status</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <form asp-action="UpdateApplicationStatus" method="post" class="d-inline">
+                                                <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                                                <input type="hidden" name="newStatus" value="Approved" />
+                                                <button type="submit" class="btn btn-success btn-sm" title="Approve">
+                                                    <span class="fa fa-check"></span>
+                                                </button>
+                                            </form>
+                                            
+                                            <form asp-action="UpdateApplicationStatus" method="post" class="d-inline ml-1">
+                                                <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                                                <input type="hidden" name="newStatus" value="Rejected" />
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Reject">
+                                                    <span class="fa fa-times"></span>
+                                                </button>
+                                            </form>
+
+                                            <div class="twm-table-controls d-inline-block ml-2">
+                                                <ul class="twm-DT-controls-icon list-unstyled mb-0">
+                                                    <li>
+                                                        <button title="View profile" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                            <span class="fa fa-eye"></span>
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center">No applications received yet.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.Applications.TotalPages > 1)
+                {
+                    <div class="pagination-outer text-right p-a20">
+                        <div class="pagination-style1">
+                            <ul class="clearfix">
+                                @if (Model.Applications.Page > 1)
+                                {
+                                    <li class="prev">
+                                        <a asp-action="Applications" asp-route-page="@(Model.Applications.Page - 1)">
+                                            <span> <i class="fa fa-angle-left"></i> </span>
+                                        </a>
+                                    </li>
+                                }
+                                
+                                @for (int i = 1; i <= Model.Applications.TotalPages; i++)
+                                {
+                                    <li class="@(i == Model.Applications.Page ? "active" : "")">
+                                        <a asp-action="Applications" asp-route-page="@i">@i</a>
+                                    </li>
+                                }
+
+                                @if (Model.Applications.Page < Model.Applications.TotalPages)
+                                {
+                                    <li class="next">
+                                        <a asp-action="Applications" asp-route-page="@(Model.Applications.Page + 1)">
+                                            <span> <i class="fa fa-angle-right"></i> </span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

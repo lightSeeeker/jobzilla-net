@@ -1,0 +1,155 @@
+@model jobzilla_net.Models.EmployerDash.EmployerDashOverviewViewModel
+@{
+    ViewData["Title"] = "Employer Dashboard";
+    Layout = "~/Views/Shared/_EmployerLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Hello, @User.Identity?.Name</h2>
+    <div class="breadcrumbs"><a asp-controller="Home" asp-action="Index">Home</a><span>Dashboard</span></div>
+</div>
+
+<div class="twm-dash-b-blocks mb-5">
+    <div class="row">
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-1 dashboard-card ">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="far fa-address-book"></i></div>
+                        <div class="wt-card-right wt-total-active-listing counter">@Model.Overview.PostedJobsCount</div>
+                        <div class="wt-card-bottom ">
+                            <h4 class="m-b0">Posted Jobs</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-2 dashboard-card ">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="far fa-file-alt"></i></div>
+                        <div class="wt-card-right  wt-total-listing-view counter">@Model.Overview.TotalApplicationsCount</div>
+                        <div class="wt-card-bottom">
+                            <h4 class="m-b0">Total Applications</h4> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-3 dashboard-card ">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="far fa-envelope"></i></div>
+                        <div class="wt-card-right wt-total-listing-review counter">@Model.Overview.MessagesCount</div>
+                        <div class="wt-card-bottom">
+                            <h4 class="m-b0">Messages</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-4 dashboard-card ">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="far fa-bell"></i></div>
+                        <div class="wt-card-right wt-total-listing-bookmarked counter">@Model.Overview.ShortlistedCount</div>
+                        <div class="wt-card-bottom">
+                            <h4 class="m-b0">Notifications</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+</div>
+
+<div class="twm-pro-view-chart-wrap">
+    <div class="row">
+        <div class="col-xl-6 col-lg-12 col-md-12 mb-4">
+            <div class="panel panel-default site-bg-white">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h4 class="panel-tittle m-a0"><i class="far fa-chart-bar"></i>Your Profile Views</h4>
+                </div>
+                <div class="panel-body wt-panel-body twm-pro-view-chart">
+                    <!-- Static chart for now as per template -->
+                    <canvas id="profileViewChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6 col-lg-12 col-md-12 mb-4">
+            <div class="panel panel-default">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h4 class="panel-tittle m-a0">Inbox</h4>
+                </div>
+                <div class="panel-body wt-panel-body bg-white">
+                    <div class="dashboard-messages-box-scroll scrollbar-macosx">
+                        <div class="dashboard-messages-box">
+                            <div class="dashboard-message-area">
+                                <p>No new messages.</p>
+                            </div>
+                        </div>                    
+                    </div>                        
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 mb-4">
+            <div class="panel panel-default">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h4 class="panel-tittle m-a0">Recent Applicants</h4>
+                </div>
+                <div class="panel-body wt-panel-body bg-white">
+                    <div class="twm-dashboard-candidates-wrap">
+                        <div class="row">
+                            @if(Model.Overview.RecentApplications.Any())
+                            {
+                                foreach(var applicant in Model.Overview.RecentApplications)
+                                {
+                                    <div class="col-xl-6 col-lg-12 col-md-12">
+                                        <div class="twm-dash-candidates-list">
+                                            <div class="twm-media">
+                                                <div class="twm-media-pic">
+                                                    <img src="~/images/candidates/pic1.jpg" alt="#">
+                                                </div>
+                                            </div>
+                                            <div class="twm-mid-content">
+                                                <a href="#" class="twm-job-title">
+                                                    <h4>@applicant.CandidateName</h4>
+                                                </a>
+                                                <p>@applicant.JobTitle</p>
+                                                
+                                                <div class="twm-fot-content">
+                                                    <div class="twm-left-info">
+                                                        <p class="twm-candidate-address"><i class="far fa-clock"></i>@applicant.AppliedAtUtc.ToString("MMM dd, yyyy")</p>
+                                                        <div class="twm-jobs-vacancies">@applicant.Status</div>
+                                                    </div>
+                                                    <div class="twm-right-btn">
+                                                        <ul class="twm-controls-icon list-unstyled">
+                                                            <li>
+                                                                <button title="View profile" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                    <span class="fa fa-eye"></span>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12"><p class="text-muted">No recent applicants.</p></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,4 +11,9 @@ public class BlogPost : AuditableEntity
     public string? FeaturedImagePath { get; set; }
     public bool IsPublished { get; set; }
     public DateTime? PublishedAtUtc { get; set; }
+    
+    public string? AuthorName { get; set; }
+    
+    public int? CategoryId { get; set; }
+    public BlogCategory? Category { get; set; }
 }

@@ -1,0 +1,148 @@
+@model jobzilla_net.Models.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+
+    <!-- Register Section Start -->
+    <div class="section-full site-bg-white">
+        
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-8 col-lg-6 col-md-5 twm-log-reg-media-wrap">
+                    <div class="twm-log-reg-media">
+                        <div class="twm-l-media">
+                            <img src="~/images/login-bg.png" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-7">
+                    <div class="twm-log-reg-form-wrap">
+                        <div class="twm-log-reg-logo-head">
+                            <a asp-controller="Home" asp-action="Index">
+                                <img src="~/images/logo-dark.png" alt="" class="logo">
+                            </a> 
+                        </div>
+
+                        <div class="twm-log-reg-inner">
+                            <div class="twm-log-reg-head">
+                                <div class="twm-log-reg-logo">
+                                    <span class="log-reg-form-title">Sign Up</span>
+                                </div>
+                            </div>
+                            <div class="twm-tabs-style-2">
+                                
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <!--Signup Candidate-->  
+                                    <li class="nav-item">
+                                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sign-candidate" type="button" onclick="document.getElementById('UserType').value='Candidate'"><i class="fas fa-user-tie"></i>Candidate</button>
+                                    </li>
+                                    <!--Signup Employer-->
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#sign-candidate" type="button" onclick="document.getElementById('UserType').value='Employer'"><i class="fas fa-building"></i>Employer</button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content" id="myTabContent">
+                                    <!--Signup Content-->  
+                                    <div class="tab-pane fade show active" id="sign-candidate">
+                                        
+                                        <form asp-controller="Account" asp-action="Register" method="post">
+                                            <input type="hidden" asp-for="UserType" id="UserType" value="@(string.IsNullOrEmpty(Model.UserType) ? "Candidate" : Model.UserType)" />
+
+                                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 font-weight-bold"></div>
+
+                                            <div class="row">
+
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <input asp-for="UserName" class="form-control" placeholder="Username*">
+                                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <input asp-for="Email" class="form-control" placeholder="Email*">
+                                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone">
+                                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <input asp-for="Password" class="form-control" placeholder="Password*">
+                                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password*">
+                                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <div class="form-check">
+                                                            <input asp-for="AgreeToTerms" class="form-check-input" id="agree1">
+                                                            <label class="form-check-label" for="agree1">I agree to the <a href="javascript:;">Terms and conditions</a></label>
+                                                            <span asp-validation-for="AgreeToTerms" class="text-danger d-block"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <button type="submit" class="site-button">Sign Up</button>
+                                                    </div>
+                                                    <div class="mt-3 mb-3">Already registered? 
+                                                        <a asp-controller="Account" asp-action="Login" class="twm-backto-login">Log in here</a>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                    
+                                </div>
+                            </div> 
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <!-- Register Section End -->
+
+</div>
+<!-- CONTENT END -->
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Ensure UI tab matches UserType model state on validation failure
+        document.addEventListener('DOMContentLoaded', function() {
+            var userType = document.getElementById('UserType').value;
+            if (userType === 'Employer') {
+                var tabs = document.querySelectorAll('#myTab .nav-link');
+                if(tabs.length > 1) {
+                    var employerTab = new bootstrap.Tab(tabs[1]);
+                    employerTab.show();
+                }
+            }
+        });
+    </script>
+}

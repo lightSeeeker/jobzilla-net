@@ -1,0 +1,132 @@
+@model jobzilla_net.Models.EmployerDash.EmployerDashJobsViewModel
+@{
+    ViewData["Title"] = "Manage Jobs";
+    Layout = "~/Views/Shared/_EmployerLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Manage Jobs</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="EmployerDash" asp-action="Index">Dashboard</a>
+        <span>My Job Listing</span>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-suitcase"></i> Job Details</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20 m-b30 ">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Applications</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PostedJobs.Items.Any())
+                    {
+                        foreach (var job in Model.PostedJobs.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="twm-bookmark-list">
+                                        <div class="twm-mid-content">
+                                            <a href="#" class="twm-job-title">
+                                                <h4>@job.Title</h4>
+                                                <p class="twm-bookmark-address">
+                                                    <i class="feather-map-pin"></i>@job.Location
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><a href="javascript:;" class="site-text-primary">@job.ApplicationsCount Applied</a></td>
+                                <td>@job.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if(job.Status == "Active")
+                                    {
+                                        <span class="text-clr-green2">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-clr-red">Closed</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="twm-table-controls">
+                                        <ul class="twm-DT-controls-icon list-unstyled">
+                                            <li>
+                                                <button title="View profile" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    <span class="fa fa-eye"></span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button title="Edit" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    <span class="far fa-edit"></span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button title="Delete" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No jobs posted yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        @if (Model.PostedJobs.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.PostedJobs.Page > 1)
+                        {
+                            <li class="prev">
+                                <a asp-action="PostedJobs" asp-route-page="@(Model.PostedJobs.Page - 1)">
+                                    <span> <i class="fa fa-angle-left"></i> </span>
+                                </a>
+                            </li>
+                        }
+                        
+                        @for (int i = 1; i <= Model.PostedJobs.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.PostedJobs.Page ? "active" : "")">
+                                <a asp-action="PostedJobs" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.PostedJobs.Page < Model.PostedJobs.TotalPages)
+                        {
+                            <li class="next">
+                                <a asp-action="PostedJobs" asp-route-page="@(Model.PostedJobs.Page + 1)">
+                                    <span> <i class="fa fa-angle-right"></i> </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

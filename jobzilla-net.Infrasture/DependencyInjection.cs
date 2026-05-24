@@ -1,5 +1,7 @@
+using jobzilla_net.Application.Blogs;
 using jobzilla_net.Application.Candidates;
 using jobzilla_net.Application.Common.Interfaces;
+using jobzilla_net.Application.Employers;
 using jobzilla_net.Application.Jobs;
 using jobzilla_net.Infrasture.Identity;
 using jobzilla_net.Infrasture.Persistence;
@@ -22,11 +24,19 @@ public static class DependencyInjection
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 6;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireLowercase = false;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+
+                // Account lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings
+                options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -39,6 +49,10 @@ public static class DependencyInjection
         // ── Application services ──────────────────────────────────────────────
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<ICandidateService, CandidateService>();
+        services.AddScoped<IEmployerService, EmployerService>();
+        services.AddScoped<IBlogService, BlogService>();
+        services.AddScoped<ICandidateDashboardService, CandidateDashboardService>();
+        services.AddScoped<IEmployerDashboardService, EmployerDashboardService>();
 
         return services;
     }

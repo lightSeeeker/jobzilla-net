@@ -1,0 +1,40 @@
+@model jobzilla_net.Models.CandidateDash.CandidateDashOverviewViewModel
+@{
+    var activePage = ViewData["ActivePage"]?.ToString() ?? "";
+}
+
+<div class="col-xl-3 col-lg-4 col-md-12 rightSidebar m-b30">
+
+    <div class="side-bar-st-1">
+        
+        <div class="twm-candidate-profile-pic">
+            <img src="@(string.IsNullOrEmpty(Model.Overview.RecentApplications.FirstOrDefault()?.CompanyLogoPath) ? "/images/user-avtar/pic4.jpg" : Model.Overview.RecentApplications.FirstOrDefault()?.CompanyLogoPath)" alt="">
+            <div class="upload-btn-wrapper">
+                <div id="upload-image-grid"></div>
+                <button class="site-button button-sm">Upload Photo</button>
+                <input type="file" name="myfile" id="file-uploader" accept=".jpg, .jpeg, .png">
+            </div>
+        </div>
+        <div class="twm-mid-content text-center">
+            <a href="javascript:;" class="twm-job-title">
+                <h4>Candidate</h4>
+            </a>
+            <p>IT Professional</p>
+        </div>
+       
+        <div class="twm-nav-list-1">
+            <ul>
+                <li class="@(activePage == "Dashboard" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="@(activePage == "Profile" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-user"></i> My Profile</a></li>
+                <li class="@(activePage == "AppliedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="AppliedJobs"><i class="fa fa-suitcase"></i> Applied Jobs</a></li>
+                <li class="@(activePage == "Resumes" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-receipt"></i> My Resume (CV Manager)</a></li>
+                <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
+                <li><a href="javascript:;"><i class="fa fa-bell"></i> Job Alerts</a></li>
+                <li><a href="javascript:;"><i class="fa fa-fingerprint"></i> Change Password</a></li>
+                <li><a href="javascript:;"><i class="fa fa-comments"></i> Chat</a></li>
+            </ul>
+        </div>
+        
+    </div>
+
+</div>

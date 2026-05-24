@@ -7,6 +7,7 @@ public class EmployerProfile : AuditableEntity
     public string UserId { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;
     public string? Industry { get; set; }
+    public string? CompanySize { get; set; }
     public string? WebsiteUrl { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Email { get; set; }

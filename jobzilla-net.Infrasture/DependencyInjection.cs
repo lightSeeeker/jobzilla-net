@@ -41,6 +41,20 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+        // Explicitly configure the authentication cookie paths.
+        // This prevents redirect loops and ensures unauthorized access sends
+        // users to the correct login page rather than throwing a 404.
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath        = "/Account/Login";
+            options.LogoutPath       = "/Account/Logout";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+
+            // Prevent the cookie from expiring during an active session
+            options.SlidingExpiration = true;
+            options.ExpireTimeSpan    = TimeSpan.FromHours(8);
+        });
+
         // Bind IApplicationDbContext to the already-registered ApplicationDbContext
         // — avoids a second DbContext lifetime and keeps a single scoped instance.
         services.AddScoped<IApplicationDbContext>(sp =>

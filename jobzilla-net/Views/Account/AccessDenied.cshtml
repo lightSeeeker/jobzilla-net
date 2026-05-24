@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+
+    <!-- Access Denied Section Start -->
+    <div class="section-full site-bg-white">
+        
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-8 col-lg-6 col-md-5 twm-log-reg-media-wrap">
+                    <div class="twm-log-reg-media">
+                        <div class="twm-l-media">
+                            <img src="~/images/login-bg.png" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-7">
+                    <div class="twm-log-reg-form-wrap">
+                        <div class="twm-log-reg-logo-head">
+                            <a asp-controller="Home" asp-action="Index">
+                                <img src="~/images/logo-dark.png" alt="" class="logo">
+                            </a>
+                        </div>
+
+                        <div class="twm-log-reg-inner">
+                            <div class="twm-log-reg-head">
+                                <div class="twm-log-reg-logo">
+                                    <span class="log-reg-form-title">Access Denied</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 text-center">
+                                <div class="mb-4">
+                                    <i class="fas fa-lock fa-4x text-danger"></i>
+                                </div>
+                                <h4 class="mb-3">You don't have permission to access this page.</h4>
+                                <p class="text-muted mb-4">
+                                    This area requires a different account type or additional permissions.
+                                    Please make sure you are logged in with the correct account.
+                                </p>
+                                <div class="d-flex flex-column gap-2">
+                                    <a asp-controller="Home" asp-action="Index" class="site-button">
+                                        <i class="fas fa-home me-2"></i>Back to Home
+                                    </a>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary w-100">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Log out and switch account
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+    <!-- Access Denied Section End -->
+
+</div>
+<!-- CONTENT END -->

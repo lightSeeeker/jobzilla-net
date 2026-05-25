@@ -1,4 +1,4 @@
-﻿@model jobzilla_net.Models.Blogs.BlogSearchViewModel
+@model jobzilla_net.Models.Blogs.BlogSearchViewModel
 @using jobzilla_net.Application.Blogs.Dtos
 @{
     ViewData["Title"] = "Blog List";
@@ -33,6 +33,13 @@
         <div class="row">
             <div class="col-lg-8 col-md-12">
                 
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="mb-4 text-right">
+                        <a asp-action="Manage" class="site-button"><i class="fa fa-cog"></i> Manage My Blogs</a>
+                    </div>
+                }
+
                 @if (!Model.Result.Items.Any())
                 {
                     <div class="blog-post twm-blog-post-1-outer twm-blog-list-style text-center p-5">

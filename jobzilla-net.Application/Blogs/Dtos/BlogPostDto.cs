@@ -16,6 +16,7 @@ public sealed class BlogPostDto
     public string? AuthorName { get; init; }
     
     // Category info
-    public int? CategoryId { get; init; }
-    public string? CategoryName { get; init; }
+    public int? CategoryId { get; set; }
+    public string? CategoryName { get; set; }
+    public bool IsPublished { get; set; }
 }

@@ -31,4 +31,10 @@ public interface IBlogService
     Task<IReadOnlyList<BlogPostDto>> GetLatestPostsAsync(
         int count = 3,
         CancellationToken cancellationToken = default);
+
+    Task<PagedResult<BlogPostDto>> GetMyBlogsAsync(string userId, int page, int pageSize);
+    Task<BlogCreateUpdateDto?> GetBlogForEditAsync(string userId, int blogId);
+    Task<int> CreateBlogAsync(string userId, string authorName, BlogCreateUpdateDto dto);
+    Task<bool> UpdateBlogAsync(string userId, int blogId, BlogCreateUpdateDto dto);
+    Task<bool> DeleteBlogAsync(string userId, int blogId);
 }

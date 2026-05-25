@@ -155,6 +155,35 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("jobzilla_net.Core.Entities.BlogCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("BlogCategories");
+                });
+
             modelBuilder.Entity("jobzilla_net.Core.Entities.BlogPost", b =>
                 {
                     b.Property<int>("Id")
@@ -162,6 +191,15 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AuthorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -197,6 +235,8 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("Slug")
                         .IsUnique();
@@ -398,6 +438,9 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanySize")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAtUtc")
@@ -1113,6 +1156,15 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("jobzilla_net.Core.Entities.BlogPost", b =>
+                {
+                    b.HasOne("jobzilla_net.Core.Entities.BlogCategory", "Category")
+                        .WithMany("Posts")
+                        .HasForeignKey("CategoryId");
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateResume", b =>
                 {
                     b.HasOne("jobzilla_net.Core.Entities.CandidateProfile", "CandidateProfile")
@@ -1290,6 +1342,11 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Navigation("CandidateProfile");
 
                     b.Navigation("JobPost");
+                });
+
+            modelBuilder.Entity("jobzilla_net.Core.Entities.BlogCategory", b =>
+                {
+                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateProfile", b =>

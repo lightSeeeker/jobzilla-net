@@ -1,0 +1,238 @@
+@model jobzilla_net.Models.Blogs.BlogSearchViewModel
+@using jobzilla_net.Application.Blogs.Dtos
+@{
+    ViewData["Title"] = "Blog List";
+}
+
+<!-- INNER PAGE BANNER -->
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+    <div class="overlay-main site-bg-white opacity-01"></div>
+    <div class="container">
+        <div class="wt-bnr-inr-entry">
+            <div class="banner-title-outer">
+                <div class="banner-title-name">
+                    <h2 class="wt-title">Blog List</h2>
+                </div>
+            </div>
+            <!-- BREADCRUMB ROW -->                            
+            <div>
+                <ul class="wt-breadcrumb breadcrumb-style-2">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li>Blog List</li>
+                </ul>
+            </div>
+            <!-- BREADCRUMB ROW END -->                        
+        </div>
+    </div>
+</div>
+<!-- INNER PAGE BANNER END -->
+
+<!-- OUR BLOG START -->
+<div class="section-full p-t120  p-b90 site-bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-12">
+                
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="mb-4 text-right">
+                        <a asp-action="Manage" class="site-button"><i class="fa fa-cog"></i> Manage My Blogs</a>
+                    </div>
+                }
+
+                @if (!Model.Result.Items.Any())
+                {
+                    <div class="blog-post twm-blog-post-1-outer twm-blog-list-style text-center p-5">
+                        <p>No blog posts found.</p>
+                    </div>
+                }
+
+                @foreach (BlogPostDto post in Model.Result.Items)
+                {
+                    <!--Block-->
+                    <div class="blog-post twm-blog-post-1-outer twm-blog-list-style">
+                        <div class="wt-post-media">
+                            <a asp-controller="Blogs" asp-action="Details" asp-route-id="@post.Slug">
+                                @if (!string.IsNullOrEmpty(post.FeaturedImagePath))
+                                {
+                                    <img src="@post.FeaturedImagePath" alt="@post.Title">
+                                }
+                                else
+                                {
+                                    <img src="~/images/blog/latest/bg1.jpg" alt="@post.Title">
+                                }
+                            </a>
+                        </div>                                    
+                        <div class="wt-post-info">
+                            <div class="wt-post-meta ">
+                                <ul>
+                                    <li class="post-date">@(post.PublishedAtUtc?.ToString("MMMM dd, yyyy") ?? "")</li>
+                                    @if (!string.IsNullOrEmpty(post.AuthorName))
+                                    {
+                                        <li class="post-author">By <a href="javascript:;">@post.AuthorName</a></li>
+                                    }
+                                    @if (!string.IsNullOrEmpty(post.CategoryName))
+                                    {
+                                        <li class="post-category"><a asp-controller="Blogs" asp-action="Index" asp-route-categoryId="@post.CategoryId" class="site-text-primary">@post.CategoryName</a></li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="wt-post-title ">
+                                <h4 class="post-title">
+                                    <a asp-controller="Blogs" asp-action="Details" asp-route-id="@post.Slug">@post.Title</a>
+                                </h4>
+                            </div>
+                            <div class="wt-post-text ">
+                                <p>
+                                    @post.Excerpt
+                                </p>
+                            </div>
+                            <div class="wt-post-readmore ">
+                                <a asp-controller="Blogs" asp-action="Details" asp-route-id="@post.Slug" class="site-button-link site-text-primary">Read More</a>
+                            </div>                                        
+                        </div>                                
+                    </div>
+                }
+
+                @if (Model.Result.TotalPages > 1)
+                {
+                    string PageUrl(int p) =>
+                        $"?page={p}&pageSize={Model.PageSize}" +
+                        (string.IsNullOrEmpty(Model.Keyword) ? "" : $"&keyword={Uri.EscapeDataString(Model.Keyword)}") +
+                        (!Model.CategoryId.HasValue          ? "" : $"&categoryId={Model.CategoryId.Value}");
+
+                    int totalPages = Model.Result.TotalPages;
+                    int currPage   = Model.Result.Page;
+                    int start      = Math.Max(1, currPage - 2);
+                    int end        = Math.Min(totalPages, start + 4);
+                    start          = Math.Max(1, end - 4);
+
+                    <div class="pagination-outer">
+                        <div class="pagination-style1">
+                            <ul class="clearfix">
+                                <li class="prev">
+                                    <a href="@(Model.Result.HasPreviousPage ? PageUrl(currPage - 1) : "javascript:;")">
+                                        <span> <i class="fa fa-angle-left"></i> </span>
+                                    </a>
+                                </li>
+                                @for (int p = start; p <= end; p++)
+                                {
+                                    <li class="@(p == currPage ? "active" : "")">
+                                        <a href="@PageUrl(p)">@p</a>
+                                    </li>
+                                }
+                                @if (end < totalPages)
+                                {
+                                    <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
+                                    <li><a href="@PageUrl(totalPages)">@totalPages</a></li>
+                                }
+                                <li class="next">
+                                    <a href="@(Model.Result.HasNextPage ? PageUrl(currPage + 1) : "javascript:;")">
+                                        <span> <i class="fa fa-angle-right"></i> </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+            <div class="col-lg-4 col-md-12 rightSidebar">
+
+                <div class="side-bar">
+                    <div class="widget search-bx">
+                        <form role="search" method="get" action="/Blogs">
+                            <div class="input-group">
+                                <input type="text" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Search">
+                                <button class="btn" type="submit" id="button-addon2"><i class="feather-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+
+                    @if (Model.Categories.Any())
+                    {
+                        <div class="widget all_services_list">
+                            <h4 class="section-head-small mb-4">Categories</h4> 
+                            <div class="all_services m-b30">
+                                <ul>
+                                    <li>
+                                        <a asp-controller="Blogs" asp-action="Index" class="@(!Model.CategoryId.HasValue ? "font-weight-bold" : "")">All Categories</a>
+                                    </li>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <li>
+                                            <a asp-controller="Blogs" asp-action="Index" asp-route-categoryId="@category.Id" class="@(Model.CategoryId == category.Id ? "site-text-primary" : "")">
+                                                @category.Name
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.LatestPosts.Any())
+                    {
+                        <div class="widget recent-posts-entry">
+                            <h4 class="section-head-small mb-4">Recent Article</h4>
+                            <div class="section-content">
+                                <div class="widget-post-bx">
+
+                                    @foreach (var recentPost in Model.LatestPosts)
+                                    {
+                                        <div class="widget-post clearfix">
+                                            <div class="wt-post-media">
+                                                @if (!string.IsNullOrEmpty(recentPost.FeaturedImagePath))
+                                                {
+                                                    <img src="@recentPost.FeaturedImagePath" alt="@recentPost.Title">
+                                                }
+                                                else
+                                                {
+                                                    <img src="~/images/blog/recent-blog/pic1.jpg" alt="@recentPost.Title">
+                                                }
+                                            </div>
+                                            <div class="wt-post-info">
+                                                <div class="wt-post-header">
+                                                    <span class="post-date">@(recentPost.PublishedAtUtc?.ToString("MMMM dd, yyyy") ?? "")</span>
+                                                    <span class="post-title"> 
+                                                        <a asp-controller="Blogs" asp-action="Details" asp-route-id="@recentPost.Slug">@recentPost.Title</a>
+                                                    </span>
+                                                </div>                                                    
+                                            </div>
+                                        </div>
+                                    }
+                                        
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="widget tw-sidebar-tags-wrap">
+                        <h4 class="section-head-small mb-4">Tags</h4>
+                        
+                        <div class="tagcloud">
+                            <a asp-controller="Jobs" asp-action="Index">General</a>
+                            <a asp-controller="Jobs" asp-action="Index">Jobs </a>
+                            <a asp-controller="Jobs" asp-action="Index">Payment</a>                                            
+                            <a asp-controller="Jobs" asp-action="Index">Application </a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Work</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Recruiting</a>
+                            <a asp-controller="Employers" asp-action="Index">Employer</a>
+                            <a asp-controller="Jobs" asp-action="Index">Income</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Tips</a>
+                        </div>
+                    </div>
+                    
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+</div>   
+<!-- OUR BLOG END -->
+
+
+
+

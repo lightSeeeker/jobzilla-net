@@ -18,6 +18,12 @@ public sealed class CandidateSearchQuery
     /// <summary>Maximum expected salary filter (inclusive). Null = no filter.</summary>
     public decimal? MaxExpectedSalary { get; set; }
 
+    /// <summary>Category filter. Matches jobs the candidate has applied to or saved. Null = no filter.</summary>
+    public int? CategoryId { get; set; }
+
+    /// <summary>Skill filter. Matches candidate's associated skills. Null = no filter.</summary>
+    public int? SkillId { get; set; }
+
     // ── Pagination ───────────────────────────────────────────────────────────
 
     private int _page = 1;

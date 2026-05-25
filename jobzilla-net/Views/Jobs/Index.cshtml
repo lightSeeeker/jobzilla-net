@@ -1,4 +1,4 @@
-@model jobzilla_net.Models.Jobs.JobSearchViewModel
+﻿@model jobzilla_net.Models.Jobs.JobSearchViewModel
 @using jobzilla_net.Application.Jobs.Dtos
 @{
     ViewData["Title"] = "Jobs List";
@@ -16,7 +16,7 @@
 }
 
 <!-- INNER PAGE BANNER -->
-<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(images/banner/1.jpg);">
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
     <div class="overlay-main site-bg-white opacity-01"></div>
     <div class="container">
         <div class="wt-bnr-inr-entry">
@@ -27,7 +27,7 @@
             </div>
             <div>
                 <ul class="wt-breadcrumb breadcrumb-style-2">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
                     <li>Jobs List</li>
                 </ul>
             </div>
@@ -246,26 +246,26 @@
                     <div class="widget tw-sidebar-tags-wrap">
                         <h4 class="section-head-small mb-4">Tags</h4>
                         <div class="tagcloud">
-                            <a href="job-list.html">General</a>
-                            <a href="job-list.html">Jobs </a>
-                            <a href="job-list.html">Payment</a>
-                            <a href="job-list.html">Application </a>
-                            <a href="job-list.html">Work</a>
-                            <a href="job-list.html">Recruiting</a>
-                            <a href="job-list.html">Employer</a>
-                            <a href="job-list.html">Income</a>
-                            <a href="job-list.html">Tips</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">General</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Jobs </a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Payment</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Application </a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Work</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Recruiting</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Employers" asp-action="Index">Employer</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Income</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Tips</a>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="twm-advertisment" style="background-image:url(images/add-bg.jpg);">
+                <div class="twm-advertisment" style="background-image:url(/images/add-bg.jpg);">
                     <div class="overlay"></div>
                     <h4 class="twm-title">Recruiting?</h4>
                     <p>Get Best Matched Jobs On your <br>
                         Email. Add Resume NOW!</p>
-                    <a href="about-1.html" class="site-button white">Read More</a>
+                    <a asp-controller="Home" asp-action="Index" class="site-button white">Read More</a>
                 </div>
 
             </div>
@@ -297,7 +297,7 @@
 
                 </div>
 
-                <!-- ── DYNAMIC JOB CARDS ── only this <ul> is replaced ───────── -->
+                <!-- â”€â”€ DYNAMIC JOB CARDS â”€â”€ only this <ul> is replaced â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
                 <div class="twm-jobs-list-wrap">
                     <ul>
                         @if (!Model.Result.Items.Any())
@@ -337,7 +337,7 @@
                                             <h4>@job.Title <span class="twm-job-post-duration">/ @ageLabel</span></h4>
                                         </a>
                                         <p class="twm-job-address">@job.Location</p>
-                                        <a href="#" class="twm-job-websites site-text-primary">@job.CompanyName</a>
+                                        <a asp-controller="Employers" asp-action="Details" class="twm-job-websites site-text-primary">@job.CompanyName</a>
                                     </div>
                                     <div class="twm-right-content">
                                         <div class="twm-jobs-category green"><span class="@badgeCss">@typeLabel</span></div>
@@ -352,7 +352,7 @@
                         }
                     </ul>
                 </div>
-                <!-- ── END DYNAMIC JOB CARDS ──────────────────────────────────── -->
+                <!-- â”€â”€ END DYNAMIC JOB CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
                 @if (Model.Result.TotalPages > 1)
                 {
@@ -388,7 +388,7 @@
                                 }
                                 @if (end < totalPages)
                                 {
-                                    <li><a href="javascript:;"><i class="fa fa-ellipsis-h"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
                                     <li><a href="@PageUrl(totalPages)">@totalPages</a></li>
                                 }
                                 <li class="next">
@@ -408,3 +408,7 @@
 
 </div>
 <!-- OUR BLOG END -->
+
+
+
+

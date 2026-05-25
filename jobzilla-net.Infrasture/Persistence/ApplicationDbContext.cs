@@ -34,6 +34,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Conversation> Conversations => Set<Conversation>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+    public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();
     public DbSet<ContentPage> ContentPages => Set<ContentPage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -67,6 +68,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<JobCategory>().HasIndex(x => x.Name).IsUnique();
         builder.Entity<Skill>().HasIndex(x => x.Name).IsUnique();
         builder.Entity<BlogPost>().HasIndex(x => x.Slug).IsUnique();
+        builder.Entity<BlogCategory>().HasIndex(x => x.Name).IsUnique();
         builder.Entity<ContentPage>().HasIndex(x => x.Key).IsUnique();
     }
 

@@ -58,6 +58,18 @@ public sealed class CandidateService : ICandidateService
                 c.ExpectedSalary <= query.MaxExpectedSalary.Value);
         }
 
+        if (query.CategoryId.HasValue)
+        {
+            q = q.Where(c => 
+                c.Applications.Any(a => a.JobPost != null && a.JobPost.JobCategoryId == query.CategoryId.Value) ||
+                c.SavedJobs.Any(s => s.JobPost != null && s.JobPost.JobCategoryId == query.CategoryId.Value));
+        }
+
+        if (query.SkillId.HasValue)
+        {
+            q = q.Where(c => c.Skills.Any(s => s.SkillId == query.SkillId.Value));
+        }
+
         // ── Count before paging ───────────────────────────────────────────────
         var totalCount = await q.CountAsync(cancellationToken);
 

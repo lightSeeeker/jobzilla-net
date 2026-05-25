@@ -1,11 +1,11 @@
-@model jobzilla_net.Models.Candidates.CandidateSearchViewModel
+﻿@model jobzilla_net.Models.Candidates.CandidateSearchViewModel
 @using jobzilla_net.Application.Candidates.Dtos
 @{
     ViewData["Title"] = "Candidate List";
 }
 
 <!-- INNER PAGE BANNER -->
-<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(images/banner/1.jpg);">
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
     <div class="overlay-main site-bg-white opacity-01"></div>
     <div class="container">
         <div class="wt-bnr-inr-entry">
@@ -16,7 +16,7 @@
             </div>
             <div>
                 <ul class="wt-breadcrumb breadcrumb-style-2">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
                     <li>Candidate List</li>
                 </ul>
             </div>
@@ -31,13 +31,49 @@
     <div class="container">
         <div class="row">
 
-            <!-- ── SIDEBAR ──────────────────────────────────────────────────── -->
+            <!-- â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
             <div class="col-lg-4 col-md-12 rightSidebar">
 
                 <div class="side-bar">
 
                     <div class="sidebar-elements search-bx">
                         <form action="/Candidates" method="get">
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Category</h4>
+                                <select name="categoryId" class="wt-select-bar-large selectpicker" data-live-search="true" data-bv-field="size">
+                                    <option value="">All Categories</option>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        if (Model.CategoryId == cat.Id)
+                                        {
+                                            <option value="@cat.Id" selected>@cat.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@cat.Id">@cat.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Skill</h4>
+                                <select name="skillId" class="wt-select-bar-large selectpicker" data-live-search="true" data-bv-field="size">
+                                    <option value="">All Skills</option>
+                                    @foreach (var skill in Model.Skills)
+                                    {
+                                        if (Model.SkillId == skill.Id)
+                                        {
+                                            <option value="@skill.Id" selected>@skill.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@skill.Id">@skill.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
 
                             <div class="form-group mb-4">
                                 <h4 class="section-head-small mb-4">Keyword</h4>
@@ -80,32 +116,32 @@
                     <div class="widget tw-sidebar-tags-wrap">
                         <h4 class="section-head-small mb-4">Tags</h4>
                         <div class="tagcloud">
-                            <a href="javascript:;">General</a>
-                            <a href="javascript:;">Jobs </a>
-                            <a href="javascript:;">Payment</a>
-                            <a href="javascript:;">Application </a>
-                            <a href="javascript:;">Work</a>
-                            <a href="javascript:;">Recruiting</a>
-                            <a href="javascript:;">Employer</a>
-                            <a href="javascript:;">Income</a>
-                            <a href="javascript:;">Tips</a>
+                            <a asp-controller="Jobs" asp-action="Index">General</a>
+                            <a asp-controller="Jobs" asp-action="Index">Jobs </a>
+                            <a asp-controller="Jobs" asp-action="Index">Payment</a>
+                            <a asp-controller="Jobs" asp-action="Index">Application </a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Work</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Recruiting</a>
+                            <a asp-controller="Employers" asp-action="Index">Employer</a>
+                            <a asp-controller="Jobs" asp-action="Index">Income</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Tips</a>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="twm-advertisment" style="background-image:url(images/add-bg.jpg);">
+                <div class="twm-advertisment" style="background-image:url(/images/add-bg.jpg);">
                     <div class="overlay"></div>
                     <h4 class="twm-title">Recruiting?</h4>
                     <p>Get Best Matched Jobs On your <br>
                         Email. Add Resume NOW!</p>
-                    <a href="about-1.html" class="site-button white">Read More</a>
+                    <a asp-controller="Home" asp-action="Index" class="site-button white">Read More</a>
                 </div>
 
             </div>
-            <!-- ── SIDEBAR END ────────────────────────────────────────────── -->
+            <!-- â”€â”€ SIDEBAR END â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
-            <!-- ── MAIN COLUMN ──────────────────────────────────────────────── -->
+            <!-- â”€â”€ MAIN COLUMN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
             <div class="col-lg-8 col-md-12">
                 <!--Filter Short By-->
                 <div class="product-filter-wrap d-flex justify-content-between align-items-center m-b30">
@@ -131,7 +167,7 @@
                     </form>
                 </div>
 
-                <!-- ── DYNAMIC CANDIDATE CARDS — only this <ul> is replaced ── -->
+                <!-- â”€â”€ DYNAMIC CANDIDATE CARDS â€” only this <ul> is replaced â”€â”€ -->
                 <div class="twm-candidates-list-wrap">
                     <ul>
                         @if (!Model.Result.Items.Any())
@@ -201,7 +237,7 @@
                         }
                     </ul>
                 </div>
-                <!-- ── END DYNAMIC CANDIDATE CARDS ─────────────────────────── -->
+                <!-- â”€â”€ END DYNAMIC CANDIDATE CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
                 @if (Model.Result.TotalPages > 1)
                 {
@@ -210,7 +246,9 @@
                         (string.IsNullOrEmpty(Model.Keyword)           ? "" : $"&keyword={Uri.EscapeDataString(Model.Keyword)}") +
                         (string.IsNullOrEmpty(Model.Location)          ? "" : $"&location={Uri.EscapeDataString(Model.Location)}") +
                         (Model.MinExperienceYears.HasValue              ? $"&minExperienceYears={Model.MinExperienceYears}" : "") +
-                        (Model.MaxExpectedSalary.HasValue               ? $"&maxExpectedSalary={Model.MaxExpectedSalary}" : "");
+                        (Model.MaxExpectedSalary.HasValue               ? $"&maxExpectedSalary={Model.MaxExpectedSalary}" : "") +
+                        (Model.CategoryId.HasValue                      ? $"&categoryId={Model.CategoryId}" : "") +
+                        (Model.SkillId.HasValue                         ? $"&skillId={Model.SkillId}" : "");
 
                     int totalPages = Model.Result.TotalPages;
                     int currPage   = Model.Result.Page;
@@ -234,7 +272,7 @@
                                 }
                                 @if (end < totalPages)
                                 {
-                                    <li><a href="javascript:;"><i class="fa fa-ellipsis-h"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
                                     <li><a href="@PageUrl(totalPages)">@totalPages</a></li>
                                 }
                                 <li class="next">
@@ -248,10 +286,14 @@
                 }
 
             </div>
-            <!-- ── MAIN COLUMN END ──────────────────────────────────────────── -->
+            <!-- â”€â”€ MAIN COLUMN END â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
         </div>
     </div>
 
 </div>
 <!-- OUR BLOG END -->
+
+
+
+

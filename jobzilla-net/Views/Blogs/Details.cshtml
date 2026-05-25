@@ -1,0 +1,299 @@
+﻿@model jobzilla_net.Models.Blogs.BlogDetailViewModel
+@{
+    ViewData["Title"] = Model.Post.Title;
+}
+
+<!-- INNER PAGE BANNER -->
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+    <div class="overlay-main site-bg-white opacity-01"></div>
+    <div class="container">
+        <div class="wt-bnr-inr-entry">
+            <div class="banner-title-outer">
+                <div class="banner-title-name">
+                    <h2 class="wt-title">Blog detail</h2>
+                </div>
+            </div>
+            <!-- BREADCRUMB ROW -->                            
+            <div>
+                <ul class="wt-breadcrumb breadcrumb-style-2">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Blogs" asp-action="Index">Blog</a></li>
+                    <li>Blog detail</li>
+                </ul>
+            </div>
+            <!-- BREADCRUMB ROW END -->                        
+        </div>
+    </div>
+</div>
+<!-- INNER PAGE BANNER END -->
+
+<!-- OUR BLOG START -->
+<div class="section-full  p-t120 p-b90 bg-white">
+    <div class="container">
+    
+        <!-- BLOG SECTION START -->
+        <div class="section-content">
+            <div class="row d-flex justify-content-center">
+            
+                <div class="col-lg-8 col-md-12">
+                    <!-- BLOG START -->
+                    <div class="blog-post-single-outer">
+                        <div class="blog-post-single bg-white">                                    
+
+                            <div class="wt-post-info">
+                
+                                <div class="wt-post-media m-b30">
+                                    @if (!string.IsNullOrEmpty(Model.Post.FeaturedImagePath))
+                                    {
+                                        <img src="@Model.Post.FeaturedImagePath" alt="@Model.Post.Title">
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/blog/blog-single/1.jpg" alt="@Model.Post.Title">
+                                    }
+                                </div>
+                                
+                                <div class="wt-post-title ">
+                                    <div class="wt-post-meta-list">
+                                        <div class="wt-list-content post-date">@(Model.Post.PublishedAtUtc?.ToString("MMMM dd, yyyy") ?? "")</div>
+                                        @if (!string.IsNullOrEmpty(Model.Post.AuthorName))
+                                        {
+                                            <div class="wt-list-content post-author">By @Model.Post.AuthorName</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.Post.CategoryName))
+                                        {
+                                            <div class="wt-list-content post-category site-text-primary">@Model.Post.CategoryName</div>
+                                        }
+                                    </div> 
+                                    <h3 class="post-title">@Model.Post.Title</h3>
+                                </div>
+                                
+                                <div class="wt-post-discription">
+                                    @Html.Raw(Model.Post.Content)
+                                </div> 
+                                
+                                <div class="twm-posts-author">
+                                    <div class="twm-post-author-pic">
+                                        <img src="~/images/blog/post-author.jpg" alt="#">
+                                    </div>
+                                    <div class="twm-post-author-content">
+                                        <span>Author</span>
+                                        <p>
+                                            <!-- Author bio placeholder -->
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
+                                            incididunt ut labore et dolore magna aliqua.
+                                        </p>
+                                        <strong>@(Model.Post.AuthorName ?? "Unknown Author")</strong>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                        </div>
+
+                        <div class="post-area-tags-wrap">
+                            <div class="post-social-icons-wrap">
+                                <h4 class="mb-4">Share</h4>
+                                <ul class="post-social-icons">
+                                    <li><a href="javascript:void(0);" class="fab fa-facebook-f"></a></li>
+                                    <li><a href="javascript:void(0);" class="fab fa-twitter"></a></li>
+                                    <li><a href="javascript:void(0);" class="fab fa-linkedin-in"></a></li>
+                                    <li><a href="javascript:void(0);" class="fab fa-google"></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation and Comments kept static for layout preservation -->
+                        <div class="post-navigation m-t30">
+                            <div class="post-nav-links">
+                                <div class="post-nav-item nav-post-prev">
+                                    <div class="nav-post-arrow"> 
+                                        <a asp-controller="Blogs" asp-action="Index">
+                                            <i class="fa fa-angle-left"></i>
+                                        </a>
+                                    </div>
+                                    <div class="nav-post-meta"> 
+                                        <a asp-controller="Blogs" asp-action="Index">Back to Blogs</a>
+                                    </div>
+                                </div>
+                                <div class="post-nav-item nav-post-next">
+                                    <!-- Keeping Next static as per template -->
+                                    <div class="nav-post-arrow"> 
+                                        <a href="javascript:;">
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                    <div class="nav-post-meta"> 
+                                        <a href="javascript:;">Next Article</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                                
+
+                        <div class="clear" id="comment-list">
+                            <div class="comments-area" id="comments">
+                                <h3 class="section-head-small mb-4">Comments</h3>
+                                <div>
+                                    <!-- COMMENT LIST START -->
+                                    <ol class="comment-list">
+                                        <li class="comment">
+                                            <!-- COMMENT BLOCK -->
+                                            <div class="comment-body">
+
+                                                <div class="comment-author">
+                                                    <img class="avatar photo" src="~/images/blog/comment/pic1.jpg" alt="">
+                                                    <div class="comment-meta">
+                                                        <a href="javascript:void(0);">Apr 05, 2023</a>
+                                                    </div>
+                                                </div>
+                                                <div class="comment-info">                                                
+                                                    <cite class="fn">Richard Anderson</cite>
+                                                    <div class="reply">
+                                                        <a href="javascript:;" class="comment-reply-link">Reply</a>
+                                                    </div>                                        
+                                                    <p>No one rejects, dislikes, or avoids pleasure itself, because pleasure, but 
+                                                        because those who do not know how to pursue.
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    </ol>
+                                    <!-- COMMENT LIST END -->
+                                    
+                                    <!-- LEAVE A REPLY START -->
+                                    <div class="comment-respond m-t30" id="respond">
+        
+                                        <h3 class="comment-reply-title section-head-small mb-4" id="reply-title">Leave a reply
+                                            <small>
+                                                <a style="display:none;" href="#" id="cancel-comment-reply-link" rel="nofollow">Cancel reply</a>
+                                            </small>
+                                        </h3>
+        
+                                        <form class="comment-form" id="commentform" method="post" action="javascript:;">
+                                            <div class="row">
+                                                <div class="comment-form-author col-md-6 mb-3">
+                                                    <label>Your Name* <span class="required">*</span></label>
+                                                    <input class="form-control" type="text" value="" name="user-comment" placeholder="Your Name*" id="author">
+                                                </div>
+                                                
+                                                <div class="comment-form-email col-md-6 mb-3">
+                                                    <label>Your Email* <span class="required">*</span></label>
+                                                    <input class="form-control" type="text" value="" name="email" placeholder="Your Email*">
+                                                </div>
+                                                                                                    
+                                                <div class="comment-form-comment col-md-12 mb-4">
+                                                    <label>Message*</label>
+                                                    <textarea class="form-control" rows="8" name="comment" placeholder="Message*" id="comment"></textarea>
+                                                </div>
+                                                
+                                                <div class="form-submit">
+                                                    <button type="submit" class="site-button">Submit Now</button>
+                                                </div>
+                                            </div>
+                                            
+                                        </form>
+        
+                                    </div>
+                                    <!-- LEAVE A REPLY END -->
+                            </div>
+                            </div>
+                        </div>
+                    </div>                             
+                </div>
+                
+                <div class="col-lg-4 col-md-12 rightSidebar">
+
+                    <div class="side-bar">
+                        <div class="widget search-bx">
+                            <form role="search" method="get" action="/Blogs">
+                                <div class="input-group">
+                                    <input type="text" name="keyword" class="form-control" placeholder="Search">
+                                    <button class="btn" type="submit" id="button-addon2"><i class="feather-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+
+                        @if (Model.Categories.Any())
+                        {
+                            <div class="widget all_services_list">
+                                <h4 class="section-head-small mb-4">Categories</h4> 
+                                <div class="all_services m-b30">
+                                    <ul>
+                                        <li>
+                                            <a asp-controller="Blogs" asp-action="Index">All Categories</a>
+                                        </li>
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            <li>
+                                                <a asp-controller="Blogs" asp-action="Index" asp-route-categoryId="@category.Id">
+                                                    @category.Name
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.LatestPosts.Any())
+                        {
+                            <div class="widget recent-posts-entry">
+                                <h4 class="section-head-small mb-4">Recent Article</h4>
+                                <div class="section-content">
+                                    <div class="widget-post-bx">
+                                        @foreach (var recentPost in Model.LatestPosts)
+                                        {
+                                            <div class="widget-post clearfix">
+                                                <div class="wt-post-media">
+                                                    @if (!string.IsNullOrEmpty(recentPost.FeaturedImagePath))
+                                                    {
+                                                        <img src="@recentPost.FeaturedImagePath" alt="@recentPost.Title">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="~/images/blog/recent-blog/pic1.jpg" alt="@recentPost.Title">
+                                                    }
+                                                </div>
+                                                <div class="wt-post-info">
+                                                    <div class="wt-post-header">
+                                                        <span class="post-date">@(recentPost.PublishedAtUtc?.ToString("MMMM dd, yyyy") ?? "")</span>
+                                                        <span class="post-title"> 
+                                                            <a asp-controller="Blogs" asp-action="Details" asp-route-id="@recentPost.Slug">@recentPost.Title</a>
+                                                        </span>
+                                                    </div>                                                    
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="widget tw-sidebar-tags-wrap">
+                            <h4 class="section-head-small mb-4">Tags</h4>
+                            
+                            <div class="tagcloud">
+                                <a asp-controller="Jobs" asp-action="Index">General</a>
+                                <a asp-controller="Jobs" asp-action="Index">Jobs </a>
+                                <a asp-controller="Jobs" asp-action="Index">Payment</a>                                            
+                                <a asp-controller="Jobs" asp-action="Index">Application </a>
+                                <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Work</a>
+                                <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Recruiting</a>
+                                <a asp-controller="Employers" asp-action="Index">Employer</a>
+                                <a asp-controller="Jobs" asp-action="Index">Income</a>
+                                <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Tips</a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>   
+<!-- OUR BLOG END -->
+
+
+

@@ -22,6 +22,7 @@ public interface IApplicationDbContext
     DbSet<Conversation> Conversations { get; }
     DbSet<Message> Messages { get; }
     DbSet<BlogPost> BlogPosts { get; }
+    DbSet<BlogCategory> BlogCategories { get; }
     DbSet<ContentPage> ContentPages { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

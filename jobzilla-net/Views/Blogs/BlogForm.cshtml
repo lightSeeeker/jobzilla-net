@@ -1,0 +1,112 @@
+@model jobzilla_net.Models.Blogs.BlogFormViewModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? "Edit Blog" : "Post a New Blog";
+}
+
+<!-- INNER PAGE BANNER -->
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+    <div class="overlay-main site-bg-white opacity-01"></div>
+    <div class="container">
+        <div class="wt-bnr-inr-entry">
+            <div class="banner-title-outer">
+                <div class="banner-title-name">
+                    <h2 class="wt-title">@ViewData["Title"]</h2>
+                </div>
+            </div>
+            <!-- BREADCRUMB ROW -->                            
+            <div>
+                <ul class="wt-breadcrumb breadcrumb-style-2">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Blogs" asp-action="Index">Blogs</a></li>
+                    <li><a asp-action="Manage">Manage</a></li>
+                    <li>@ViewData["Title"]</li>
+                </ul>
+            </div>
+            <!-- BREADCRUMB ROW END -->                        
+        </div>
+    </div>
+</div>
+<!-- INNER PAGE BANNER END -->
+
+<div class="section-full p-t120 p-b90 site-bg-white">
+    <div class="container">
+        
+        <form asp-action="@(Model.IsEditMode ? "Edit" : "Create")" asp-route-id="@(Model.IsEditMode ? Model.BlogId : null)" method="post">
+            @if (Model.IsEditMode)
+            {
+                <input type="hidden" asp-for="BlogId" />
+            }
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="panel panel-default border rounded shadow-sm">
+                <div class="panel-heading wt-panel-heading p-a20 bg-light border-bottom">
+                    <h4 class="panel-tittle m-a0">Blog Information</h4>
+                </div>
+                <div class="panel-body wt-panel-body p-a20 m-b30 ">
+                    <div class="row">
+                        
+                        <div class="col-xl-6 col-lg-12 col-md-12">
+                            <div class="form-group mb-4">
+                                <label asp-for="Blog.Title" class="form-label">Blog Title</label>
+                                <div class="ls-inputicon-box"> 
+                                    <input asp-for="Blog.Title" class="form-control" placeholder="Enter title here...">
+                                </div>
+                                <span asp-validation-for="Blog.Title" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-6 col-lg-12 col-md-12">
+                            <div class="form-group mb-4">
+                                <label asp-for="Blog.CategoryId" class="form-label">Category</label>
+                                <div class="ls-inputicon-box">  
+                                    <select asp-for="Blog.CategoryId" asp-items="Model.Categories" class="form-control" data-live-search="true">
+                                        <option value="">Select Category</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Blog.CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="form-group mb-4">
+                                <label asp-for="Blog.Excerpt" class="form-label">Excerpt</label>
+                                <textarea asp-for="Blog.Excerpt" class="form-control" rows="3" placeholder="Brief summary of the blog post..."></textarea>
+                                <span asp-validation-for="Blog.Excerpt" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="form-group mb-4">
+                                <label asp-for="Blog.Content" class="form-label">Content</label>
+                                <textarea asp-for="Blog.Content" class="form-control" rows="8" placeholder="Full content goes here..."></textarea>
+                                <span asp-validation-for="Blog.Content" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="form-group mb-4 form-check">
+                                <input asp-for="Blog.IsPublished" class="form-check-input" type="checkbox" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault" asp-for="Blog.IsPublished">
+                                    Publish Immediately
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 col-md-12">                                   
+                            <div class="text-left mt-3">
+                                <button type="submit" class="site-button">@(Model.IsEditMode ? "Save Changes" : "Post Blog")</button>
+                                <a asp-action="Manage" class="site-button site-btn-light ms-2">Cancel</a>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

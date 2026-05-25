@@ -1,0 +1,41 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+<nav id="sidebar-admin-wraper">
+    <div class="page-logo">
+        <a asp-controller="Home" asp-action="Index"><img src="~/images/logo-dark.png" alt=""></a>
+    </div>
+    
+    <div class="admin-nav scrollbar-macosx">
+        <ul>
+            <li class="@(currentAction == "Index" ? "active" : "")">
+                <a asp-controller="EmployerDash" asp-action="Index"><i class="fa fa-home"></i><span class="admin-nav-text">Dashboard</span></a>
+            </li>
+
+            <li class="@(currentAction == "Profile" ? "active" : "")">
+                <a asp-controller="EmployerDash" asp-action="Profile"><i class="fa fa-user-tie"></i><span class="admin-nav-text">Company Profile</span></a>
+            </li>
+
+            <li>
+                <a asp-controller="EmployerDash" asp-action="PostedJobs"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
+                <ul class="sub-menu">
+                    <li class="@(currentAction == "PostJob" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostJob"><span class="admin-nav-text">Post a New Jobs</span></a></li>
+                    <li class="@(currentAction == "PostedJobs" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostedJobs"><span class="admin-nav-text">Manage Jobs</span></a></li>
+                </ul>
+            </li>
+            <li class="@(currentAction == "Applications" ? "active" : "")">
+                <a asp-controller="EmployerDash" asp-action="Applications"><i class="fa fa-user-friends"></i><span class="admin-nav-text">Candidates</span></a>
+            </li>
+            
+            <li>
+                <a asp-controller="Blogs" asp-action="Manage"><i class="fa fa-newspaper"></i><span class="admin-nav-text">My Blogs</span></a>
+            </li>
+            
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormSidebar" style="display: none;"></form>
+                <a href="javascript:document.getElementById('logoutFormSidebar').submit()"><i class="fa fa-share-square"></i><span class="admin-nav-text">Logout</span></a>
+            </li>                    
+        </ul>
+    </div>   
+</nav>

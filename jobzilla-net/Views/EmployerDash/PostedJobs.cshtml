@@ -1,0 +1,151 @@
+@model jobzilla_net.Models.EmployerDash.EmployerDashJobsViewModel
+@{
+    ViewData["Title"] = "Manage Jobs";
+    Layout = "~/Views/Shared/_EmployerLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Manage Jobs</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="EmployerDash" asp-action="Index">Dashboard</a>
+        <span>My Job Listing</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-suitcase"></i> Job Details</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20 m-b30 ">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Applications</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PostedJobs.Items.Any())
+                    {
+                        foreach (var job in Model.PostedJobs.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="twm-bookmark-list">
+                                        <div class="twm-mid-content">
+                                            <a asp-controller="Jobs" asp-action="Details" class="twm-job-title">
+                                                <h4>@job.Title</h4>
+                                                <p class="twm-bookmark-address">
+                                                    <i class="feather-map-pin"></i>@job.Location
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><a asp-controller="Candidates" asp-action="Index" class="site-text-primary">@job.ApplicationsCount Applied</a></td>
+                                <td>@job.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if(job.Status == "Active")
+                                    {
+                                        <span class="text-clr-green2">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-clr-red">Closed</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="twm-table-controls">
+                                        <ul class="twm-DT-controls-icon list-unstyled d-flex align-items-center">
+                                            <li>
+                                                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.JobPostId" title="View Job" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    <span class="fa fa-eye"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a asp-controller="EmployerDash" asp-action="EditJob" asp-route-id="@job.JobPostId" title="Edit" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    <span class="far fa-edit"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <form asp-controller="EmployerDash" asp-action="DeleteJob" asp-route-id="@job.JobPostId" method="post" onsubmit="return confirm('Are you sure you want to delete this job?');" class="d-inline">
+                                                    <button type="submit" title="Delete" data-bs-toggle="tooltip" data-bs-placement="top" class="border-0 bg-transparent text-danger p-0 m-0 ms-1">
+                                                        <span class="far fa-trash-alt"></span>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No jobs posted yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        @if (Model.PostedJobs.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.PostedJobs.Page > 1)
+                        {
+                            <li class="prev">
+                                <a asp-action="PostedJobs" asp-route-page="@(Model.PostedJobs.Page - 1)">
+                                    <span> <i class="fa fa-angle-left"></i> </span>
+                                </a>
+                            </li>
+                        }
+                        
+                        @for (int i = 1; i <= Model.PostedJobs.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.PostedJobs.Page ? "active" : "")">
+                                <a asp-action="PostedJobs" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.PostedJobs.Page < Model.PostedJobs.TotalPages)
+                        {
+                            <li class="next">
+                                <a asp-action="PostedJobs" asp-route-page="@(Model.PostedJobs.Page + 1)">
+                                    <span> <i class="fa fa-angle-right"></i> </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+

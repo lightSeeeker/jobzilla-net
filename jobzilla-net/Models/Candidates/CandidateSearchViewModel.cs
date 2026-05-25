@@ -1,6 +1,7 @@
 using jobzilla_net.Application.Candidates.Dtos;
 using jobzilla_net.Application.Candidates.Queries;
 using jobzilla_net.Application.Common;
+using jobzilla_net.Core.Entities;
 
 namespace jobzilla_net.Models.Candidates;
 
@@ -25,6 +26,12 @@ public sealed class CandidateSearchViewModel
     /// <summary>Maximum expected salary filter. Null = no filter.</summary>
     public decimal? MaxExpectedSalary { get; set; }
 
+    /// <summary>Category filter. Matches jobs the candidate has applied to or saved. Null = no filter.</summary>
+    public int? CategoryId { get; set; }
+
+    /// <summary>Skill filter. Matches candidate's associated skills. Null = no filter.</summary>
+    public int? SkillId { get; set; }
+
     /// <summary>Current page number. Defaults to 1.</summary>
     public int Page { get; set; } = 1;
 
@@ -37,6 +44,18 @@ public sealed class CandidateSearchViewModel
     public PagedResult<CandidateSummaryDto> Result { get; set; } =
         PagedResult<CandidateSummaryDto>.Empty(1, 10);
 
+    /// <summary>
+    /// All active categories for the filter sidebar.
+    /// Populated by the controller from the database.
+    /// </summary>
+    public IReadOnlyList<JobCategory> Categories { get; set; } = Array.Empty<JobCategory>();
+
+    /// <summary>
+    /// All active skills for the filter sidebar.
+    /// Populated by the controller from the database.
+    /// </summary>
+    public IReadOnlyList<Skill> Skills { get; set; } = Array.Empty<Skill>();
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /// <summary>True when any filter is actively applied.</summary>
@@ -44,7 +63,9 @@ public sealed class CandidateSearchViewModel
         !string.IsNullOrWhiteSpace(Keyword) ||
         !string.IsNullOrWhiteSpace(Location) ||
         MinExperienceYears.HasValue ||
-        MaxExpectedSalary.HasValue;
+        MaxExpectedSalary.HasValue ||
+        CategoryId.HasValue ||
+        SkillId.HasValue;
 
     /// <summary>Converts this view model into an Application-layer query.</summary>
     public CandidateSearchQuery ToQuery() => new()
@@ -53,6 +74,8 @@ public sealed class CandidateSearchViewModel
         Location           = Location,
         MinExperienceYears = MinExperienceYears,
         MaxExpectedSalary  = MaxExpectedSalary,
+        CategoryId         = CategoryId,
+        SkillId            = SkillId,
         Page               = Page,
         PageSize           = PageSize
     };

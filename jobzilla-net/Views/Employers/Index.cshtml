@@ -1,0 +1,228 @@
+﻿@model jobzilla_net.Models.Employers.EmployerSearchViewModel
+@using jobzilla_net.Application.Employers.Dtos
+@{
+    ViewData["Title"] = "Employers List";
+}
+
+<!-- INNER PAGE BANNER -->
+<div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+    <div class="overlay-main site-bg-white opacity-01"></div>
+    <div class="container">
+        <div class="wt-bnr-inr-entry">
+            <div class="banner-title-outer">
+                <div class="banner-title-name">
+                    <h2 class="wt-title">Employers List</h2>
+                </div>
+            </div>
+            <!-- BREADCRUMB ROW -->                            
+            <div>
+                <ul class="wt-breadcrumb breadcrumb-style-2">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li>Employers List</li>
+                </ul>
+            </div>
+            <!-- BREADCRUMB ROW END -->                        
+        </div>
+    </div>
+</div>
+<!-- INNER PAGE BANNER END -->
+
+<!-- Employer List START -->
+<div class="section-full p-t120  p-b90 site-bg-white">
+    <div class="container">
+        <div class="row">
+            
+            <div class="col-lg-4 col-md-12 rightSidebar">
+                <div class="side-bar">
+                    <div class="sidebar-elements search-bx">
+                        <form action="/Employers" method="get">
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Industry</h4>
+                                <div class="input-group">
+                                    <input type="text" name="industry" value="@Model.Industry" class="form-control" placeholder="Search Industry">
+                                    <button class="btn" type="submit"><i class="feather-search"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Company Size</h4>
+                                <select name="companySize" class="wt-select-bar-large selectpicker" data-live-search="true" data-bv-field="size">
+                                    <option value="" selected="@(string.IsNullOrEmpty(Model.CompanySize) ? "selected" : null)">All Sizes</option>
+                                    <option value="1-10" selected="@(Model.CompanySize == "1-10" ? "selected" : null)">1-10 Employees</option>
+                                    <option value="11-50" selected="@(Model.CompanySize == "11-50" ? "selected" : null)">11-50 Employees</option>
+                                    <option value="51-200" selected="@(Model.CompanySize == "51-200" ? "selected" : null)">51-200 Employees</option>
+                                    <option value="201-500" selected="@(Model.CompanySize == "201-500" ? "selected" : null)">201-500 Employees</option>
+                                    <option value="501+" selected="@(Model.CompanySize == "501+" ? "selected" : null)">501+ Employees</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Keyword</h4>
+                                <div class="input-group">
+                                    <input type="text" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Company Name">
+                                    <button class="btn" type="submit"><i class="feather-search"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <h4 class="section-head-small mb-4">Location</h4>
+                                <div class="input-group">
+                                    <input type="text" name="location" value="@Model.Location" class="form-control" placeholder="Search location">
+                                    <button class="btn" type="submit"><i class="feather-map-pin"></i></button>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="page" value="1" />
+                            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+
+                            <button type="submit" class="site-button">Search Employers</button>
+                        </form>
+                    </div>
+
+                    <div class="widget tw-sidebar-tags-wrap">
+                        <h4 class="section-head-small mb-4">Tags</h4>
+                        <div class="tagcloud">
+                            <a asp-controller="Jobs" asp-action="Index">General</a>
+                            <a asp-controller="Jobs" asp-action="Index">Jobs </a>
+                            <a asp-controller="Jobs" asp-action="Index">Payment</a>                                            
+                            <a asp-controller="Jobs" asp-action="Index">Application </a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Work</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Recruiting</a>
+                            <a asp-controller="Employers" asp-action="Index">Employer</a>
+                            <a asp-controller="Jobs" asp-action="Index">Income</a>
+                            <a asp-controller="Jobs" asp-action="Index" asp-controller="Jobs" asp-action="Index">Tips</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="twm-advertisment" style="background-image:url(/images/add-bg.jpg);">
+                   <div class="overlay"></div>
+                   <h4 class="twm-title">Recruiting?</h4>
+                   <p>Get Best Matched Jobs On your <br>
+                    Email. Add Resume NOW!</p>
+                    <a asp-controller="Home" asp-action="Index" class="site-button white">Read More</a> 
+                </div>
+            </div>
+
+            <div class="col-lg-8 col-md-12">
+                <!--Filter Short By-->
+                <div class="product-filter-wrap d-flex justify-content-between align-items-center m-b30">
+                    <span class="woocommerce-result-count-left">Showing @Model.Result.TotalCount employer@(Model.Result.TotalCount == 1 ? "" : "s")</span>
+                   
+                    <form class="woocommerce-ordering twm-filter-select" method="get">
+                        <span class="woocommerce-result-count">Short By</span>
+                        <select class="wt-select-bar-2 selectpicker"  data-live-search="true" data-bv-field="size">
+                            <option>Most Recent</option>
+                        </select>
+                        <select class="wt-select-bar-2 selectpicker"  data-live-search="true" data-bv-field="size">
+                            <option>Show 10</option>
+                            <option>Show 20</option>
+                            <option>Show 30</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div class="twm-employer-list-wrap">
+                    <ul>
+                        @if (!Model.Result.Items.Any())
+                        {
+                            <li>
+                                <div class="twm-employer-list-style1 mb-5 text-center p-4">
+                                    <p>No employers found.</p>
+                                </div>
+                            </li>
+                        }
+                        
+                        @foreach (EmployerSummaryDto employer in Model.Result.Items)
+                        {
+                            <li>
+                                <div class="twm-employer-list-style1 mb-5">
+                                    <div class="twm-media">
+                                        @if (!string.IsNullOrEmpty(employer.LogoPath))
+                                        {
+                                            <img src="@employer.LogoPath" alt="@employer.CompanyName">
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/jobs-company/pic1.jpg" alt="@employer.CompanyName">
+                                        }
+                                    </div>
+                                    <div class="twm-mid-content">
+                                        <a asp-controller="Employers" asp-action="Details" asp-route-id="@employer.Id" class="twm-job-title">
+                                            <h4>@employer.CompanyName</h4>
+                                        </a>
+                                        @if (!string.IsNullOrEmpty(employer.Location))
+                                        {
+                                            <p class="twm-job-address">
+                                                <i class="feather-map-pin"></i> @employer.Location
+                                            </p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(employer.Industry))
+                                        {
+                                            <a asp-controller="Employers" asp-action="Details" asp-route-id="@employer.Id" class="twm-job-websites site-text-primary">@employer.Industry</a>
+                                        }
+                                    </div>
+                                    <div class="twm-right-content">
+                                        <div class="twm-jobs-vacancies"><span>@employer.ActiveJobCount</span>Vacancies</div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                
+                @if (Model.Result.TotalPages > 1)
+                {
+                    string PageUrl(int p) =>
+                        $"?page={p}&pageSize={Model.PageSize}" +
+                        (string.IsNullOrEmpty(Model.Keyword)           ? "" : $"&keyword={Uri.EscapeDataString(Model.Keyword)}") +
+                        (string.IsNullOrEmpty(Model.Location)          ? "" : $"&location={Uri.EscapeDataString(Model.Location)}") +
+                        (string.IsNullOrEmpty(Model.Industry)          ? "" : $"&industry={Uri.EscapeDataString(Model.Industry)}") +
+                        (string.IsNullOrEmpty(Model.CompanySize)       ? "" : $"&companySize={Uri.EscapeDataString(Model.CompanySize)}");
+
+                    int totalPages = Model.Result.TotalPages;
+                    int currPage   = Model.Result.Page;
+                    int start      = Math.Max(1, currPage - 2);
+                    int end        = Math.Min(totalPages, start + 4);
+                    start          = Math.Max(1, end - 4);
+
+                    <div class="pagination-outer">
+                        <div class="pagination-style1">
+                            <ul class="clearfix">
+                                <li class="prev">
+                                    <a href="@(Model.Result.HasPreviousPage ? PageUrl(currPage - 1) : "javascript:;")">
+                                        <span> <i class="fa fa-angle-left"></i> </span>
+                                    </a>
+                                </li>
+                                @for (int p = start; p <= end; p++)
+                                {
+                                    <li class="@(p == currPage ? "active" : "")">
+                                        <a href="@PageUrl(p)">@p</a>
+                                    </li>
+                                }
+                                @if (end < totalPages)
+                                {
+                                    <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
+                                    <li><a href="@PageUrl(totalPages)">@totalPages</a></li>
+                                }
+                                <li class="next">
+                                    <a href="@(Model.Result.HasNextPage ? PageUrl(currPage + 1) : "javascript:;")">
+                                        <span> <i class="fa fa-angle-right"></i> </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Employer List END -->
+
+
+
+

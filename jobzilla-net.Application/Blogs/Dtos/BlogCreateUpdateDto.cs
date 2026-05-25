@@ -16,7 +16,7 @@ public class BlogCreateUpdateDto
 
     [Required(ErrorMessage = "Category is required.")]
     [Display(Name = "Category")]
-    public int CategoryId { get; set; }
+    public int? CategoryId { get; set; }
 
     [Display(Name = "Publish Immediately")]
     public bool IsPublished { get; set; }

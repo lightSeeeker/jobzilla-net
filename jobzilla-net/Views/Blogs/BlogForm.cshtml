@@ -31,7 +31,7 @@
 <div class="section-full p-t120 p-b90 site-bg-white">
     <div class="container">
         
-        <form asp-action="@(Model.IsEditMode ? "Edit" : "Create")" method="post">
+        <form asp-action="@(Model.IsEditMode ? "Edit" : "Create")" asp-route-id="@(Model.IsEditMode ? Model.BlogId : null)" method="post">
             @if (Model.IsEditMode)
             {
                 <input type="hidden" asp-for="BlogId" />

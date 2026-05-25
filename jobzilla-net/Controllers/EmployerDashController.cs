@@ -131,4 +131,102 @@ public class EmployerDashController : Controller
 
         return RedirectToAction(nameof(Applications));
     }
+    // ── JOBS CRUD ────────────────────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> PostJob([FromServices] jobzilla_net.Application.Common.Interfaces.IApplicationDbContext dbContext)
+    {
+        var model = new EmployerDashJobFormViewModel { IsEditMode = false };
+        await PopulateDropdownsAsync(model, dbContext);
+        return View("JobForm", model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PostJob(EmployerDashJobFormViewModel model, [FromServices] jobzilla_net.Application.Common.Interfaces.IApplicationDbContext dbContext)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model, dbContext);
+            return View("JobForm", model);
+        }
+
+        var jobId = await _dashboardService.CreateJobAsync(GetUserId(), model.Job);
+        TempData["SuccessMessage"] = "Job posted successfully.";
+        return RedirectToAction(nameof(PostedJobs));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditJob(int id, [FromServices] jobzilla_net.Application.Common.Interfaces.IApplicationDbContext dbContext)
+    {
+        var job = await _dashboardService.GetJobForEditAsync(GetUserId(), id);
+        if (job == null) return NotFound();
+
+        var model = new EmployerDashJobFormViewModel
+        {
+            IsEditMode = true,
+            JobId = id,
+            Job = job
+        };
+        await PopulateDropdownsAsync(model, dbContext);
+        return View("JobForm", model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditJob(int id, EmployerDashJobFormViewModel model, [FromServices] jobzilla_net.Application.Common.Interfaces.IApplicationDbContext dbContext)
+    {
+        if (id != model.JobId) return BadRequest();
+
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model, dbContext);
+            return View("JobForm", model);
+        }
+
+        var success = await _dashboardService.UpdateJobAsync(GetUserId(), id, model.Job);
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Job updated successfully.";
+            return RedirectToAction(nameof(PostedJobs));
+        }
+
+        ModelState.AddModelError(string.Empty, "Failed to update job.");
+        await PopulateDropdownsAsync(model, dbContext);
+        return View("JobForm", model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteJob(int id)
+    {
+        var success = await _dashboardService.DeleteJobAsync(GetUserId(), id);
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Job deleted successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Failed to delete job.";
+        }
+        return RedirectToAction(nameof(PostedJobs));
+    }
+
+    private async Task PopulateDropdownsAsync(EmployerDashJobFormViewModel model, jobzilla_net.Application.Common.Interfaces.IApplicationDbContext dbContext)
+    {
+        model.Categories = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
+            System.Linq.Queryable.Select(dbContext.JobCategories, c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem 
+            { 
+                Value = c.Id.ToString(), 
+                Text = c.Name 
+            }));
+            
+        model.EmploymentTypes = System.Enum.GetValues<jobzilla_net.Core.Enums.EmploymentType>()
+            .Select(e => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem 
+            { 
+                Value = e.ToString(), 
+                Text = e.ToString() 
+            })
+            .ToList();
+    }
 }

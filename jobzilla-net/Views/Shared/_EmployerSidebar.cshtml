@@ -20,7 +20,7 @@
             <li>
                 <a asp-controller="EmployerDash" asp-action="PostedJobs"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
                 <ul class="sub-menu">
-                    <li> <a asp-controller="EmployerDash" asp-action="PostedJobs"><span class="admin-nav-text">Post a New Jobs</span></a></li>
+                    <li class="@(currentAction == "PostJob" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostJob"><span class="admin-nav-text">Post a New Jobs</span></a></li>
                     <li class="@(currentAction == "PostedJobs" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostedJobs"><span class="admin-nav-text">Manage Jobs</span></a></li>
                 </ul>
             </li>

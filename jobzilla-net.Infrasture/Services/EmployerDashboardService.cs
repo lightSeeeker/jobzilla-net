@@ -213,4 +213,91 @@ public class EmployerDashboardService : IEmployerDashboardService
 
         return false;
     }
+
+    public async Task<EmployerJobCreateUpdateDto?> GetJobForEditAsync(string userId, int jobId)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        var job = await _context.JobPosts
+            .FirstOrDefaultAsync(j => j.Id == jobId && j.EmployerProfileId == profile.Id);
+
+        if (job == null) return null;
+
+        return new EmployerJobCreateUpdateDto
+        {
+            JobCategoryId = job.JobCategoryId,
+            Title = job.Title,
+            Description = job.Description ?? string.Empty,
+            Requirements = job.Requirements,
+            Responsibilities = job.Responsibilities,
+            Location = job.Location,
+            EmploymentType = job.EmploymentType,
+            MinimumSalary = job.MinimumSalary,
+            MaximumSalary = job.MaximumSalary,
+            ExpiresAtUtc = job.ExpiresAtUtc
+        };
+    }
+
+    public async Task<int> CreateJobAsync(string userId, EmployerJobCreateUpdateDto dto)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+
+        var job = new JobPost
+        {
+            EmployerProfileId = profile.Id,
+            JobCategoryId = dto.JobCategoryId,
+            Title = dto.Title,
+            Slug = dto.Title.ToLower().Replace(" ", "-") + "-" + Guid.NewGuid().ToString("N").Substring(0, 6),
+            Description = dto.Description,
+            Requirements = dto.Requirements,
+            Responsibilities = dto.Responsibilities,
+            Location = dto.Location,
+            EmploymentType = dto.EmploymentType,
+            Status = JobStatus.Published, // Auto-publish for now
+            MinimumSalary = dto.MinimumSalary,
+            MaximumSalary = dto.MaximumSalary,
+            ExpiresAtUtc = dto.ExpiresAtUtc,
+            IsFeatured = false,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+
+        _context.JobPosts.Add(job);
+        await _context.SaveChangesAsync();
+        return job.Id;
+    }
+
+    public async Task<bool> UpdateJobAsync(string userId, int jobId, EmployerJobCreateUpdateDto dto)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        var job = await _context.JobPosts
+            .FirstOrDefaultAsync(j => j.Id == jobId && j.EmployerProfileId == profile.Id);
+
+        if (job == null) return false;
+
+        job.JobCategoryId = dto.JobCategoryId;
+        job.Title = dto.Title;
+        job.Description = dto.Description;
+        job.Requirements = dto.Requirements;
+        job.Responsibilities = dto.Responsibilities;
+        job.Location = dto.Location;
+        job.EmploymentType = dto.EmploymentType;
+        job.MinimumSalary = dto.MinimumSalary;
+        job.MaximumSalary = dto.MaximumSalary;
+        job.ExpiresAtUtc = dto.ExpiresAtUtc;
+
+        _context.JobPosts.Update(job);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteJobAsync(string userId, int jobId)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        var job = await _context.JobPosts
+            .FirstOrDefaultAsync(j => j.Id == jobId && j.EmployerProfileId == profile.Id);
+
+        if (job == null) return false;
+
+        // Hard delete for simplicity as requested/default behavior unless soft delete was specified
+        _context.JobPosts.Remove(job);
+        return await _context.SaveChangesAsync() > 0;
+    }
 }

@@ -26,6 +26,9 @@ public class ResumeBuilderService : IResumeBuilderService
             .Include(p => p.Educations)
             .Include(p => p.Certifications)
             .Include(p => p.SocialLinks)
+            .Include(p => p.Projects)
+            .Include(p => p.Skills)
+                .ThenInclude(cs => cs.Skill)
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
 
         var vm = new ResumeExportViewModel();
@@ -95,6 +98,11 @@ public class ResumeBuilderService : IResumeBuilderService
                 EndDate = p.EndDate,
                 IsOngoing = p.IsOngoing
             }).ToList();
+
+            vm.Skills = profile.Skills
+                .Where(cs => cs.Skill != null)
+                .Select(cs => cs.Skill!.Name)
+                .ToList();
         }
 
         return vm;
@@ -189,6 +197,53 @@ public class ResumeBuilderService : IResumeBuilderService
                 Name = vm.Name, Description = vm.Description, ProjectUrl = vm.ProjectUrl, 
                 StartDate = vm.StartDate, EndDate = vm.EndDate, IsOngoing = vm.IsOngoing, CandidateProfileId = profile.Id
             });
+
+        // 6. Skills — sync edited List<string> back to CandidateSkill join table
+        if (model.Skills != null)
+        {
+            // Load current skills with navigation so we can compare names
+            var existingSkillLinks = await _context.CandidateSkills
+                .Include(cs => cs.Skill)
+                .Where(cs => cs.CandidateProfileId == profile.Id)
+                .ToListAsync(cancellationToken);
+
+            var submittedNames = model.Skills
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Select(s => s.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            // Remove links for skills no longer in the submitted list
+            var toRemove = existingSkillLinks
+                .Where(cs => cs.Skill == null || !submittedNames.Any(n => n.Equals(cs.Skill.Name, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+            foreach (var link in toRemove)
+                _context.CandidateSkills.Remove(link);
+
+            // Add links for new skill names
+            var existingNames = existingSkillLinks
+                .Where(cs => cs.Skill != null)
+                .Select(cs => cs.Skill!.Name)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var skillName in submittedNames)
+            {
+                if (existingNames.Contains(skillName)) continue;
+
+                var skill = await _context.Skills
+                    .FirstOrDefaultAsync(s => s.Name.ToLower() == skillName.ToLower(), cancellationToken)
+                    ?? new Skill { Name = skillName };
+
+                if (skill.Id == 0)
+                    _context.Skills.Add(skill);
+
+                _context.CandidateSkills.Add(new CandidateSkill
+                {
+                    CandidateProfileId = profile.Id,
+                    Skill              = skill
+                });
+            }
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
         return true;

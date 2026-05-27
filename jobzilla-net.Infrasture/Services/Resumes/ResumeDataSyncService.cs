@@ -22,11 +22,15 @@ public class ResumeDataSyncService : IResumeDataSyncService
     {
         _logger.LogInformation("Syncing parsed resume data for user {UserId}", userId);
 
+        // Load all required navigation properties in a single query
         var profile = await _context.CandidateProfiles
             .Include(p => p.Experiences)
             .Include(p => p.Educations)
             .Include(p => p.Certifications)
             .Include(p => p.SocialLinks)
+            .Include(p => p.Projects)
+            .Include(p => p.Skills)
+                .ThenInclude(cs => cs.Skill)
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
 
         if (profile == null)
@@ -35,72 +39,111 @@ public class ResumeDataSyncService : IResumeDataSyncService
             return false;
         }
 
-        // Basic mapping logic (Update if null/empty, or add to collections)
-        if (string.IsNullOrWhiteSpace(profile.FullName) && !string.IsNullOrWhiteSpace(parsedData.FullName))
+        // ── Personal Information ──────────────────────────────────────────────
+        // Parsed data is PRIMARY. Profile fields are fallback when parser extracted nothing.
+        if (!string.IsNullOrWhiteSpace(parsedData.FullName))
             profile.FullName = parsedData.FullName;
 
-        if (string.IsNullOrWhiteSpace(profile.PhoneNumber) && !string.IsNullOrWhiteSpace(parsedData.PhoneNumber))
+        if (!string.IsNullOrWhiteSpace(parsedData.PhoneNumber))
             profile.PhoneNumber = parsedData.PhoneNumber;
 
+        if (!string.IsNullOrWhiteSpace(parsedData.Summary))
+            profile.Summary = parsedData.Summary;
+
+        // ── Experience ────────────────────────────────────────────────────────
         foreach (var exp in parsedData.Experiences)
         {
-            // Simple deduplication check based on CompanyName and Title
             if (!profile.Experiences.Any(e => e.CompanyName == exp.CompanyName && e.JobTitle == exp.JobTitle))
             {
                 profile.Experiences.Add(new CandidateExperience
                 {
-                    CompanyName = exp.CompanyName ?? "Unknown",
-                    JobTitle = exp.JobTitle ?? "Unknown",
-                    StartDate = exp.StartDate ?? DateTime.UtcNow,
-                    EndDate = exp.EndDate,
-                    Description = exp.Description
+                    CompanyName        = exp.CompanyName ?? "Unknown",
+                    JobTitle           = exp.JobTitle    ?? "Unknown",
+                    StartDate          = exp.StartDate   ?? DateTime.UtcNow,
+                    EndDate            = exp.EndDate,
+                    Description        = exp.Description,
+                    CandidateProfileId = profile.Id
                 });
             }
         }
 
+        // ── Education ─────────────────────────────────────────────────────────
         foreach (var edu in parsedData.Educations)
         {
             if (!profile.Educations.Any(e => e.InstitutionName == edu.InstitutionName && e.Degree == edu.Degree))
             {
                 profile.Educations.Add(new CandidateEducation
                 {
-                    InstitutionName = edu.InstitutionName ?? "Unknown",
-                    Degree = edu.Degree ?? "Unknown",
-                    FieldOfStudy = edu.FieldOfStudy ?? "Unknown",
-                    StartDate = edu.StartDate ?? DateTime.UtcNow,
-                    EndDate = edu.EndDate
+                    InstitutionName    = edu.InstitutionName ?? "Unknown",
+                    Degree             = edu.Degree          ?? "Unknown",
+                    FieldOfStudy       = edu.FieldOfStudy    ?? "Unknown",
+                    StartDate          = edu.StartDate       ?? DateTime.UtcNow,
+                    EndDate            = edu.EndDate,
+                    CandidateProfileId = profile.Id
                 });
             }
         }
 
+        // ── Certifications ────────────────────────────────────────────────────
         foreach (var cert in parsedData.Certifications)
         {
             if (!profile.Certifications.Any(c => c.Name == cert.Name))
             {
                 profile.Certifications.Add(new CandidateCertification
                 {
-                    Name = cert.Name ?? "Unknown",
+                    Name                = cert.Name                ?? "Unknown",
                     IssuingOrganization = cert.IssuingOrganization ?? "Unknown",
-                    IssueDate = cert.IssueDate ?? DateTime.UtcNow
+                    IssueDate           = cert.IssueDate           ?? DateTime.UtcNow,
+                    CandidateProfileId  = profile.Id
                 });
             }
         }
 
+        // ── Social Links ──────────────────────────────────────────────────────
         foreach (var link in parsedData.SocialLinks)
         {
             if (!profile.SocialLinks.Any(l => l.Url == link.Url))
             {
                 profile.SocialLinks.Add(new CandidateSocialLink
                 {
-                    PlatformName = link.PlatformName ?? "Unknown",
-                    Url = link.Url ?? string.Empty
+                    PlatformName       = link.PlatformName ?? "Unknown",
+                    Url                = link.Url          ?? string.Empty,
+                    CandidateProfileId = profile.Id
                 });
             }
         }
 
-        // Skills logic (requires finding existing skills or creating new ones, then linking)
-        // For simplicity in this implementation, we assume skill linking is handled separately or we log it.
-        _logger.LogInformation("Parsed {Count} skills. Linking should be done via Skill lookup.", parsedData.Skills.Count);
+        // ── Skills ────────────────────────────────────────────────────────────
+        // Skills use a normalised lookup table (Skill) + join table (CandidateSkill).
+        // For each parsed skill name, upsert the Skill row then link it to the profile.
+        var existingSkillNames = profile.Skills
+            .Where(cs => cs.Skill != null)
+            .Select(cs => cs.Skill!.Name.ToLowerInvariant())
+            .ToHashSet();
+
+        foreach (var skillName in parsedData.Skills.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (existingSkillNames.Contains(skillName.ToLowerInvariant()))
+                continue;
+
+            // Find or create the global Skill record
+            var skill = await _context.Skills
+                .FirstOrDefaultAsync(s => s.Name.ToLower() == skillName.ToLower(), cancellationToken)
+                ?? new Skill { Name = skillName };
+
+            if (skill.Id == 0)
+                _context.Skills.Add(skill);
+
+            profile.Skills.Add(new CandidateSkill
+            {
+                Skill              = skill,
+                CandidateProfileId = profile.Id
+            });
+
+            existingSkillNames.Add(skillName.ToLowerInvariant());
+        }
+
+        _logger.LogInformation("Synced {Count} skills for user {UserId}", parsedData.Skills.Count, userId);
 
         try
         {

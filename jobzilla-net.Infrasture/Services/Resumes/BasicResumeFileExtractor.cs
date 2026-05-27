@@ -1,3 +1,8 @@
+using System.Text;
+using DocumentFormat.OpenXml.Packaging;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using jobzilla_net.Application.Resumes.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,23 +19,55 @@ public class BasicResumeFileExtractor : IResumeFileExtractor
 
     public async Task<string> ExtractTextAsync(string filePath, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Extracting text from {FilePath}. Note: A recommended library (e.g. iText7 or OpenXML) should be used in production.", filePath);
-        
         if (!File.Exists(filePath))
-        {
             throw new FileNotFoundException("Resume file not found.", filePath);
-        }
 
-        // Simplistic stub for extraction. In a real scenario, we'd use a dedicated library.
-        // For now, we simulate extraction returning some dummy text if it's a binary file,
-        // or read it directly if it happens to be plain text.
-        
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
-        if (extension == ".txt")
+
+        _logger.LogInformation("Extracting text from {FilePath} (type: {Ext})", filePath, extension);
+
+        return extension switch
         {
-            return await File.ReadAllTextAsync(filePath, cancellationToken);
+            ".pdf"  => await ExtractFromPdfAsync(filePath),
+            ".docx" => await ExtractFromDocxAsync(filePath),
+            ".doc"  => await ExtractFromDocxAsync(filePath), // best-effort for legacy .doc
+            ".txt"  => await File.ReadAllTextAsync(filePath, cancellationToken),
+            _ => throw new NotSupportedException($"File type '{extension}' is not supported for text extraction.")
+        };
+    }
+
+    private Task<string> ExtractFromPdfAsync(string filePath)
+    {
+        var sb = new StringBuilder();
+
+        using var reader = new PdfReader(filePath);
+        using var pdf = new PdfDocument(reader);
+
+        for (int page = 1; page <= pdf.GetNumberOfPages(); page++)
+        {
+            var strategy = new LocationTextExtractionStrategy();
+            var text = PdfTextExtractor.GetTextFromPage(pdf.GetPage(page), strategy);
+            sb.AppendLine(text);
         }
 
-        return "STUB_EXTRACTED_TEXT: Name: John Doe\nEmail: john@example.com\nPhone: 123-456-7890\nSkills: C#, ASP.NET Core\nExperience: Software Engineer at Jobzilla (2020-2023)";
+        return Task.FromResult(sb.ToString());
+    }
+
+    private Task<string> ExtractFromDocxAsync(string filePath)
+    {
+        var sb = new StringBuilder();
+
+        using var doc = WordprocessingDocument.Open(filePath, false);
+        var body = doc.MainDocumentPart?.Document?.Body;
+
+        if (body != null)
+        {
+            foreach (var para in body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Paragraph>())
+            {
+                sb.AppendLine(para.InnerText);
+            }
+        }
+
+        return Task.FromResult(sb.ToString());
     }
 }

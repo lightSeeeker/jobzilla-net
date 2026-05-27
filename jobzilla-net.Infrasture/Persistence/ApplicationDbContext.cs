@@ -24,6 +24,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Skill> Skills => Set<Skill>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     public DbSet<CandidateResume> CandidateResumes => Set<CandidateResume>();
+    public DbSet<CandidateExperience> CandidateExperiences => Set<CandidateExperience>();
+    public DbSet<CandidateEducation> CandidateEducations => Set<CandidateEducation>();
+    public DbSet<CandidateCertification> CandidateCertifications => Set<CandidateCertification>();
+    public DbSet<CandidateProject> CandidateProjects => Set<CandidateProject>();
+    public DbSet<CandidateSocialLink> CandidateSocialLinks => Set<CandidateSocialLink>();
+    public DbSet<ResumeTemplate> ResumeTemplates => Set<ResumeTemplate>();
     public DbSet<SavedJob> SavedJobs => Set<SavedJob>();
     public DbSet<CandidateSkill> CandidateSkills => Set<CandidateSkill>();
     public DbSet<JobPostSkill> JobPostSkills => Set<JobPostSkill>();
@@ -197,6 +203,26 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 MaximumSalary = 10000m,
                 ExpiresAtUtc = new DateTime(2026, 12, 31, 0, 0, 0, DateTimeKind.Utc),
                 IsFeatured = false,
+                CreatedAtUtc = SeedDate
+            });
+
+        builder.Entity<ResumeTemplate>().HasData(
+            new ResumeTemplate
+            {
+                Id = 1,
+                Name = "Standard Professional",
+                Description = "A clean, professional template suitable for all industries.",
+                TemplateFilePath = "Standard", // Corresponds to Standard.cshtml
+                IsActive = true,
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 2,
+                Name = "Modern Creative",
+                Description = "A sleek, modern design with vibrant accents for creative roles.",
+                TemplateFilePath = "Modern", // Corresponds to Modern.cshtml
+                IsActive = true,
                 CreatedAtUtc = SeedDate
             });
     }

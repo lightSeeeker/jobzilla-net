@@ -256,4 +256,24 @@ public class CandidateDashboardService : ICandidateDashboardService
         
         return true;
     }
+
+    public async Task<bool> SetDefaultResumeAsync(string userId, int resumeId)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        
+        var existingResumes = await _context.CandidateResumes
+            .Where(r => r.CandidateProfileId == profile.Id)
+            .ToListAsync();
+
+        var targetResume = existingResumes.FirstOrDefault(r => r.Id == resumeId);
+        if (targetResume == null) return false;
+
+        foreach (var resume in existingResumes)
+        {
+            resume.IsDefault = (resume.Id == resumeId);
+        }
+
+        await _context.SaveChangesAsync(CancellationToken.None);
+        return true;
+    }
 }

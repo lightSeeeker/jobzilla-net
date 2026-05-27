@@ -11,19 +11,31 @@ namespace jobzilla_net.Controllers;
 public class CandidateDashController : Controller
 {
     private readonly ICandidateDashboardService _dashboardService;
+    private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeParsingOrchestrator _resumeOrchestrator;
+    private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService _resumeBuilderService;
+    private readonly jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer _templateRenderer;
+    private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeExportService _resumeExportService;
     private readonly ILogger<CandidateDashController> _logger;
 
     public CandidateDashController(
         ICandidateDashboardService dashboardService,
+        jobzilla_net.Application.Resumes.Interfaces.IResumeParsingOrchestrator resumeOrchestrator,
+        jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService resumeBuilderService,
+        jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer templateRenderer,
+        jobzilla_net.Application.Resumes.Interfaces.IResumeExportService resumeExportService,
         ILogger<CandidateDashController> logger)
     {
         _dashboardService = dashboardService;
+        _resumeOrchestrator = resumeOrchestrator;
+        _resumeBuilderService = resumeBuilderService;
+        _templateRenderer = templateRenderer;
+        _resumeExportService = resumeExportService;
         _logger = logger;
     }
 
     private string GetUserId()
     {
-        return User.FindFirstValue(ClaimTypes.NameIdentifier) 
+        return User.FindFirstValue(ClaimTypes.NameIdentifier)
                ?? throw new UnauthorizedAccessException("User ID claim not found.");
     }
 
@@ -38,12 +50,12 @@ public class CandidateDashController : Controller
     public async Task<IActionResult> Index()
     {
         var overview = await _dashboardService.GetDashboardOverviewAsync(GetUserId());
-        
+
         var viewModel = new CandidateDashOverviewViewModel
         {
             Overview = overview
         };
-        
+
         return View(viewModel);
     }
 
@@ -54,7 +66,7 @@ public class CandidateDashController : Controller
     {
         const int pageSize = 10;
         var appliedJobs = await _dashboardService.GetAppliedJobsAsync(GetUserId(), page, pageSize);
-        
+
         var viewModel = new CandidateDashAppliedJobsViewModel
         {
             AppliedJobs = appliedJobs
@@ -70,7 +82,7 @@ public class CandidateDashController : Controller
     {
         const int pageSize = 10;
         var savedJobs = await _dashboardService.GetSavedJobsAsync(GetUserId(), page, pageSize);
-        
+
         var viewModel = new CandidateDashSavedJobsViewModel
         {
             SavedJobs = savedJobs
@@ -85,7 +97,7 @@ public class CandidateDashController : Controller
     public async Task<IActionResult> Profile()
     {
         var profile = await _dashboardService.GetProfileAsync(GetUserId());
-        
+
         // Populate email from Identity context since it is not part of CandidateProfile entity directly
         profile.Email = GetUserEmail();
 
@@ -124,7 +136,7 @@ public class CandidateDashController : Controller
     public async Task<IActionResult> Resumes()
     {
         var resumes = await _dashboardService.GetResumesAsync(GetUserId());
-        
+
         var viewModel = new CandidateDashResumesViewModel
         {
             Resumes = resumes
@@ -143,27 +155,110 @@ public class CandidateDashController : Controller
             return RedirectToAction(nameof(Resumes));
         }
 
-        // Simplistic file upload for backend implementation phase
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "resumes");
-        if (!Directory.Exists(uploadsFolder))
+        // Validate file size (max 5 MB)
+        const long maxFileSize = 5 * 1024 * 1024;
+        if (resumeFile.Length > maxFileSize)
         {
-            Directory.CreateDirectory(uploadsFolder);
+            TempData["ErrorMessage"] = "File size cannot exceed 5MB.";
+            return RedirectToAction(nameof(Resumes));
         }
 
-        var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(resumeFile.FileName);
-        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        // Validate file extension
+        var allowedExtensions = new[] { ".pdf", ".docx", ".doc" };
+        var extension = Path.GetExtension(resumeFile.FileName).ToLowerInvariant();
+        if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
         {
-            await resumeFile.CopyToAsync(fileStream);
+            TempData["ErrorMessage"] = "Only PDF and DOCX files are allowed.";
+            return RedirectToAction(nameof(Resumes));
         }
 
-        var relativePath = $"/uploads/resumes/{uniqueFileName}";
-        
-        await _dashboardService.AddResumeAsync(GetUserId(), title, relativePath, isDefault);
+        // Validate MIME type
+        var allowedMimeTypes = new[]
+        {
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/msword"
+        };
+        if (!allowedMimeTypes.Contains(resumeFile.ContentType))
+        {
+            TempData["ErrorMessage"] = "Invalid file content type.";
+            return RedirectToAction(nameof(Resumes));
+        }
 
-        TempData["SuccessMessage"] = "Resume uploaded successfully.";
+        try
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "resumes");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Generate a secure, unique file name to prevent path traversal and overwriting
+            var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await resumeFile.CopyToAsync(fileStream);
+            }
+
+            var relativePath = $"/uploads/resumes/{uniqueFileName}";
+
+            // Associate with Candidate profile
+            var resumeDto = await _dashboardService.AddResumeAsync(GetUserId(), title, relativePath, isDefault);
+
+            // Trigger Parsing Pipeline
+            var parseSuccess = await _resumeOrchestrator.ParseAndSyncResumeAsync(GetUserId(), filePath);
+
+            if (parseSuccess)
+            {
+                TempData["SuccessMessage"] = "Resume uploaded and parsed successfully! You can now edit the extracted fields.";
+                return RedirectToAction(nameof(Builder));
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Resume uploaded, but auto-parsing could not extract all fields. Please fill them manually.";
+                return RedirectToAction(nameof(Builder));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading resume for user {UserId}", GetUserId());
+            TempData["ErrorMessage"] = "An error occurred while uploading the resume. Please try again.";
+        }
+
         return RedirectToAction(nameof(Resumes));
+    }
+
+    // ── RESUME BUILDER (Parsed Data Editor) ──────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> Builder()
+    {
+        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId());
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Builder(jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Please correct the errors in the form.";
+            return View(model);
+        }
+
+        var success = await _resumeBuilderService.UpdateResumeDataAsync(GetUserId(), model);
+
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Resume data updated successfully.";
+            return RedirectToAction(nameof(Builder));
+        }
+
+        TempData["ErrorMessage"] = "Failed to update resume data.";
+        return View(model);
     }
 
     [HttpPost]
@@ -171,16 +266,75 @@ public class CandidateDashController : Controller
     public async Task<IActionResult> DeleteResume(int resumeId)
     {
         var success = await _dashboardService.DeleteResumeAsync(GetUserId(), resumeId);
-        
+
         if (success)
         {
             TempData["SuccessMessage"] = "Resume deleted successfully.";
         }
         else
         {
-            TempData["ErrorMessage"] = "Failed to delete resume or resume not found.";
+            TempData["ErrorMessage"] = "Resume not found or could not be deleted.";
         }
 
         return RedirectToAction(nameof(Resumes));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SetDefaultResume(int resumeId)
+    {
+        var success = await _dashboardService.SetDefaultResumeAsync(GetUserId(), resumeId);
+        
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Active resume switched successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Resume not found or could not be updated.";
+        }
+        
+        return RedirectToAction(nameof(Resumes));
+    }
+
+    // ── TEMPLATE SYSTEM ──────────────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> Templates()
+    {
+        var templates = await _resumeBuilderService.GetActiveTemplatesAsync();
+        return View(templates);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PreviewTemplate(int id)
+    {
+        var template = await _resumeBuilderService.GetTemplateByIdAsync(id);
+        if (template == null) return NotFound("Template not found or inactive.");
+
+        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId());
+
+        var htmlContent = await _templateRenderer.RenderTemplateAsync(
+            $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",
+            model);
+
+        return Content(htmlContent, "text/html");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ExportTemplate(int id)
+    {
+        var pdfBytes = await _resumeExportService.ExportResumeToPdfAsync(GetUserId(), id);
+        
+        if (pdfBytes == null)
+        {
+            TempData["ErrorMessage"] = "Failed to export resume. Please try again later.";
+            return RedirectToAction(nameof(Templates));
+        }
+
+        var template = await _resumeBuilderService.GetTemplateByIdAsync(id);
+        var fileName = $"Resume_{template?.Name ?? "Export"}_{DateTime.Now:yyyyMMdd}.pdf";
+
+        return File(pdfBytes, "application/pdf", fileName);
     }
 }

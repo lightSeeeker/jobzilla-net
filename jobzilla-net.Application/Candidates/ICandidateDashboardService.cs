@@ -20,4 +20,6 @@ public interface ICandidateDashboardService
     Task<CandidateResumeDto?> AddResumeAsync(string userId, string title, string filePath, bool isDefault);
     
     Task<bool> DeleteResumeAsync(string userId, int resumeId);
+    
+    Task<bool> SetDefaultResumeAsync(string userId, int resumeId);
 }

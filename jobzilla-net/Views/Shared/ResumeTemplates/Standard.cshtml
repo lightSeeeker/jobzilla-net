@@ -1,0 +1,173 @@
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@{
+    Layout = null; // Standalone layout for clean PDF export later
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.Profile?.FullName - Resume</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+            background-color: #f4f4f4; /* Gray background outside paper */
+        }
+        .resume-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 50px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .header h3 {
+            margin: 5px 0 15px;
+            font-weight: normal;
+            color: #666;
+        }
+        .contact-info {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 1.2em;
+            text-transform: uppercase;
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .item {
+            margin-bottom: 15px;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .item-sub {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .item-desc {
+            font-size: 0.95em;
+        }
+        /* Action bar for preview mode */
+        .action-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: sans-serif;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="action-bar d-print-none">
+        <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
+        @if (ViewBag.TemplateId != null)
+        {
+            <a href="/CandidateDash/ExportTemplate?id=@ViewBag.TemplateId" class="btn">Download as PDF</a>
+        }
+    </div>
+
+    <div class="resume-container">
+        <div class="header">
+            <h1>@(Model.Profile?.FullName ?? "Your Name")</h1>
+            <h3>@(Model.Profile?.ProfessionalTitle ?? "Professional Title")</h3>
+            <div class="contact-info">
+                @(Model.Profile?.Email) | @(Model.Profile?.PhoneNumber) | @(Model.Profile?.Location)
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Profile?.Summary))
+        {
+            <div class="section">
+                <div class="section-title">Professional Summary</div>
+                <div class="item-desc">@Model.Profile.Summary</div>
+            </div>
+        }
+
+        @if (Model.Experiences.Any())
+        {
+            <div class="section">
+                <div class="section-title">Experience</div>
+                @foreach (var exp in Model.Experiences.OrderByDescending(e => e.StartDate))
+                {
+                    <div class="item">
+                        <div class="item-header">
+                            <span>@exp.JobTitle</span>
+                            <span>@exp.StartDate.ToString("MMM yyyy") - @(exp.EndDate?.ToString("MMM yyyy") ?? "Present")</span>
+                        </div>
+                        <div class="item-sub">@exp.CompanyName @(!string.IsNullOrEmpty(exp.Location) ? $"| {exp.Location}" : "")</div>
+                        <div class="item-desc">@exp.Description</div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.Educations.Any())
+        {
+            <div class="section">
+                <div class="section-title">Education</div>
+                @foreach (var edu in Model.Educations.OrderByDescending(e => e.StartDate))
+                {
+                    <div class="item">
+                        <div class="item-header">
+                            <span>@edu.Degree in @edu.FieldOfStudy</span>
+                            <span>@edu.StartDate.ToString("yyyy") - @(edu.EndDate?.ToString("yyyy") ?? "Present")</span>
+                        </div>
+                        <div class="item-sub">@edu.InstitutionName</div>
+                    </div>
+                }
+            </div>
+        }
+        
+        @if (Model.Certifications.Any())
+        {
+            <div class="section">
+                <div class="section-title">Certifications</div>
+                @foreach (var cert in Model.Certifications.OrderByDescending(c => c.IssueDate))
+                {
+                    <div class="item">
+                        <div class="item-header">
+                            <span>@cert.Name</span>
+                            <span>@cert.IssueDate.ToString("MMM yyyy")</span>
+                        </div>
+                        <div class="item-sub">@cert.IssuingOrganization</div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</body>
+</html>

@@ -27,7 +27,11 @@
                 <li class="@(activePage == "Dashboard" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="@(activePage == "Profile" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-user"></i> My Profile</a></li>
                 <li class="@(activePage == "AppliedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="AppliedJobs"><i class="fa fa-suitcase"></i> Applied Jobs</a></li>
-                <li class="@(activePage == "Resumes" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-receipt"></i> My Resume (CV Manager)</a></li>
+                <li class="@(activePage == "Resumes" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-receipt"></i> My Resume</a></li>
+                <li><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-cloud-upload-alt"></i> Upload Resume</a></li>
+                <li class="@(activePage == "Builder" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Builder"><i class="fa fa-pencil-ruler"></i> Resume Builder</a></li>
+                <li class="@(activePage == "Templates" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Templates"><i class="fa fa-file-alt"></i> Templates</a></li>
+                <li><a asp-controller="CandidateDash" asp-action="Templates"><i class="fa fa-download"></i> Download Resume</a></li>
                 <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
                 <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-bell"></i> Job Alerts</a></li>
                 <li><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-fingerprint"></i> Change Password</a></li>

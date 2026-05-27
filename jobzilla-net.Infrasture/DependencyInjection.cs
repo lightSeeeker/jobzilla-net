@@ -68,6 +68,16 @@ public static class DependencyInjection
         services.AddScoped<ICandidateDashboardService, CandidateDashboardService>();
         services.AddScoped<IEmployerDashboardService, EmployerDashboardService>();
 
+        // ── Resume Parsing Pipeline ──────────────────────────────────────────
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeFileExtractor, jobzilla_net.Infrasture.Services.Resumes.BasicResumeFileExtractor>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeTextParser, jobzilla_net.Infrasture.Services.Resumes.BasicRegexResumeParser>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeDataSyncService, jobzilla_net.Infrasture.Services.Resumes.ResumeDataSyncService>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeParsingOrchestrator, jobzilla_net.Infrasture.Services.Resumes.ResumeParsingOrchestrator>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService, jobzilla_net.Infrasture.Services.Resumes.ResumeBuilderService>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer, jobzilla_net.Infrasture.Services.Resumes.RazorTemplateRenderer>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IPdfGenerator, jobzilla_net.Infrasture.Services.Resumes.SelectPdfGenerator>();
+        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeExportService, jobzilla_net.Infrasture.Services.Resumes.ResumeExportService>();
+
         return services;
     }
 }

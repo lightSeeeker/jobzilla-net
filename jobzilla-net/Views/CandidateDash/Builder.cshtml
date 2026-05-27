@@ -1,0 +1,290 @@
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@{
+    ViewData["Title"] = "Resume Builder";
+    ViewData["ActivePage"] = "Builder"; 
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+
+    <!-- INNER PAGE BANNER -->
+    <div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+        <div class="overlay-main site-bg-white opacity-01"></div>
+        <div class="container">
+            <div class="wt-bnr-inr-entry">
+                <div class="banner-title-outer">
+                    <div class="banner-title-name">
+                        <h2 class="wt-title">Resume Builder</h2>
+                    </div>
+                </div>
+                <!-- BREADCRUMB ROW -->                            
+                <div>
+                    <ul class="wt-breadcrumb breadcrumb-style-2">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li>Resume Builder</li>
+                    </ul>
+                </div>
+                <!-- BREADCRUMB ROW END -->                        
+            </div>
+        </div>
+    </div>
+    <!-- INNER PAGE BANNER END -->
+
+    <div class="section-full p-t120 p-b90 site-bg-white">
+        <div class="container">
+            <div class="row">
+                
+                <partial name="_CandidateSidebar" model="null" />
+
+                <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
+                    <div class="twm-right-section-panel site-bg-gray">
+                        
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                        }
+
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> Review and manually edit your extracted resume data here before exporting to a template.
+                        </div>
+
+                        <form asp-controller="CandidateDash" asp-action="Builder" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <!-- Basic Information -->
+                            <div class="panel panel-default mb-4">
+                                <div class="panel-heading wt-panel-heading p-a20">
+                                    <h4 class="panel-tittle m-a0">Personal Information</h4>
+                                </div>
+                                <div class="panel-body wt-panel-body p-a20">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-12 mb-3">
+                                            <div class="form-group">
+                                                <label>Full Name</label>
+                                                <input asp-for="Profile.FullName" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 mb-3">
+                                            <div class="form-group">
+                                                <label>Professional Title</label>
+                                                <input asp-for="Profile.ProfessionalTitle" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 mb-3">
+                                            <div class="form-group">
+                                                <label>Email</label>
+                                                <input asp-for="Profile.Email" class="form-control" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 mb-3">
+                                            <div class="form-group">
+                                                <label>Phone Number</label>
+                                                <input asp-for="Profile.PhoneNumber" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 mb-3">
+                                            <div class="form-group">
+                                                <label>Summary</label>
+                                                <textarea asp-for="Profile.Summary" class="form-control" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Experience Section -->
+                            <div class="panel panel-default mb-4">
+                                <div class="panel-heading wt-panel-heading p-a20 d-flex justify-content-between align-items-center">
+                                    <h4 class="panel-tittle m-a0">Experiences</h4>
+                                    <!-- Simple logic for adding handled by JS in real app, but we provide editable existing rows -->
+                                    <small class="text-muted">Edit parsed experiences below.</small>
+                                </div>
+                                <div class="panel-body wt-panel-body p-a20">
+                                    @for (int i = 0; i < Model.Experiences.Count; i++)
+                                    {
+                                        <div class="card mb-3 p-3 bg-light">
+                                            <input type="hidden" asp-for="Experiences[i].Id" />
+                                            <div class="row">
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Company Name</label>
+                                                    <input asp-for="Experiences[i].CompanyName" class="form-control" />
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Job Title</label>
+                                                    <input asp-for="Experiences[i].JobTitle" class="form-control" />
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Start Date</label>
+                                                    <input asp-for="Experiences[i].StartDate" type="date" class="form-control" />
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>End Date</label>
+                                                    <input asp-for="Experiences[i].EndDate" type="date" class="form-control" />
+                                                </div>
+                                                <div class="col-md-12 mb-2">
+                                                    <label>Description</label>
+                                                    <textarea asp-for="Experiences[i].Description" class="form-control" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (Model.Experiences.Count == 0)
+                                    {
+                                        <p class="text-muted">No experience records parsed.</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Education Section -->
+                            <div class="panel panel-default mb-4">
+                                <div class="panel-heading wt-panel-heading p-a20 d-flex justify-content-between align-items-center">
+                                    <h4 class="panel-tittle m-a0">Education</h4>
+                                    <small class="text-muted">Edit parsed education below.</small>
+                                </div>
+                                <div class="panel-body wt-panel-body p-a20">
+                                    @for (int i = 0; i < Model.Educations.Count; i++)
+                                    {
+                                        <div class="card mb-3 p-3 bg-light">
+                                            <input type="hidden" asp-for="Educations[i].Id" />
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2">
+                                                    <label>Institution</label>
+                                                    <input asp-for="Educations[i].InstitutionName" class="form-control" />
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label>Degree</label>
+                                                    <input asp-for="Educations[i].Degree" class="form-control" />
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label>Field of Study</label>
+                                                    <input asp-for="Educations[i].FieldOfStudy" class="form-control" />
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Start Date</label>
+                                                    <input asp-for="Educations[i].StartDate" type="date" class="form-control" />
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>End Date</label>
+                                                    <input asp-for="Educations[i].EndDate" type="date" class="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (Model.Educations.Count == 0)
+                                    {
+                                        <p class="text-muted">No education records parsed.</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Certifications & Social Links -->
+                            <div class="panel panel-default mb-4">
+                                <div class="panel-heading wt-panel-heading p-a20">
+                                    <h4 class="panel-tittle m-a0">Certifications & Social Links</h4>
+                                </div>
+                                <div class="panel-body wt-panel-body p-a20">
+                                    <h5>Certifications</h5>
+                                    @for (int i = 0; i < Model.Certifications.Count; i++)
+                                    {
+                                        <div class="card mb-2 p-2 bg-light">
+                                            <input type="hidden" asp-for="Certifications[i].Id" />
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <input asp-for="Certifications[i].Name" placeholder="Name" class="form-control mb-1" />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input asp-for="Certifications[i].IssuingOrganization" placeholder="Organization" class="form-control mb-1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (Model.Certifications.Count == 0) { <p class="text-muted">None</p> }
+
+                                    <h5 class="mt-4">Social Links</h5>
+                                    @for (int i = 0; i < Model.SocialLinks.Count; i++)
+                                    {
+                                        <div class="card mb-2 p-2 bg-light">
+                                            <input type="hidden" asp-for="SocialLinks[i].Id" />
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <input asp-for="SocialLinks[i].PlatformName" placeholder="Platform" class="form-control mb-1" />
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input asp-for="SocialLinks[i].Url" placeholder="URL" class="form-control mb-1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (Model.SocialLinks.Count == 0) { <p class="text-muted">None</p> }
+                                </div>
+                            </div>
+
+                            <!-- Skills & Projects -->
+                            <div class="panel panel-default mb-4">
+                                <div class="panel-heading wt-panel-heading p-a20">
+                                    <h4 class="panel-tittle m-a0">Skills & Projects</h4>
+                                </div>
+                                <div class="panel-body wt-panel-body p-a20">
+                                    <h5>Skills</h5>
+                                    @for (int i = 0; i < Model.Skills.Count; i++)
+                                    {
+                                        <div class="mb-2">
+                                            <input asp-for="Skills[i]" class="form-control" placeholder="Skill (e.g. C#, Leadership)" />
+                                        </div>
+                                    }
+                                    @if (Model.Skills.Count == 0) { <p class="text-muted mb-4">None</p> }
+
+                                    <h5 class="mt-4">Projects</h5>
+                                    @for (int i = 0; i < Model.Projects.Count; i++)
+                                    {
+                                        <div class="card mb-3 p-3 bg-light">
+                                            <input type="hidden" asp-for="Projects[i].Id" />
+                                            <div class="row">
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Project Name</label>
+                                                    <input asp-for="Projects[i].Name" class="form-control" />
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <label>Start Date</label>
+                                                    <input asp-for="Projects[i].StartDate" type="date" class="form-control" />
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <label>End Date</label>
+                                                    <input asp-for="Projects[i].EndDate" type="date" class="form-control" />
+                                                </div>
+                                                <div class="col-md-12 mb-2">
+                                                    <label>URL</label>
+                                                    <input asp-for="Projects[i].ProjectUrl" class="form-control" />
+                                                </div>
+                                                <div class="col-md-12 mb-2">
+                                                    <label>Description</label>
+                                                    <textarea asp-for="Projects[i].Description" class="form-control" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (Model.Projects.Count == 0) { <p class="text-muted">None</p> }
+                                </div>
+                            </div>
+
+                            <div class="text-left mt-4">
+                                <button type="submit" class="site-button">Save Resume Data</button>
+                                <a asp-action="Templates" class="site-button outline primary ms-2">Choose Template</a>
+                                <a asp-action="Resumes" class="site-button outline dark ms-2">Back to Resumes</a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>   
+
+</div>
+<!-- CONTENT END -->

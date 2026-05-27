@@ -77,8 +77,11 @@
                         </div>
 
                         <!--Filter Short By-->
-                        <div class="product-filter-wrap d-flex justify-content-between align-items-center">
+                        <div class="product-filter-wrap d-flex justify-content-between align-items-center mb-4">
                             <span class="woocommerce-result-count-left">CV Manager</span>
+                            <div>
+                                <a asp-controller="CandidateDash" asp-action="Builder" class="site-button">Edit Parsed Data</a>
+                            </div>
                         </div>
 
                         <div class="twm-cv-manager-list-wrap">
@@ -109,7 +112,17 @@
                                                                 <i class="fa fa-download"></i>
                                                             </a>
                                                             
-                                                            <form asp-controller="CandidateDash" asp-action="DeleteResume" method="post" style="display:inline;">
+                                                            @if (!resume.IsDefault)
+                                                            {
+                                                                <form asp-controller="CandidateDash" asp-action="SetDefaultResume" method="post" style="display:inline;">
+                                                                    <input type="hidden" name="resumeId" value="@resume.Id" />
+                                                                    <button type="submit" class="btn btn-link p-0 m-0 align-baseline ms-2" title="Set Active" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                        <i class="fa fa-check-circle text-success"></i>
+                                                                    </button>
+                                                                </form>
+                                                            }
+
+                                                            <form asp-controller="CandidateDash" asp-action="DeleteResume" method="post" style="display:inline;" class="ms-2">
                                                                 <input type="hidden" name="resumeId" value="@resume.Id" />
                                                                 <button type="submit" class="btn btn-link p-0 m-0 align-baseline" title="Delete" data-bs-toggle="tooltip" data-bs-placement="top" onclick="return confirm('Are you sure you want to delete this resume?');">
                                                                     <i class="fa fa-trash-alt text-danger"></i>

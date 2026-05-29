@@ -201,6 +201,7 @@ public class CandidateDashboardService : ICandidateDashboardService
                 FilePath = r.FilePath,
                 IsDefault = r.IsDefault,
                 IsBuilderGenerated = r.IsBuilderGenerated,
+                TemplateId = r.TemplateId,
                 CreatedAtUtc = r.CreatedAtUtc
             })
             .ToListAsync();
@@ -241,6 +242,7 @@ public class CandidateDashboardService : ICandidateDashboardService
             FilePath = newResume.FilePath,
             IsDefault = newResume.IsDefault,
             IsBuilderGenerated = newResume.IsBuilderGenerated,
+            TemplateId = newResume.TemplateId,
             CreatedAtUtc = newResume.CreatedAtUtc
         };
     }

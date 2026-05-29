@@ -54,23 +54,6 @@
                             </div>
                         </div>
 
-                        <!-- Sticky Save Bar -->
-                        <div id="cvb-sticky-save-bar" class="cvb-sticky-save-bar mb-4">
-                            <div class="d-flex justify-content-between align-items-center w-100">
-                                <div class="d-flex align-items-center gap-3">
-                                    <span id="cvb-save-status-icon" style="font-size: 1.5rem; color: #64748b;"><i class="fa fa-cloud"></i></span>
-                                    <div class="d-flex flex-column">
-                                        <span id="cvb-save-status-text" style="font-weight: 700; color: #1e293b; line-height: 1.2;">All changes saved</span>
-                                        <span id="cvb-save-timestamp" style="font-size: 0.8rem; color: #64748b;">Ready</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <button id="cvb-save-draft-btn" class="cvb-btn cvb-btn-primary">
-                                        <i class="fa fa-save me-1"></i> Save Draft
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Add section modal drawer -->
                         <div id="cvb-add-section-drawer" class="cvb-drawer" style="display:none;">
@@ -133,6 +116,24 @@
                             <i class="fa fa-file-alt cvb-empty-icon"></i>
                             <h5>No sections yet</h5>
                             <p class="text-muted">Click <strong>Add Section</strong> above to build your resume.</p>
+                        </div>
+
+                        <!-- Sticky Save Bar -->
+                        <div id="cvb-sticky-save-bar" class="cvb-sticky-save-bar mb-4">
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span id="cvb-save-status-icon" style="font-size: 1.5rem; color: #64748b;"><i class="fa fa-cloud"></i></span>
+                                    <div class="d-flex flex-column">
+                                        <span id="cvb-save-status-text" style="font-weight: 700; color: #1e293b; line-height: 1.2;">All changes saved</span>
+                                        <span id="cvb-save-timestamp" style="font-size: 0.8rem; color: #64748b;">Ready</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button id="cvb-save-draft-btn" class="cvb-btn cvb-btn-primary">
+                                        <i class="fa fa-save me-1"></i> Save Draft
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Bottom bar -->
@@ -512,6 +513,7 @@
     const PERSONAL_FIELDS = [
         { key:'fullName',         label:'Full Name',          type:'text',  col:6 },
         { key:'professionalTitle',label:'Professional Title', type:'text',  col:6 },
+        { key:'email',            label:'Email Address',      type:'email', col:6 },
         { key:'phone',            label:'Phone',              type:'tel',   col:6 },
         { key:'location',         label:'Location',           type:'text',  col:6 },
         { key:'linkedInUrl',      label:'LinkedIn URL',       type:'url',   col:6 },

@@ -21,5 +21,6 @@ public interface IResumeBuilderService
     // ── Template helpers ─────────────────────────────────────────────────────
     Task<List<jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto>> GetActiveTemplatesAsync(CancellationToken cancellationToken = default);
     Task<jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto?> GetTemplateByIdAsync(int templateId, CancellationToken cancellationToken = default);
+    Task<bool> SetTemplateForResumeAsync(string userId, int resumeId, int templateId, CancellationToken cancellationToken = default);
 }
 

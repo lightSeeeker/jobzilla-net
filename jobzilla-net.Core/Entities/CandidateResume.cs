@@ -11,4 +11,9 @@ public class CandidateResume : AuditableEntity
     public bool IsDefault { get; set; }
     public string? DocumentData { get; set; }
     public bool IsBuilderGenerated { get; set; }
+
+    // Builder/Template settings
+    public int? TemplateId { get; set; }
+    public ResumeTemplate? Template { get; set; }
+    public string? SettingsJson { get; set; }
 }

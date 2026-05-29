@@ -341,7 +341,17 @@ public class CandidateDashController : Controller
             return RedirectToAction(nameof(Resumes));
         }
 
+        var profileId = await _dashboardService.GetProfileAsync(GetUserId()); // Ensure profile exists
+        int? activeTemplateId = null;
+        if (profileId != null)
+        {
+            var resumes = await _dashboardService.GetResumesAsync(GetUserId());
+            var dbResume = resumes.FirstOrDefault(r => r.Id == resumeId.Value);
+            activeTemplateId = dbResume?.TemplateId;
+        }
+
         ViewBag.ResumeId = resumeId;
+        ViewBag.ActiveTemplateId = activeTemplateId;
         var templates = await _resumeBuilderService.GetActiveTemplatesAsync();
         return View(templates);
     }
@@ -351,6 +361,11 @@ public class CandidateDashController : Controller
     {
         var template = await _resumeBuilderService.GetTemplateByIdAsync(id);
         if (template == null) return NotFound("Template not found or inactive.");
+
+        if (resumeId.HasValue)
+        {
+            await _resumeBuilderService.SetTemplateForResumeAsync(GetUserId(), resumeId.Value, id);
+        }
 
         var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId(), resumeId);
 

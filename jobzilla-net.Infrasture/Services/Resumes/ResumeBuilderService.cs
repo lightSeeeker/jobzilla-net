@@ -295,9 +295,9 @@ public class ResumeBuilderService : IResumeBuilderService
     {
         var template = await _context.ResumeTemplates
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Id == templateId, cancellationToken);
-
-        if (template == null || !template.IsActive) return null;
+            .FirstOrDefaultAsync(t => t.Id == templateId && t.IsActive, cancellationToken);
+            
+        if (template == null) return null;
 
         return new jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto
         {
@@ -307,6 +307,21 @@ public class ResumeBuilderService : IResumeBuilderService
             TemplateFilePath = template.TemplateFilePath,
             PreviewImagePath = template.PreviewImagePath
         };
+    }
+
+    public async Task<bool> SetTemplateForResumeAsync(string userId, int resumeId, int templateId, CancellationToken cancellationToken = default)
+    {
+        var profileId = await GetProfileIdAsync(userId, cancellationToken);
+        if (profileId == null) return false;
+
+        var resume = await _context.CandidateResumes
+            .FirstOrDefaultAsync(r => r.Id == resumeId && r.CandidateProfileId == profileId.Value, cancellationToken);
+
+        if (resume == null) return false;
+
+        resume.TemplateId = templateId;
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
     }
 
     // ── Dynamic Document API ──────────────────────────────────────────────────

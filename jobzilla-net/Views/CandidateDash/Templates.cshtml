@@ -52,13 +52,20 @@
                                 <div class="col-lg-6 col-md-6 mb-4">
                                     <div class="card h-100 shadow-sm border-0">
                                         <div class="card-body text-center d-flex flex-column">
-                                            <!-- Icon/Preview Placeholder -->
+                                            @if (ViewBag.ActiveTemplateId != null && ViewBag.ActiveTemplateId == template.Id)
+                                            {
+                                                <div class="position-absolute top-0 end-0 p-2">
+                                                    <span class="badge bg-success">Selected</span>
+                                                </div>
+                                            }
                                             <i class="fa fa-file-alt fa-5x text-primary mb-3 mt-3"></i>
                                             <h4 class="card-title">@template.Name</h4>
                                             <p class="card-text text-muted mb-4">@template.Description</p>
                                             
                                             <div class="mt-auto">
-                                                <a asp-action="PreviewTemplate" asp-route-id="@template.Id" asp-route-resumeId="@ViewBag.ResumeId" class="site-button w-100">Preview & Export</a>
+                                                <a asp-action="PreviewTemplate" asp-route-id="@template.Id" asp-route-resumeId="@ViewBag.ResumeId" class="site-button w-100 @(ViewBag.ActiveTemplateId == template.Id ? "outline" : "")">
+                                                    @(ViewBag.ActiveTemplateId == template.Id ? "Preview & Export" : "Select Template")
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

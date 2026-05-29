@@ -1,5 +1,6 @@
 namespace jobzilla_net.Application.Resumes.Dtos;
 
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
 public enum ResumeSectionType
 {
     PersonalInfo,

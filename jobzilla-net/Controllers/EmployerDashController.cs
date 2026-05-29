@@ -101,17 +101,26 @@ public class EmployerDashController : Controller
     // ── APPLICATIONS ─────────────────────────────────────────────────────────
 
     [HttpGet]
-    public async Task<IActionResult> Applications(int page = 1)
+    public async Task<IActionResult> Applications(int page = 1, int? jobId = null)
     {
         const int pageSize = 10;
-        var applications = await _dashboardService.GetApplicationsAsync(GetUserId(), page, pageSize);
+        var applications = await _dashboardService.GetApplicationsAsync(GetUserId(), page, pageSize, jobId);
         
         var viewModel = new EmployerDashApplicationsViewModel
         {
             Applications = applications
         };
 
+        ViewBag.JobId = jobId;
+
         return View(viewModel);
+    }
+
+    [HttpGet("/api/employer/ats-score/{applicationId}")]
+    public async Task<IActionResult> ApiGetAtsScore(int applicationId)
+    {
+        var score = await _dashboardService.CalculateAtsScoreAsync(GetUserId(), applicationId);
+        return Ok(new { score });
     }
 
     [HttpPost]

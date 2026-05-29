@@ -1,4 +1,4 @@
-﻿@model jobzilla_net.Models.EmployerDash.EmployerDashApplicationsViewModel
+@model jobzilla_net.Models.EmployerDash.EmployerDashApplicationsViewModel
 @{
     ViewData["Title"] = "Candidates";
     Layout = "~/Views/Shared/_EmployerLayout.cshtml";
@@ -44,6 +44,7 @@
                                 <th>Applied for</th>
                                 <th>Date</th>
                                 <th>Status</th>
+                                <th>ATS Score</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -57,11 +58,11 @@
                                             <div class="twm-DT-candidates-list">
                                                 <div class="twm-media">
                                                     <div class="twm-media-pic">
-                                                       <img src="~/images/candidates/pic1.jpg" alt="#">
+                                                       <img src="@(string.IsNullOrEmpty(app.CandidateProfileImage) ? "/images/candidates/pic1.jpg" : app.CandidateProfileImage)" alt="#">
                                                     </div>
                                                 </div>
                                                 <div class="twm-mid-content">
-                                                    <a asp-controller="Jobs" asp-action="Details" class="twm-job-title">
+                                                    <a asp-controller="Candidates" asp-action="Profile" asp-route-id="@app.ApplicationId" class="twm-job-title">
                                                         <h4>@app.CandidateName</h4>
                                                         <p class="twm-candidate-address">
                                                             <i class="feather-map-pin"></i>@app.CandidateLocation
@@ -92,6 +93,11 @@
                                                 }
                                             </div>
                                         </td>
+                                        <td id="ats-col-@app.ApplicationId">
+                                            <button class="btn btn-sm btn-outline-primary btn-check-ats" data-application-id="@app.ApplicationId">
+                                                Check ATS
+                                            </button>
+                                        </td>
                                         <td>
                                             <form asp-action="UpdateApplicationStatus" method="post" class="d-inline">
                                                 <input type="hidden" name="applicationId" value="@app.ApplicationId" />
@@ -112,9 +118,9 @@
                                             <div class="twm-table-controls d-inline-block ml-2">
                                                 <ul class="twm-DT-controls-icon list-unstyled mb-0">
                                                     <li>
-                                                        <button title="View profile" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                        <a href="@(!string.IsNullOrEmpty(app.ResumePath) ? app.ResumePath : "#")" title="View Resume" data-bs-toggle="tooltip" data-bs-placement="top" target="_blank">
                                                             <span class="fa fa-eye"></span>
-                                                        </button>
+                                                        </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -125,7 +131,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="5" class="text-center">No applications received yet.</td>
+                                    <td colspan="6" class="text-center">No applications received yet.</td>
                                 </tr>
                             }
                         </tbody>
@@ -141,7 +147,7 @@
                                 @if (Model.Applications.Page > 1)
                                 {
                                     <li class="prev">
-                                        <a asp-action="Applications" asp-route-page="@(Model.Applications.Page - 1)">
+                                        <a asp-action="Applications" asp-route-page="@(Model.Applications.Page - 1)" asp-route-jobId="@ViewBag.JobId">
                                             <span> <i class="fa fa-angle-left"></i> </span>
                                         </a>
                                     </li>
@@ -150,14 +156,14 @@
                                 @for (int i = 1; i <= Model.Applications.TotalPages; i++)
                                 {
                                     <li class="@(i == Model.Applications.Page ? "active" : "")">
-                                        <a asp-action="Applications" asp-route-page="@i">@i</a>
+                                        <a asp-action="Applications" asp-route-page="@i" asp-route-jobId="@ViewBag.JobId">@i</a>
                                     </li>
                                 }
 
                                 @if (Model.Applications.Page < Model.Applications.TotalPages)
                                 {
                                     <li class="next">
-                                        <a asp-action="Applications" asp-route-page="@(Model.Applications.Page + 1)">
+                                        <a asp-action="Applications" asp-route-page="@(Model.Applications.Page + 1)" asp-route-jobId="@ViewBag.JobId">
                                             <span> <i class="fa fa-angle-right"></i> </span>
                                         </a>
                                     </li>
@@ -171,4 +177,39 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const atsButtons = document.querySelectorAll('.btn-check-ats');
+            atsButtons.forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const appId = this.getAttribute('data-application-id');
+                    const col = document.getElementById(`ats-col-${appId}`);
+                    
+                    // Show loading
+                    col.innerHTML = '<span class="fa fa-spinner fa-spin text-primary"></span>';
+                    
+                    try {
+                        const response = await fetch(`/api/employer/ats-score/${appId}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            const score = data.score;
+                            
+                            let badgeClass = 'bg-danger';
+                            if (score >= 80) badgeClass = 'bg-success';
+                            else if (score >= 50) badgeClass = 'bg-warning';
+                            
+                            col.innerHTML = `<span class="badge ${badgeClass}">${score}% Match</span>`;
+                        } else {
+                            col.innerHTML = '<span class="text-danger">Error</span>';
+                        }
+                    } catch (error) {
+                        col.innerHTML = '<span class="text-danger">Error</span>';
+                    }
+                });
+            });
+        });
+    </script>
+}
 

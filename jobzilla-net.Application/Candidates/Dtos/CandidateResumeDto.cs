@@ -6,5 +6,7 @@ public class CandidateResumeDto
     public string Title { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
     public bool IsDefault { get; set; }
+    public bool IsBuilderGenerated { get; set; }
+    public int? TemplateId { get; set; }
     public DateTime CreatedAtUtc { get; set; }
 }

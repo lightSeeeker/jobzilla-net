@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using jobzilla_net.Infrasture.Persistence;
 
@@ -11,9 +12,11 @@ using jobzilla_net.Infrasture.Persistence;
 namespace jobzilla_net.Infrasture.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527164130_AddResumeBuilderEntities")]
+    partial class AddResumeBuilderEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -493,58 +496,6 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.ToTable("CandidateProjects");
                 });
 
-            modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateReference", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CandidateProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Company")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Designation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReferenceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Relationship")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CandidateProfileId");
-
-                    b.ToTable("CandidateReferences");
-                });
-
             modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateResume", b =>
                 {
                     b.Property<int>("Id")
@@ -559,27 +510,15 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DocumentData")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsBuilderGenerated")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("SettingsJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TemplateId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -591,8 +530,6 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateProfileId");
-
-                    b.HasIndex("TemplateId");
 
                     b.ToTable("CandidateResumes");
                 });
@@ -1565,17 +1502,6 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Navigation("CandidateProfile");
                 });
 
-            modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateReference", b =>
-                {
-                    b.HasOne("jobzilla_net.Core.Entities.CandidateProfile", "CandidateProfile")
-                        .WithMany("References")
-                        .HasForeignKey("CandidateProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CandidateProfile");
-                });
-
             modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateResume", b =>
                 {
                     b.HasOne("jobzilla_net.Core.Entities.CandidateProfile", "CandidateProfile")
@@ -1584,13 +1510,7 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("jobzilla_net.Core.Entities.ResumeTemplate", "Template")
-                        .WithMany()
-                        .HasForeignKey("TemplateId");
-
                     b.Navigation("CandidateProfile");
-
-                    b.Navigation("Template");
                 });
 
             modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateSkill", b =>
@@ -1790,8 +1710,6 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Navigation("JobAlerts");
 
                     b.Navigation("Projects");
-
-                    b.Navigation("References");
 
                     b.Navigation("Resumes");
 

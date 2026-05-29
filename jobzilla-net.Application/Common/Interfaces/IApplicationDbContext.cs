@@ -12,6 +12,13 @@ public interface IApplicationDbContext
     DbSet<Skill> Skills { get; }
     DbSet<JobApplication> JobApplications { get; }
     DbSet<CandidateResume> CandidateResumes { get; }
+    DbSet<CandidateExperience> CandidateExperiences { get; }
+    DbSet<CandidateEducation> CandidateEducations { get; }
+    DbSet<CandidateCertification> CandidateCertifications { get; }
+    DbSet<CandidateProject> CandidateProjects { get; }
+    DbSet<CandidateSocialLink> CandidateSocialLinks { get; }
+    DbSet<CandidateReference> CandidateReferences { get; }
+    DbSet<ResumeTemplate> ResumeTemplates { get; }
     DbSet<SavedJob> SavedJobs { get; }
     DbSet<CandidateSkill> CandidateSkills { get; }
     DbSet<JobPostSkill> JobPostSkills { get; }

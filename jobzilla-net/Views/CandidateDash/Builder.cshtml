@@ -1,0 +1,1119 @@
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@{
+    ViewData["Title"] = "Resume Builder";
+    ViewData["ActivePage"] = "Builder";
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+
+    <!-- INNER PAGE BANNER -->
+    <div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+        <div class="overlay-main site-bg-white opacity-01"></div>
+        <div class="container">
+            <div class="wt-bnr-inr-entry">
+                <div class="banner-title-outer">
+                    <div class="banner-title-name">
+                        <h2 class="wt-title">Resume Builder</h2>
+                    </div>
+                </div>
+                <div>
+                    <ul class="wt-breadcrumb breadcrumb-style-2">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li>Resume Builder</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- INNER PAGE BANNER END -->
+
+    <div class="section-full p-t120 p-b90 site-bg-white">
+        <div class="container">
+            <div class="row">
+
+                <partial name="_CandidateSidebar" model="null" />
+
+                <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
+                    <div class="twm-right-section-panel site-bg-gray">
+
+
+
+                        <!-- Builder header -->
+                        <div class="cvb-toolbar d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="m-0" style="font-weight:700;color:#1a1a2e;">
+                                <i class="fa fa-pencil-ruler me-2" style="color:#00b4d8;"></i>Dynamic CV Builder
+                            </h4>
+                            <div class="d-flex gap-2">
+                                <button id="cvb-add-section-btn" class="cvb-btn cvb-btn-primary" title="Add a new section">
+                                    <i class="fa fa-plus"></i> Add Section
+                                </button>
+                                <a asp-action="Templates" asp-route-resumeId="@ViewBag.ResumeId" class="cvb-btn cvb-btn-outline">
+                                    <i class="fa fa-file-alt"></i> Templates
+                                </a>
+                            </div>
+                        </div>
+
+
+                        <!-- Add section modal drawer -->
+                        <div id="cvb-add-section-drawer" class="cvb-drawer" style="display:none;">
+                            <div class="cvb-drawer-inner">
+                                <div class="cvb-drawer-header">
+                                    <span>Add Section</span>
+                                    <button id="cvb-drawer-close" class="cvb-drawer-close">&times;</button>
+                                </div>
+                                <div class="cvb-drawer-body">
+                                    <p class="text-muted small mb-3">Choose a predefined section or create a custom one.</p>
+                                    <div class="cvb-section-pills" id="cvb-section-pills">
+                                        <!-- populated by JS -->
+                                    </div>
+                                    <hr/>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Custom Section Title</label>
+                                        <div class="d-flex gap-2">
+                                            <input id="cvb-custom-section-name" type="text" class="form-control form-control-sm" placeholder="e.g. Volunteer Work, Publications…" />
+                                            <button id="cvb-add-custom-btn" class="cvb-btn cvb-btn-primary" style="white-space:nowrap;">
+                                                <i class="fa fa-plus"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information card -->
+                        <div class="cvb-card mb-3" id="cvb-personal-card">
+                            <div class="cvb-card-header" id="cvb-personal-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa fa-user-circle" style="color:#00b4d8;font-size:1.1rem;"></i>
+                                    <span class="cvb-section-title-text">Personal Information</span>
+                                </div>
+                                <button class="cvb-collapse-btn" data-target="cvb-personal-body" title="Toggle">
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="cvb-card-body" id="cvb-personal-body">
+                                <div class="row g-3" id="cvb-personal-fields">
+                                    <!-- populated by JS from API -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic sections list -->
+                        <div id="cvb-sections-list">
+                            <!-- section cards injected by JS -->
+                        </div>
+
+                        <!-- Add Section Bottom Button -->
+                        <div class="d-flex justify-content-center mt-4 mb-2">
+                            <button id="cvb-add-section-btn-bottom" class="cvb-btn cvb-btn-outline" style="border-style: dashed; width: 100%; justify-content: center; padding: 12px; border-width: 2px;">
+                                <i class="fa fa-plus"></i> Add New Section
+                            </button>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div id="cvb-empty-state" class="cvb-empty-state" style="display:none;">
+                            <i class="fa fa-file-alt cvb-empty-icon"></i>
+                            <h5>No sections yet</h5>
+                            <p class="text-muted">Click <strong>Add Section</strong> above to build your resume.</p>
+                        </div>
+
+                        <!-- Sticky Save Bar -->
+                        <div id="cvb-sticky-save-bar" class="cvb-sticky-save-bar mb-4">
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span id="cvb-save-status-icon" style="font-size: 1.5rem; color: #64748b;"><i class="fa fa-cloud"></i></span>
+                                    <div class="d-flex flex-column">
+                                        <span id="cvb-save-status-text" style="font-weight: 700; color: #1e293b; line-height: 1.2;">All changes saved</span>
+                                        <span id="cvb-save-timestamp" style="font-size: 0.8rem; color: #64748b;">Ready</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button id="cvb-save-draft-btn" class="cvb-btn cvb-btn-primary">
+                                        <i class="fa fa-save me-1"></i> Save Draft
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom bar -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a asp-action="Resumes" class="cvb-btn cvb-btn-outline">
+                                <i class="fa fa-arrow-left me-1"></i> My Resumes
+                            </a>
+                            <a asp-action="Templates" asp-route-resumeId="@ViewBag.ResumeId" class="cvb-btn cvb-btn-primary">
+                                Choose Template <i class="fa fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+
+                    </div><!-- /twm-right-section-panel -->
+                </div><!-- /col -->
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- CONTENT END -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BUILDER STYLES
+═══════════════════════════════════════════════════════════════ -->
+<style>
+    :root {
+        --cvb-accent:       #00b4d8;
+        --cvb-accent-dark:  #0077b6;
+        --cvb-surface:      #ffffff;
+        --cvb-surface2:     #f8fafc;
+        --cvb-border:       #e2e8f0;
+        --cvb-text:         #1e293b;
+        --cvb-text-muted:   #64748b;
+        --cvb-danger:       #ef4444;
+        --cvb-success:      #22c55e;
+        --cvb-shadow:       0 1px 4px rgba(0,0,0,.08);
+        --cvb-radius:       10px;
+        --cvb-transition:   .18s ease;
+    }
+
+    /* Sticky Save Bar */
+    .cvb-sticky-save-bar {
+        position: sticky;
+        bottom: 20px;
+        z-index: 99;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border: 1.5px solid var(--cvb-border);
+        border-radius: var(--cvb-radius);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        padding: 12px 24px;
+        transition: all var(--cvb-transition);
+    }
+
+    /* Toolbar */
+    .cvb-toolbar {
+        padding: 16px 20px;
+        border-bottom: 2px solid var(--cvb-border);
+        background: var(--cvb-surface);
+        border-radius: var(--cvb-radius) var(--cvb-radius) 0 0;
+        margin: -24px -24px 20px;
+    }
+
+    /* Buttons */
+    .cvb-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 18px;
+        border: none; border-radius: 8px;
+        font-size: .85rem; font-weight: 600;
+        cursor: pointer; text-decoration: none;
+        transition: all var(--cvb-transition);
+    }
+    .cvb-btn-primary   { background: var(--cvb-accent); color: #fff; }
+    .cvb-btn-primary:hover { background: var(--cvb-accent-dark); color:#fff; transform: translateY(-1px); }
+    .cvb-btn-outline   { background: transparent; color: var(--cvb-accent); border: 1.5px solid var(--cvb-accent); }
+    .cvb-btn-outline:hover { background: var(--cvb-accent); color: #fff; }
+    .cvb-btn-danger    { background: var(--cvb-danger); color: #fff; }
+    .cvb-btn-danger:hover { background: #dc2626; }
+    .cvb-btn-ghost     { background: transparent; color: var(--cvb-text-muted); border: 1px solid var(--cvb-border); }
+    .cvb-btn-ghost:hover { background: var(--cvb-surface2); color: var(--cvb-text); }
+    .cvb-btn-icon      { padding: 6px 10px; }
+
+    /* Cards */
+    .cvb-card {
+        background: var(--cvb-surface);
+        border: 1.5px solid var(--cvb-border);
+        border-radius: var(--cvb-radius);
+        box-shadow: var(--cvb-shadow);
+        overflow: hidden;
+        transition: box-shadow var(--cvb-transition);
+    }
+    .cvb-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+    .cvb-card.cvb-dragging { opacity: .6; box-shadow: 0 8px 30px rgba(0,180,216,.25); }
+
+    .cvb-card-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 14px 20px;
+        background: var(--cvb-surface2);
+        border-bottom: 1px solid var(--cvb-border);
+        cursor: grab;
+        user-select: none;
+    }
+    .cvb-card-header:active { cursor: grabbing; }
+
+    .cvb-section-title-text {
+        font-weight: 700; font-size: .95rem; color: var(--cvb-text);
+    }
+
+    .cvb-card-actions { display: flex; gap: 6px; align-items: center; }
+    .cvb-action-btn {
+        background: none; border: none; cursor: pointer;
+        color: var(--cvb-text-muted); font-size: .9rem;
+        padding: 4px 7px; border-radius: 5px;
+        transition: all var(--cvb-transition);
+    }
+    .cvb-action-btn:hover { background: var(--cvb-border); color: var(--cvb-text); }
+    .cvb-action-btn.danger:hover { background: #fee2e2; color: var(--cvb-danger); }
+
+    .cvb-card-body   { padding: 20px; }
+
+    .cvb-collapse-btn {
+        background: none; border: none; cursor: pointer;
+        color: var(--cvb-text-muted); font-size: .85rem;
+        padding: 4px 8px; border-radius: 5px;
+        transition: transform .2s;
+    }
+    .cvb-collapse-btn.collapsed i { transform: rotate(-90deg); display: inline-block; }
+
+    /* Section visibility toggle */
+    .cvb-visibility-toggle { cursor: pointer; }
+    .cvb-section-hidden .cvb-card-header { opacity: .55; }
+
+    /* Items */
+    .cvb-item {
+        background: var(--cvb-surface2);
+        border: 1px solid var(--cvb-border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        position: relative;
+        transition: box-shadow var(--cvb-transition);
+    }
+    .cvb-item:hover { box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+    .cvb-item.cvb-dragging { opacity: .5; }
+
+    .cvb-item-handle {
+        color: var(--cvb-text-muted); cursor: grab; font-size: .85rem;
+        position: absolute; left: 10px; top: 18px;
+    }
+    .cvb-item-handle:active { cursor: grabbing; }
+    .cvb-item-inner { padding-left: 20px; }
+
+    .cvb-item-actions {
+        display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px;
+    }
+
+    /* Form fields */
+    .cvb-field-group { margin-bottom: 12px; }
+    .cvb-field-group label {
+        display: block; font-size: .78rem; font-weight: 600;
+        color: var(--cvb-text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .cvb-field-group input,
+    .cvb-field-group textarea,
+    .cvb-field-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1.5px solid var(--cvb-border);
+        border-radius: 7px;
+        font-size: .88rem;
+        color: var(--cvb-text);
+        background: var(--cvb-surface);
+        transition: border-color var(--cvb-transition), box-shadow var(--cvb-transition);
+        outline: none;
+    }
+    .cvb-field-group input:focus,
+    .cvb-field-group textarea:focus {
+        border-color: var(--cvb-accent);
+        box-shadow: 0 0 0 3px rgba(0,180,216,.15);
+    }
+    .cvb-field-group textarea { resize: vertical; min-height: 72px; }
+
+    /* Skills chip input */
+    .cvb-skills-input {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        padding: 8px; border: 1.5px solid var(--cvb-border); border-radius: 7px;
+        background: var(--cvb-surface); min-height: 48px; cursor: text;
+    }
+    .cvb-skills-input.focused { border-color: var(--cvb-accent); box-shadow: 0 0 0 3px rgba(0,180,216,.15); }
+    .cvb-skill-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: var(--cvb-accent); color: #fff;
+        border-radius: 20px; padding: 4px 12px; font-size: .8rem; font-weight: 600;
+        animation: chipIn .15s ease;
+    }
+    @@keyframes chipIn { from { transform: scale(.8); opacity:0; } to { transform: scale(1); opacity:1; } }
+    .cvb-chip-del {
+        background: none; border: none; color: rgba(255,255,255,.8);
+        cursor: pointer; font-size: .9rem; padding: 0; line-height: 1;
+    }
+    .cvb-chip-del:hover { color: #fff; }
+    .cvb-skill-chip-input {
+        border: none; outline: none; min-width: 100px; font-size: .85rem;
+        background: transparent; padding: 4px;
+    }
+
+    /* Add item button */
+    .cvb-add-item-btn {
+        display: flex; align-items: center; gap: 6px;
+        padding: 9px 16px; width: 100%;
+        background: transparent; border: 1.5px dashed var(--cvb-accent);
+        border-radius: 8px; color: var(--cvb-accent);
+        font-size: .85rem; font-weight: 600; cursor: pointer;
+        transition: all var(--cvb-transition); margin-top: 8px;
+        justify-content: center;
+    }
+    .cvb-add-item-btn:hover { background: rgba(0,180,216,.07); }
+
+    /* Drawer */
+    .cvb-drawer {
+        position: fixed; top: 0; right: 0; bottom: 0; width: 340px;
+        z-index: 10000; display: flex; flex-direction: column;
+        background: var(--cvb-surface);
+        box-shadow: -4px 0 20px rgba(0,0,0,.15);
+        animation: drawerIn .2s ease;
+    }
+    @@keyframes drawerIn { from { transform: translateX(340px); } to { transform: translateX(0); } }
+    .cvb-drawer-inner { display: flex; flex-direction: column; height: 100%; }
+    .cvb-drawer-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 20px; border-bottom: 1px solid var(--cvb-border);
+        font-weight: 700; font-size: 1rem; color: var(--cvb-text);
+    }
+    .cvb-drawer-close {
+        background: none; border: none; font-size: 1.4rem;
+        cursor: pointer; color: var(--cvb-text-muted); line-height: 1;
+        transition: color var(--cvb-transition);
+    }
+    .cvb-drawer-close:hover { color: var(--cvb-danger); }
+    .cvb-drawer-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .cvb-drawer-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.35);
+        z-index: 9999; animation: fadeIn .2s;
+    }
+    @@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    /* Section pills */
+    .cvb-section-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .cvb-section-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 14px; border: 1.5px solid var(--cvb-border);
+        border-radius: 20px; font-size: .82rem; font-weight: 600;
+        cursor: pointer; background: var(--cvb-surface2);
+        color: var(--cvb-text); transition: all var(--cvb-transition);
+    }
+    .cvb-section-pill:hover { border-color: var(--cvb-accent); color: var(--cvb-accent); background: rgba(0,180,216,.07); }
+
+    /* Empty state */
+    .cvb-empty-state {
+        text-align: center; padding: 60px 20px;
+        color: var(--cvb-text-muted);
+    }
+    .cvb-empty-icon { font-size: 3rem; margin-bottom: 16px; color: var(--cvb-border); display: block; }
+
+    /* Sortable ghost */
+    .sortable-ghost { opacity: .35; border: 2px dashed var(--cvb-accent) !important; }
+    .sortable-chosen { box-shadow: 0 8px 30px rgba(0,180,216,.3) !important; }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BUILDER SCRIPT
+═══════════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@@1.15.2/Sortable.min.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    // ── Constants ────────────────────────────────────────────────────────────
+    const SECTION_TEMPLATES = [
+        { type: 'Experience',     title: 'Work Experience', icon: 'fa-briefcase' },
+        { type: 'Education',      title: 'Education',       icon: 'fa-graduation-cap' },
+        { type: 'Skills',         title: 'Skills',          icon: 'fa-tools' },
+        { type: 'Certifications', title: 'Certifications',  icon: 'fa-certificate' },
+        { type: 'Projects',       title: 'Projects',        icon: 'fa-project-diagram' },
+        { type: 'References',     title: 'References',      icon: 'fa-users' },
+        { type: 'Awards',         title: 'Awards',          icon: 'fa-trophy' },
+        { type: 'Languages',      title: 'Languages',       icon: 'fa-language' },
+        { type: 'Publications',   title: 'Publications',    icon: 'fa-book' },
+        { type: 'Volunteer',      title: 'Volunteer Work',  icon: 'fa-hands-helping' },
+        { type: 'Achievements',   title: 'Achievements',    icon: 'fa-star' },
+    ];
+
+    // Fields defined per section type — drives the "Add Item" form.
+    const SECTION_FIELDS = {
+        Experience:     [
+            { key:'JobTitle',    label:'Job Title',        type:'text' },
+            { key:'CompanyName', label:'Company Name',     type:'text' },
+            { key:'Location',    label:'Location',         type:'text' },
+            { key:'StartDate',   label:'Start Date',       type:'date' },
+            { key:'EndDate',     label:'End Date',         type:'date' },
+            { key:'IsCurrent',   label:'Currently Working', type:'checkbox' },
+            { key:'Description', label:'Responsibilities / Description', type:'textarea' },
+        ],
+        Education:      [
+            { key:'InstitutionName', label:'Institution', type:'text' },
+            { key:'Degree',          label:'Degree',      type:'text' },
+            { key:'FieldOfStudy',    label:'Field of Study', type:'text' },
+            { key:'StartDate',  label:'Start Date', type:'date' },
+            { key:'EndDate',    label:'End Date',   type:'date' },
+            { key:'IsCurrent',  label:'Currently Studying', type:'checkbox' },
+            { key:'Description', label:'Description', type:'textarea' },
+        ],
+        Skills:         [
+            { key:'Name', label:'Skill', type:'text' },
+        ],
+        Certifications: [
+            { key:'Name',                label:'Certification Name',    type:'text' },
+            { key:'IssuingOrganization', label:'Issuing Organization',  type:'text' },
+            { key:'IssueDate',           label:'Issue Date',            type:'date' },
+            { key:'ExpirationDate',      label:'Expiration Date',       type:'date' },
+            { key:'CredentialId',        label:'Credential ID',         type:'text' },
+            { key:'CredentialUrl',       label:'Credential URL',        type:'url'  },
+        ],
+        Projects:       [
+            { key:'Name',        label:'Project Name',  type:'text' },
+            { key:'ProjectUrl',  label:'Project URL',   type:'url'  },
+            { key:'StartDate',   label:'Start Date',    type:'date' },
+            { key:'EndDate',     label:'End Date',      type:'date' },
+            { key:'IsOngoing',   label:'Ongoing',       type:'checkbox' },
+            { key:'Description', label:'Description',   type:'textarea' },
+        ],
+        References:     [
+            { key:'ReferenceName', label:'Reference Name', type:'text' },
+            { key:'Company',       label:'Company',         type:'text' },
+            { key:'Designation',   label:'Designation',     type:'text' },
+            { key:'Phone',         label:'Phone',           type:'tel'  },
+            { key:'Email',         label:'Email',           type:'email'},
+            { key:'Relationship',  label:'Relationship',    type:'text' },
+            { key:'Notes',         label:'Notes',           type:'textarea' },
+        ],
+        Awards:         [
+            { key:'Title',        label:'Award Title', type:'text' },
+            { key:'Issuer',       label:'Issuer',      type:'text' },
+            { key:'Date',         label:'Date',        type:'date' },
+            { key:'Description',  label:'Description', type:'textarea' },
+        ],
+        Languages:      [
+            { key:'Language',    label:'Language',    type:'text' },
+            { key:'Proficiency', label:'Proficiency', type:'text' },
+        ],
+        Publications:   [
+            { key:'Title',       label:'Publication Title', type:'text' },
+            { key:'Publisher',   label:'Publisher',         type:'text' },
+            { key:'Date',        label:'Date',              type:'date' },
+            { key:'Url',         label:'URL',               type:'url'  },
+            { key:'Description', label:'Description',       type:'textarea' },
+        ],
+        Volunteer:      [
+            { key:'Organization', label:'Organization', type:'text' },
+            { key:'Role',         label:'Role',          type:'text' },
+            { key:'StartDate',    label:'Start Date',    type:'date' },
+            { key:'EndDate',      label:'End Date',      type:'date' },
+            { key:'Description',  label:'Description',   type:'textarea' },
+        ],
+        Achievements:   [
+            { key:'Title',       label:'Achievement',  type:'text' },
+            { key:'Date',        label:'Date',         type:'date' },
+            { key:'Description', label:'Description',  type:'textarea' },
+        ],
+        Custom:         [
+            { key:'Title',       label:'Title',       type:'text' },
+            { key:'Description', label:'Description', type:'textarea' },
+        ],
+    };
+
+    const PERSONAL_FIELDS = [
+        { key:'fullName',         label:'Full Name',          type:'text',  col:6 },
+        { key:'professionalTitle',label:'Professional Title', type:'text',  col:6 },
+        { key:'email',            label:'Email Address',      type:'email', col:6 },
+        { key:'phone',            label:'Phone',              type:'tel',   col:6 },
+        { key:'location',         label:'Location',           type:'text',  col:6 },
+        { key:'linkedInUrl',      label:'LinkedIn URL',       type:'url',   col:6 },
+        { key:'gitHubUrl',        label:'GitHub URL',         type:'url',   col:6 },
+        { key:'website',          label:'Website',            type:'url',   col:6 },
+        { key:'summary',          label:'Professional Summary', type:'textarea', col:12 },
+    ];
+
+    // ── State ────────────────────────────────────────────────────────────────
+    const _resumeId = @(ViewBag.ResumeId ?? "null");
+    let _document = null;        // The full ResumeDocument from the API
+    let _saveTimer = null;       // Debounce handle
+    let _drawerOverlay = null;
+
+    // ── Bootstrap ────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+        buildSectionPills();
+        await loadDocument();
+        wirePersonalSave();
+        wireDrawer();
+        wireAddCustomSection();
+        initSectionSortable();
+
+        document.getElementById('cvb-save-draft-btn')?.addEventListener('click', () => {
+            clearTimeout(_saveTimer);
+            if (_isDirty) autosave();
+            else updateSaveUI('Already saved', 'fa-check-circle', '#22c55e');
+        });
+    });
+
+    // ── API helpers ──────────────────────────────────────────────────────────
+    function getToken() {
+        return document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+    }
+
+    async function apiFetch(url, method = 'GET', body = null) {
+        const opts = {
+            method,
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': getToken() }
+        };
+        if (body) opts.body = JSON.stringify(body);
+        
+        let finalUrl = url;
+        if (_resumeId !== null) {
+            finalUrl += (url.includes('?') ? '&' : '?') + 'resumeId=' + _resumeId;
+        }
+        
+        const r = await fetch(finalUrl, opts);
+        if (!r.ok) throw new Error(`${method} ${finalUrl} → ${r.status}`);
+        return r.json();
+    }
+
+    // ── Load document ────────────────────────────────────────────────────────
+    async function loadDocument() {
+        try {
+            updateSaveUI('Loading…', 'fa-spinner fa-spin', '#00b4d8');
+            _document = await apiFetch('/api/resume/document');
+            _lastSavedDataStr = JSON.stringify(_document);
+            renderPersonal();
+            renderSections();
+            updateSaveUI('All changes saved', 'fa-check-circle', '#22c55e');
+        } catch (e) {
+            updateSaveUI('Failed to load resume.', 'fa-exclamation-triangle', '#ef4444');
+            console.error(e);
+        }
+    }
+
+    // ── Personal info rendering ───────────────────────────────────────────────
+    function renderPersonal() {
+        const container = document.getElementById('cvb-personal-fields');
+        container.innerHTML = '';
+        PERSONAL_FIELDS.forEach(f => {
+            const col = document.createElement('div');
+            col.className = `col-lg-${f.col} col-md-12`;
+            col.innerHTML = buildFieldHtml(f.key, f.label, _document?.[f.key] ?? '', f.type, 'cvb-personal-field');
+            container.appendChild(col);
+        });
+    }
+
+    function wirePersonalSave() {
+        document.querySelectorAll('.cvb-personal-field').forEach(el => {
+            const handler = () => {
+                if (_document) {
+                    _document[el.dataset.key] = el.value || null;
+                    scheduleAutosave();
+                }
+            };
+            el.addEventListener('change', handler);
+            el.addEventListener('input', handler);
+        });
+    }
+
+    // ── Sections rendering ────────────────────────────────────────────────────
+    function renderSections() {
+        const list = document.getElementById('cvb-sections-list');
+        list.innerHTML = '';
+        const sections = (_document?.sections ?? []).slice().sort((a, b) => a.displayOrder - b.displayOrder);
+        sections.forEach(sec => list.appendChild(buildSectionCard(sec)));
+        document.getElementById('cvb-empty-state').style.display = sections.length === 0 ? '' : 'none';
+        initSectionSortable();
+        sections.forEach(sec => initItemSortable(sec.id));
+    }
+
+    function buildSectionCard(sec) {
+        const card = document.createElement('div');
+        card.className = 'cvb-card mb-3';
+        card.dataset.sectionId = sec.id;
+        card.dataset.sectionType = sec.sectionType;
+
+        const sectionIcon = (SECTION_TEMPLATES.find(t => t.type === sec.sectionType)?.icon ?? 'fa-list');
+        const isSkills = sec.sectionType === 'Skills';
+
+        card.innerHTML = `
+            <div class="cvb-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa fa-grip-vertical" style="color:#cbd5e1;"></i>
+                    <i class="fa ${sectionIcon}" style="color:var(--cvb-accent);font-size:1rem;"></i>
+                    <span class="cvb-section-title-text" contenteditable="true"
+                          data-section-id="${sec.id}">${escHtml(sec.title)}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="cvb-action-btn cvb-visibility-toggle" title="Toggle visibility"
+                            data-section-id="${sec.id}">
+                        <i class="fa ${sec.isVisible ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    </button>
+                    <button class="cvb-action-btn danger cvb-delete-section" title="Delete section"
+                            data-section-id="${sec.id}">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                    <button class="cvb-collapse-btn" data-target="cvb-section-body-${sec.id}" title="Collapse">
+                        <i class="fa fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="cvb-card-body" id="cvb-section-body-${sec.id}">
+                ${isSkills ? buildSkillsBody(sec) : ''}
+                <div class="cvb-items-list" id="cvb-items-${sec.id}">
+                    ${isSkills ? '' : (sec.items ?? []).map(item => buildItemHtml(item, sec.sectionType)).join('')}
+                </div>
+                ${isSkills ? '' : `
+                <button class="cvb-add-item-btn" data-section-id="${sec.id}">
+                    <i class="fa fa-plus-circle"></i> Add ${getItemLabel(sec.sectionType)}
+                </button>`}
+            </div>
+        `;
+
+        // Wire collapse
+        wireCollapse(card);
+        // Wire section title rename (autosave on blur)
+        const titleEl = card.querySelector('.cvb-section-title-text');
+        titleEl.addEventListener('blur', () => {
+            const s = _document.sections.find(s => s.id === sec.id);
+            if (s) {
+                s.title = titleEl.textContent.trim();
+                scheduleAutosave();
+            }
+        });
+        // Wire visibility toggle
+        card.querySelector('.cvb-visibility-toggle').addEventListener('click', function () {
+            const s = _document.sections.find(s => s.id === sec.id);
+            if (s) {
+                s.isVisible = !s.isVisible;
+                this.querySelector('i').className = `fa ${s.isVisible ? 'fa-eye' : 'fa-eye-slash'}`;
+                card.classList.toggle('cvb-section-hidden', !s.isVisible);
+                scheduleAutosave();
+            }
+        });
+        // Wire delete
+        card.querySelector('.cvb-delete-section').addEventListener('click', () => {
+            if (confirm(`Delete "${sec.title}"? This will remove all items in this section.`)) {
+                deleteSection(sec.id, card);
+            }
+        });
+        // Wire add item
+        const addItemBtn = card.querySelector('.cvb-add-item-btn');
+        if (addItemBtn) {
+            addItemBtn.addEventListener('click', () => addItem(sec.id, sec.sectionType, card));
+        }
+        // Wire existing item actions
+        wireItemActions(card, sec.id, sec.sectionType);
+
+        return card;
+    }
+
+    // ── Skills special renderer ───────────────────────────────────────────────
+    function buildSkillsBody(sec) {
+        const skills = (sec.items ?? []).map(i => i.fields?.find(f => f.key === 'Name')?.value).filter(Boolean);
+        return `
+            <div class="cvb-field-group mb-3">
+                <label>Skills (press Enter or comma to add)</label>
+                <div class="cvb-skills-input" id="cvb-skills-box-${sec.id}">
+                    ${skills.map(s => `<span class="cvb-skill-chip">${escHtml(s)}<button class="cvb-chip-del" title="Remove">&times;</button></span>`).join('')}
+                    <input class="cvb-skill-chip-input" id="cvb-skill-input-${sec.id}" placeholder="Type a skill…" data-section-id="${sec.id}" />
+                </div>
+            </div>
+        `;
+    }
+
+    function wireSkillsBox(container, sectionId) {
+        const box = container.querySelector(`#cvb-skills-box-${sectionId}`);
+        const input = container.querySelector(`#cvb-skill-input-${sectionId}`);
+        if (!box || !input) return;
+
+        box.addEventListener('click', () => input.focus());
+        box.addEventListener('focusin', () => box.classList.add('focused'));
+        box.addEventListener('focusout', () => box.classList.remove('focused'));
+
+        function addChip(val) {
+            val = val.trim();
+            if (!val) return;
+            const chip = document.createElement('span');
+            chip.className = 'cvb-skill-chip';
+            chip.innerHTML = `${escHtml(val)}<button class="cvb-chip-del" title="Remove">&times;</button>`;
+            chip.querySelector('.cvb-chip-del').addEventListener('click', () => {
+                chip.remove();
+                syncSkills(sectionId, box);
+            });
+            box.insertBefore(chip, input);
+            input.value = '';
+            syncSkills(sectionId, box);
+        }
+
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addChip(input.value.replace(',', ''));
+            } else if (e.key === 'Backspace' && !input.value) {
+                const chips = box.querySelectorAll('.cvb-skill-chip');
+                chips[chips.length - 1]?.remove();
+                syncSkills(sectionId, box);
+            }
+        });
+
+        box.querySelectorAll('.cvb-chip-del').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.closest('.cvb-skill-chip').remove();
+                syncSkills(sectionId, box);
+            });
+        });
+    }
+
+    function syncSkills(sectionId, box) {
+        const skills = [...box.querySelectorAll('.cvb-skill-chip')].map(c => c.textContent.trim()).filter(Boolean);
+        const s = _document?.sections?.find(s => s.id === sectionId);
+        if (s) {
+            s.items = skills.map((name, i) => ({
+                id: `sk_${i}`,
+                displayOrder: i,
+                fields: [{ key: 'Name', label: 'Skill', value: name, fieldType: 'text' }]
+            }));
+        }
+        debounceSaveSkills(sectionId, skills);
+    }
+
+    function debounceSaveSkills(sectionId, skills) {
+        scheduleAutosave();
+    }
+
+    // ── Item rendering ────────────────────────────────────────────────────────
+    function buildItemHtml(item, sectionType) {
+        const fieldDefs = SECTION_FIELDS[sectionType] ?? SECTION_FIELDS['Custom'];
+        const fieldsHtml = buildItemFieldsHtml(item, fieldDefs);
+
+        return `
+            <div class="cvb-item" data-item-id="${item.id}">
+                <span class="cvb-item-handle" title="Drag to reorder"><i class="fa fa-grip-lines-vertical"></i></span>
+                <div class="cvb-item-inner">
+                    <div class="row g-2">${fieldsHtml}</div>
+                    <div class="cvb-item-actions">
+                        <button class="cvb-btn cvb-btn-danger cvb-btn-icon cvb-delete-item" data-item-id="${item.id}" title="Delete">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function buildItemFieldsHtml(item, fieldDefs) {
+        return fieldDefs.map(def => {
+            const value = item?.fields?.find(f => f.key === def.key)?.value ?? '';
+            const col = (def.type === 'textarea' || def.key === 'Description') ? 12 : 6;
+            return `<div class="col-md-${col}">${buildFieldHtml(def.key, def.label, value, def.type, 'cvb-item-field', item?.id)}</div>`;
+        }).join('');
+    }
+
+    function buildFieldHtml(key, label, value, type, cssClass, itemId = '') {
+        const dataAttrs = `data-key="${key}" ${itemId ? `data-item-id="${itemId}"` : ''}`;
+        const inputId = `fld_${key}_${itemId || 'personal'}`;
+        if (type === 'textarea') {
+            return `
+                <div class="cvb-field-group">
+                    <label for="${inputId}">${escHtml(label)}</label>
+                    <textarea id="${inputId}" class="${cssClass}" ${dataAttrs} rows="3">${escHtml(value ?? '')}</textarea>
+                </div>`;
+        }
+        if (type === 'checkbox') {
+            const checked = (value === 'true') ? 'checked' : '';
+            return `
+                <div class="cvb-field-group">
+                    <label style="display:flex;align-items:center;gap:8px;text-transform:none;">
+                        <input type="checkbox" id="${inputId}" class="${cssClass}" ${dataAttrs} ${checked} style="width:auto;" />
+                        ${escHtml(label)}
+                    </label>
+                </div>`;
+        }
+        return `
+            <div class="cvb-field-group">
+                <label for="${inputId}">${escHtml(label)}</label>
+                <input id="${inputId}" type="${type}" class="${cssClass}" ${dataAttrs} value="${escAttr(value ?? '')}" />
+            </div>`;
+    }
+
+    // ── Item actions ──────────────────────────────────────────────────────────
+    function wireItemActions(container, sectionId, sectionType) {
+        wireSkillsBox(container, sectionId);
+        container.querySelectorAll('.cvb-delete-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const itemCard = btn.closest('.cvb-item');
+                const itemId = btn.dataset.itemId;
+                if (confirm('Delete this entry?')) {
+                    itemCard.style.transition = 'opacity .2s';
+                    itemCard.style.opacity = '0';
+                    setTimeout(() => {
+                        itemCard.remove();
+                        const s = _document?.sections?.find(s => s.id === sectionId);
+                        if (s) s.items = s.items.filter(i => i.id !== itemId);
+                        scheduleAutosave();
+                    }, 200);
+                }
+            });
+        });
+        // Autosave on field change
+        container.querySelectorAll('.cvb-item-field').forEach(el => {
+            const handler = () => {
+                const s = _document?.sections?.find(s => s.id === sectionId);
+                const item = s?.items?.find(i => i.id === el.dataset.itemId);
+                if (item) {
+                    let field = item.fields.find(f => f.key === el.dataset.key);
+                    if (!field) {
+                        field = { key: el.dataset.key, label: '', value: '', fieldType: 'text' };
+                        item.fields.push(field);
+                    }
+                    field.value = el.type === 'checkbox' ? (el.checked ? 'true' : 'false') : el.value;
+                    scheduleAutosave();
+                }
+            };
+            el.addEventListener('change', handler);
+            el.addEventListener('input', handler);
+        });
+    }
+
+    function addItem(sectionId, sectionType, card) {
+        const fieldDefs = SECTION_FIELDS[sectionType] ?? SECTION_FIELDS['Custom'];
+        const newItem = {
+            id: 'new_' + Date.now(),
+            displayOrder: 999,
+            fields: fieldDefs.map(f => ({ key: f.key, label: f.label, value: '', fieldType: f.type || 'text' }))
+        };
+        const s = _document?.sections?.find(s => s.id === sectionId);
+        if (s) s.items.push(newItem);
+
+        const itemsList = card.querySelector(`#cvb-items-${sectionId}`);
+        itemsList.insertAdjacentHTML('beforeend', buildItemHtml(newItem, sectionType));
+
+        // Wire the newly added item's actions
+        const newCard = itemsList.lastElementChild;
+        newCard.querySelectorAll('.cvb-delete-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (confirm('Delete this entry?')) {
+                    newCard.remove();
+                    if (s) s.items = s.items.filter(i => i.id !== newItem.id);
+                }
+            });
+        });
+        newCard.querySelectorAll('.cvb-item-field').forEach(el => {
+            const handler = (e) => {
+                const field = newItem.fields.find(f => f.key === el.dataset.key);
+                if (field) field.value = el.type === 'checkbox' ? (el.checked ? 'true' : 'false') : el.value;
+                scheduleAutosave();
+            };
+            el.addEventListener('change', handler);
+            el.addEventListener('input', handler);
+        });
+        initItemSortable(sectionId);
+        newCard.querySelector('.cvb-item-field')?.focus();
+    }
+
+    // ── Delete section ────────────────────────────────────────────────────────
+    function deleteSection(sectionId, cardEl) {
+        cardEl.style.transition = 'opacity .2s, transform .2s';
+        cardEl.style.opacity = '0';
+        cardEl.style.transform = 'translateY(-8px)';
+        setTimeout(() => {
+            cardEl.remove();
+            if (_document) _document.sections = _document.sections.filter(s => s.id !== sectionId);
+            const empty = document.getElementById('cvb-empty-state');
+            if (!document.querySelector('#cvb-sections-list .cvb-card')) empty.style.display = '';
+            scheduleAutosave();
+        }, 220);
+    }
+
+    // ── Add section ───────────────────────────────────────────────────────────
+    function addSection(type, title) {
+        const newSec = {
+            id: type.toLowerCase() + '_' + Date.now(),
+            sectionType: type,
+            title: title,
+            displayOrder: (_document?.sections?.length ?? 0),
+            isVisible: true,
+            items: []
+        };
+        if (!_document) _document = { sections: [] };
+        _document.sections.push(newSec);
+
+        const list = document.getElementById('cvb-sections-list');
+        list.appendChild(buildSectionCard(newSec));
+        document.getElementById('cvb-empty-state').style.display = 'none';
+        initSectionSortable();
+        initItemSortable(newSec.id);
+        closeDrawer();
+        scheduleAutosave();
+    }
+
+    // ── Drawer ────────────────────────────────────────────────────────────────
+    function buildSectionPills() {
+        const container = document.getElementById('cvb-section-pills');
+        SECTION_TEMPLATES.forEach(t => {
+            const pill = document.createElement('button');
+            pill.className = 'cvb-section-pill';
+            pill.innerHTML = `<i class="fa ${t.icon}"></i> ${t.title}`;
+            pill.addEventListener('click', () => addSection(t.type, t.title));
+            container.appendChild(pill);
+        });
+    }
+
+    function wireDrawer() {
+        document.getElementById('cvb-add-section-btn').addEventListener('click', openDrawer);
+        document.getElementById('cvb-add-section-btn-bottom').addEventListener('click', openDrawer);
+        document.getElementById('cvb-drawer-close').addEventListener('click', closeDrawer);
+    }
+
+    function openDrawer() {
+        const drawer = document.getElementById('cvb-add-section-drawer');
+        drawer.style.display = '';
+        _drawerOverlay = document.createElement('div');
+        _drawerOverlay.className = 'cvb-drawer-overlay';
+        _drawerOverlay.addEventListener('click', closeDrawer);
+        document.body.appendChild(_drawerOverlay);
+    }
+
+    function closeDrawer() {
+        document.getElementById('cvb-add-section-drawer').style.display = 'none';
+        _drawerOverlay?.remove();
+        _drawerOverlay = null;
+    }
+
+    function wireAddCustomSection() {
+        document.getElementById('cvb-add-custom-btn').addEventListener('click', () => {
+            const input = document.getElementById('cvb-custom-section-name');
+            const title = input.value.trim();
+            if (!title) { input.focus(); return; }
+            addSection('Custom', title);
+            input.value = '';
+        });
+        document.getElementById('cvb-custom-section-name').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('cvb-add-custom-btn').click();
+        });
+    }
+
+    // ── Sortable ──────────────────────────────────────────────────────────────
+    function initSectionSortable() {
+        const list = document.getElementById('cvb-sections-list');
+        if (list._sortable) list._sortable.destroy();
+        list._sortable = Sortable.create(list, {
+            animation: 200,
+            handle: '.cvb-card-header',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: () => {
+                if (!_document) return;
+                [...list.querySelectorAll('.cvb-card')].forEach((el, i) => {
+                    const id = el.dataset.sectionId;
+                    const s = _document.sections.find(s => s.id === id);
+                    if (s) s.displayOrder = i;
+                });
+                scheduleAutosave();
+            }
+        });
+    }
+
+    function initItemSortable(sectionId) {
+        const el = document.getElementById(`cvb-items-${sectionId}`);
+        if (!el) return;
+        if (el._sortable) el._sortable.destroy();
+        el._sortable = Sortable.create(el, {
+            animation: 150,
+            handle: '.cvb-item-handle',
+            ghostClass: 'sortable-ghost',
+            onEnd: () => {
+                const s = _document?.sections?.find(s => s.id === sectionId);
+                if (!s) return;
+                [...el.querySelectorAll('.cvb-item')].forEach((card, i) => {
+                    const id = card.dataset.itemId;
+                    const item = s.items.find(it => it.id === id);
+                    if (item) item.displayOrder = i;
+                });
+                scheduleAutosave();
+            }
+        });
+    }
+
+    // ── Collapse ──────────────────────────────────────────────────────────────
+    function wireCollapse(root) {
+        root.querySelectorAll('.cvb-collapse-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const body = document.getElementById(targetId);
+                if (!body) return;
+                const isHidden = body.style.display === 'none';
+                body.style.display = isHidden ? '' : 'none';
+                btn.classList.toggle('collapsed', !isHidden);
+            });
+        });
+    }
+
+    // ── Autosave ──────────────────────────────────────────────────────────────
+    let _isDirty = false;
+    let _isSaving = false;
+    let _lastSavedDataStr = null;
+
+    function scheduleAutosave() {
+        _isDirty = true;
+        updateSaveUI('Unsaved changes…', 'fa-pencil-alt', '#f59e0b');
+        clearTimeout(_saveTimer);
+        _saveTimer = setTimeout(autosave, 2500);
+    }
+
+    async function autosave() {
+        if (!_document || !_isDirty || _isSaving) return;
+        
+        const currentDataStr = JSON.stringify(_document);
+        if (currentDataStr === _lastSavedDataStr) {
+            _isDirty = false;
+            updateSaveUI('All changes saved', 'fa-check-circle', '#22c55e');
+            return;
+        }
+
+        _isSaving = true;
+        try {
+            updateSaveUI('Saving…', 'fa-spinner fa-spin', '#00b4d8');
+            await apiFetch('/api/resume/personal', 'PUT', _document);
+            _lastSavedDataStr = currentDataStr;
+            _isDirty = false;
+            
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('cvb-save-timestamp').textContent = `Last saved: ${timeStr}`;
+            updateSaveUI('All changes saved', 'fa-check-circle', '#22c55e');
+        } catch (e) {
+            updateSaveUI('Save failed. Retrying...', 'fa-exclamation-triangle', '#ef4444');
+            setTimeout(autosave, 5000); // retry
+        } finally {
+            _isSaving = false;
+            if (_isDirty) scheduleAutosave();
+        }
+    }
+
+    function updateSaveUI(text, iconClass, color) {
+        const textEl = document.getElementById('cvb-save-status-text');
+        if(textEl) textEl.textContent = text;
+        const iconSpan = document.getElementById('cvb-save-status-icon');
+        if(iconSpan) {
+            iconSpan.innerHTML = `<i class="fa ${iconClass}"></i>`;
+            iconSpan.style.color = color;
+        }
+    }
+
+    // ── Utilities ─────────────────────────────────────────────────────────────
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    }
+
+    function getItemLabel(sectionType) {
+        const map = {
+            Experience: 'Job', Education: 'Degree', Skills: 'Skill',
+            Certifications: 'Certification', Projects: 'Project',
+            References: 'Reference', Awards: 'Award',
+            Languages: 'Language', Publications: 'Publication',
+            Volunteer: 'Role', Achievements: 'Achievement',
+        };
+        return map[sectionType] ?? 'Entry';
+    }
+
+})();
+</script>
+<!-- CSRF helper for fetch calls -->
+@Html.AntiForgeryToken()

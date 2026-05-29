@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using jobzilla_net.Infrasture.Persistence;
 
@@ -11,9 +12,11 @@ using jobzilla_net.Infrasture.Persistence;
 namespace jobzilla_net.Infrasture.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260529105353_AddResumeDocumentData")]
+    partial class AddResumeDocumentData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -575,12 +578,6 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("SettingsJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TemplateId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -591,8 +588,6 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateProfileId");
-
-                    b.HasIndex("TemplateId");
 
                     b.ToTable("CandidateResumes");
                 });
@@ -1584,13 +1579,7 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("jobzilla_net.Core.Entities.ResumeTemplate", "Template")
-                        .WithMany()
-                        .HasForeignKey("TemplateId");
-
                     b.Navigation("CandidateProfile");
-
-                    b.Navigation("Template");
                 });
 
             modelBuilder.Entity("jobzilla_net.Core.Entities.CandidateSkill", b =>

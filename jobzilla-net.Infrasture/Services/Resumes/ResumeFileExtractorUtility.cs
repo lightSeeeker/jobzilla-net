@@ -1,0 +1,85 @@
+using System.Linq;
+using System.Text;
+using DocumentFormat.OpenXml.Packaging;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using jobzilla_net.Application.Resumes.Interfaces;
+using Microsoft.Extensions.Logging;
+
+namespace jobzilla_net.Infrasture.Services.Resumes;
+
+public static class ResumeFileExtractorUtility
+{
+    public static async Task<string> ExtractTextAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException("Resume file not found.", filePath);
+
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+        return extension switch
+        {
+            ".pdf"  => await ExtractFromPdfAsync(filePath),
+            ".docx" => await ExtractFromDocxAsync(filePath),
+            ".doc"  => await ExtractFromDocxAsync(filePath), // best-effort for legacy .doc
+            ".txt"  => await File.ReadAllTextAsync(filePath, cancellationToken),
+            _ => throw new NotSupportedException($"File type '{extension}' is not supported for text extraction.")
+        };
+    }
+
+    private static Task<string> ExtractFromPdfAsync(string filePath)
+    {
+        var sb = new StringBuilder();
+
+        using var reader = new PdfReader(filePath);
+        using var pdf = new PdfDocument(reader);
+
+        for (int page = 1; page <= pdf.GetNumberOfPages(); page++)
+        {
+            var strategy = new LocationTextExtractionStrategy();
+            var text = PdfTextExtractor.GetTextFromPage(pdf.GetPage(page), strategy);
+            sb.AppendLine(text);
+        }
+
+        return Task.FromResult(sb.ToString());
+    }
+
+    private static Task<string> ExtractFromDocxAsync(string filePath)
+    {
+        var sb = new StringBuilder();
+
+        using var doc = WordprocessingDocument.Open(filePath, false);
+        var body = doc.MainDocumentPart?.Document?.Body;
+
+        if (body != null)
+        {
+            // Process body elements sequentially to keep exact reading and table layout flow
+            foreach (var element in body.ChildElements)
+            {
+                if (element is DocumentFormat.OpenXml.Wordprocessing.Paragraph para)
+                {
+                    sb.AppendLine(para.InnerText);
+                }
+                else if (element is DocumentFormat.OpenXml.Wordprocessing.Table table)
+                {
+                    sb.AppendLine();
+                    foreach (var row in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableRow>())
+                    {
+                        var cells = row.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>()
+                                       .Select(c => c.InnerText.Trim())
+                                       .ToList();
+                        
+                        if (cells.Count > 0)
+                        {
+                            sb.AppendLine("| " + string.Join(" | ", cells) + " |");
+                        }
+                    }
+                    sb.AppendLine();
+                }
+            }
+        }
+
+        return Task.FromResult(sb.ToString());
+    }
+}

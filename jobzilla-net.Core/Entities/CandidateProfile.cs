@@ -19,4 +19,10 @@ public class CandidateProfile : AuditableEntity
     public ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
     public ICollection<JobAlert> JobAlerts { get; set; } = new List<JobAlert>();
     public ICollection<CandidateSkill> Skills { get; set; } = new List<CandidateSkill>();
+    public ICollection<CandidateExperience> Experiences { get; set; } = new List<CandidateExperience>();
+    public ICollection<CandidateEducation> Educations { get; set; } = new List<CandidateEducation>();
+    public ICollection<CandidateCertification> Certifications { get; set; } = new List<CandidateCertification>();
+    public ICollection<CandidateProject> Projects { get; set; } = new List<CandidateProject>();
+    public ICollection<CandidateSocialLink> SocialLinks { get; set; } = new List<CandidateSocialLink>();
+    public ICollection<CandidateReference> References { get; set; } = new List<CandidateReference>();
 }

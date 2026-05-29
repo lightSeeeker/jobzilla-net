@@ -49,6 +49,20 @@ public sealed class JobsController : Controller
         if (job is null)
             return NotFound();
 
+        ViewBag.HasApplied = false;
+        ViewBag.CandidateResumes = new List<jobzilla_net.Application.Candidates.Dtos.CandidateResumeDto>();
+
+        if (User.Identity?.IsAuthenticated == true && User.IsInRole("Candidate"))
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var candidateService = HttpContext.RequestServices.GetRequiredService<jobzilla_net.Application.Candidates.ICandidateDashboardService>();
+                ViewBag.HasApplied = await candidateService.HasAppliedForJobAsync(userId, job.Id);
+                ViewBag.CandidateResumes = await candidateService.GetResumesAsync(userId);
+            }
+        }
+
         return View(job);
     }
 }

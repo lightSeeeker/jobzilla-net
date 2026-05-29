@@ -24,4 +24,8 @@ public interface ICandidateDashboardService
     Task<bool> SetDefaultResumeAsync(string userId, int resumeId);
 
     Task<CandidateResumeDto?> CreateScratchResumeAsync(string userId, string title);
+
+    Task<(bool Success, string Message)> ApplyForJobAsync(string userId, int jobId, int? resumeId, string? coverLetter);
+    
+    Task<bool> HasAppliedForJobAsync(string userId, int jobId);
 }

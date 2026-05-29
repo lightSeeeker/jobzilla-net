@@ -1,4 +1,4 @@
-﻿@model jobzilla_net.Application.Jobs.Dtos.JobSummaryDto
+@model jobzilla_net.Application.Jobs.Dtos.JobSummaryDto
 @{
     ViewData["Title"] = Model.Title + " - Job Detail";
 
@@ -89,10 +89,44 @@
                                             }
                                         </div>
 
-                                        <div class="twm-job-self-bottom">
-                                            <a class="site-button" data-bs-toggle="modal" href="#apply_job_popup" role="button">
-                                                Apply Now
-                                            </a>
+                                        <div class="twm-job-self-bottom" id="apply-button-container">
+                                            @if (!User.Identity.IsAuthenticated)
+                                            {
+                                                <a class="site-button" href="/Account/Login?returnUrl=/Jobs/Details/@Model.Id">
+                                                    Apply Now
+                                                </a>
+                                            }
+                                            else if (User.IsInRole("Candidate"))
+                                            {
+                                                if (ViewBag.HasApplied == true)
+                                                {
+                                                    <a class="site-button outline-primary disabled" href="javascript:void(0);">
+                                                        Already Applied
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    var resumes = ViewBag.CandidateResumes as List<jobzilla_net.Application.Candidates.Dtos.CandidateResumeDto>;
+                                                    if (resumes == null || !resumes.Any())
+                                                    {
+                                                        <a class="site-button" href="/CandidateDash/Resumes">
+                                                            Create Resume to Apply
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a class="site-button" id="apply-now-btn" data-bs-toggle="modal" href="#apply_job_popup" role="button">
+                                                            Apply Now
+                                                        </a>
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <a class="site-button outline-primary disabled" href="javascript:void(0);" title="Only candidates can apply">
+                                                    Apply Now
+                                                </a>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -315,37 +349,39 @@
                 <div class="apl-job-inpopup">
                     <div class="panel panel-default">
                         <div class="panel-body wt-panel-body p-a20">
-                            <div class="twm-tabs-style-1">
+                            <form id="applyJobForm" class="twm-tabs-style-1">
+                                <div id="applyMessageArea"></div>
                                 <div class="row">
+                                    <input type="hidden" name="jobId" value="@Model.Id" />
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="form-group">
-                                            <label>Your Name</label>
+                                            <label>Select Resume</label>
                                             <div class="ls-inputicon-box">
-                                                <input class="form-control" name="company_name" type="text" placeholder="Devid Smith">
-                                                <i class="fs-input-icon fa fa-user"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-12 col-lg-12 col-md-12">
-                                        <div class="form-group">
-                                            <label>Email Address</label>
-                                            <div class="ls-inputicon-box">
-                                                <input class="form-control" name="company_Email" type="email" placeholder="Devid@example.com">
-                                                <i class="fs-input-icon fas fa-at"></i>
+                                                <select class="form-control" name="resumeId" required>
+                                                    <option value="">-- Select a Resume --</option>
+                                                    @if (ViewBag.CandidateResumes != null)
+                                                    {
+                                                        foreach (var resume in (List<jobzilla_net.Application.Candidates.Dtos.CandidateResumeDto>)ViewBag.CandidateResumes)
+                                                        {
+                                                            <option value="@resume.Id">@resume.Title @(resume.IsDefault ? "(Default)" : "")</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                <i class="fs-input-icon fa fa-file-alt"></i>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Message</label>
-                                            <textarea class="form-control" rows="3" placeholder="Message sent to the employer"></textarea>
+                                            <label>Cover Letter (Optional)</label>
+                                            <textarea class="form-control" name="coverLetter" rows="3" placeholder="Message sent to the employer"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-lg-12 col-md-12 text-right">
-                                        <button type="submit" class="site-button">Submit Application</button>
+                                        <button type="submit" id="btnApplySubmit" class="site-button">Submit Application</button>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -353,6 +389,63 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('applyJobForm');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const btn = document.getElementById('btnApplySubmit');
+                    const msgArea = document.getElementById('applyMessageArea');
+                    const formData = new FormData(form);
+                    
+                    btn.disabled = true;
+                    btn.innerHTML = 'Submitting... <i class="fa fa-spinner fa-spin"></i>';
+                    msgArea.innerHTML = '';
+                    
+                    try {
+                        const response = await fetch('/CandidateDash/ApplyJob', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            msgArea.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+                            form.reset();
+                            // Disable the apply button on the page
+                            const applyBtn = document.getElementById('apply-now-btn');
+                            if (applyBtn) {
+                                applyBtn.className = 'site-button outline-primary disabled';
+                                applyBtn.innerHTML = 'Already Applied';
+                                applyBtn.removeAttribute('data-bs-toggle');
+                                applyBtn.removeAttribute('href');
+                            }
+                            
+                            setTimeout(() => {
+                                const modalEl = document.getElementById('apply_job_popup');
+                                const modal = bootstrap.Modal.getInstance(modalEl);
+                                if (modal) modal.hide();
+                            }, 2000);
+                        } else {
+                            msgArea.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
+                            btn.disabled = false;
+                            btn.innerHTML = 'Submit Application';
+                        }
+                    } catch (error) {
+                        msgArea.innerHTML = `<div class="alert alert-danger">An error occurred while submitting. Please try again.</div>`;
+                        btn.disabled = false;
+                        btn.innerHTML = 'Submit Application';
+                    }
+                });
+            }
+        });
+    </script>
+}
 
 
 

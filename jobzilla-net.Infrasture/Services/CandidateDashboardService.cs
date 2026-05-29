@@ -311,4 +311,45 @@ public class CandidateDashboardService : ICandidateDashboardService
         await _context.SaveChangesAsync(CancellationToken.None);
         return true;
     }
+
+    public async Task<(bool Success, string Message)> ApplyForJobAsync(string userId, int jobId, int? resumeId, string? coverLetter)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        
+        var job = await _context.JobPosts.FirstOrDefaultAsync(j => j.Id == jobId);
+        if (job == null || job.Status != jobzilla_net.Core.Enums.JobStatus.Published)
+        {
+            return (false, "Job is not available or does not exist.");
+        }
+
+        var alreadyApplied = await _context.JobApplications
+            .AnyAsync(a => a.JobPostId == jobId && a.CandidateProfileId == profile.Id);
+            
+        if (alreadyApplied)
+        {
+            return (false, "You have already applied for this job.");
+        }
+
+        var application = new jobzilla_net.Core.Entities.JobApplication
+        {
+            JobPostId = jobId,
+            CandidateProfileId = profile.Id,
+            CandidateResumeId = resumeId,
+            CoverLetter = coverLetter,
+            Status = jobzilla_net.Core.Enums.ApplicationStatus.Submitted,
+            AppliedAtUtc = DateTime.UtcNow
+        };
+
+        _context.JobApplications.Add(application);
+        await _context.SaveChangesAsync(CancellationToken.None);
+
+        return (true, "Application submitted successfully.");
+    }
+
+    public async Task<bool> HasAppliedForJobAsync(string userId, int jobId)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        return await _context.JobApplications
+            .AnyAsync(a => a.JobPostId == jobId && a.CandidateProfileId == profile.Id);
+    }
 }

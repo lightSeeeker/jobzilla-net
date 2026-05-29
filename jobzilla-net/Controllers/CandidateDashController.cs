@@ -469,5 +469,20 @@ public class CandidateDashController : Controller
         var ok = await _resumeBuilderService.DeleteReferenceAsync(GetUserId(), id, ct);
         return ok ? Ok(new { success = true }) : NotFound(new { error = "Reference not found." });
     }
+
+    [HttpPost]
+    public async Task<IActionResult> ApplyJob([FromForm] int jobId, [FromForm] int resumeId, [FromForm] string? coverLetter)
+    {
+        var result = await _dashboardService.ApplyForJobAsync(GetUserId(), jobId, resumeId, coverLetter);
+        
+        if (result.Success)
+        {
+            return Json(new { success = true, message = result.Message });
+        }
+        else
+        {
+            return Json(new { success = false, message = result.Message });
+        }
+    }
 }
 

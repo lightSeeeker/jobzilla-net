@@ -1,23 +1,18 @@
 using jobzilla_net.Application.Resumes.Interfaces;
+using jobzilla_net.Application.Resumes.Utilities;
 using Microsoft.Extensions.Logging;
 
 namespace jobzilla_net.Infrasture.Services.Resumes;
 
 public class ResumeParsingOrchestrator : IResumeParsingOrchestrator
 {
-    private readonly IResumeFileExtractor _extractor;
-    private readonly IResumeTextParser _parser;
     private readonly IResumeDataSyncService _syncService;
     private readonly ILogger<ResumeParsingOrchestrator> _logger;
 
     public ResumeParsingOrchestrator(
-        IResumeFileExtractor extractor,
-        IResumeTextParser parser,
         IResumeDataSyncService syncService,
         ILogger<ResumeParsingOrchestrator> logger)
     {
-        _extractor = extractor;
-        _parser = parser;
         _syncService = syncService;
         _logger = logger;
     }
@@ -29,7 +24,7 @@ public class ResumeParsingOrchestrator : IResumeParsingOrchestrator
         try
         {
             // 1. Extract raw text from file
-            var rawText = await _extractor.ExtractTextAsync(filePath, cancellationToken);
+            var rawText = await ResumeFileExtractorUtility.ExtractTextAsync(filePath, cancellationToken);
             if (string.IsNullOrWhiteSpace(rawText))
             {
                 _logger.LogWarning("No text could be extracted from {FilePath}", filePath);
@@ -37,7 +32,7 @@ public class ResumeParsingOrchestrator : IResumeParsingOrchestrator
             }
 
             // 2. Parse text into structured DTO
-            var parsedDto = await _parser.ParseAsync(rawText, cancellationToken);
+            var parsedDto = await ResumeTextParserUtility.ParseAsync(rawText, cancellationToken);
 
             // 3. Sync structured DTO to CandidateProfile database entities
             var syncResult = await _syncService.SyncParsedDataAsync(userId, parsedDto, cancellationToken);

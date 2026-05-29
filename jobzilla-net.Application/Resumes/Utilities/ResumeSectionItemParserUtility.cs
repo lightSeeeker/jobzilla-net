@@ -6,12 +6,10 @@ using jobzilla_net.Application.Resumes.Dtos;
 using jobzilla_net.Application.Resumes.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace jobzilla_net.Infrasture.Services.Resumes;
+namespace jobzilla_net.Application.Resumes.Utilities;
 
-public class ResumeSectionItemParser : IResumeSectionItemParser
+public static class ResumeSectionItemParserUtility
 {
-    private readonly ILogger<ResumeSectionItemParser> _logger;
-
     private static readonly string[] CommonSkills = new[]
     {
         "C#", "ASP.NET", "ASP.NET Core", ".NET", "JavaScript", "TypeScript", "Python", "Java", "SQL",
@@ -23,14 +21,8 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         "NoSQL", "Firebase", "Google Cloud", "GCP", "OAuth", "JWT", "Jira", "Confluence"
     };
 
-    public ResumeSectionItemParser(ILogger<ResumeSectionItemParser> logger)
+    public static void ParseSectionInto(DetectedResumeSection section, ParsedResumeDto target)
     {
-        _logger = logger;
-    }
-
-    public void ParseSectionInto(DetectedResumeSection section, ParsedResumeDto target)
-    {
-        _logger.LogInformation("Parsing section {SectionType} ({RawHeading}) into ParsedResumeDto.", section.SectionType, section.RawHeading);
 
         switch (section.SectionType)
         {
@@ -67,7 +59,6 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
                 break;
 
             case ResumeSectionType.Unknown:
-                _logger.LogWarning("Section type is Unknown: {Heading}. Storing content dynamically if needed.", section.RawHeading);
                 // Graceful handling of Unknown/Custom sections:
                 // We can parse generic information like email, phone, and skills from unknown sections as well!
                 ParseGenericText(section.RawContent, target);
@@ -75,7 +66,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParsePersonalInfo(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParsePersonalInfo(DetectedResumeSection section, ParsedResumeDto target)
     {
         // 1. Email
         var emailMatch = Regex.Match(section.RawContent, @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
@@ -106,7 +97,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParseExperience(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParseExperience(DetectedResumeSection section, ParsedResumeDto target)
     {
         foreach (var block in section.Blocks)
         {
@@ -144,7 +135,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParseEducation(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParseEducation(DetectedResumeSection section, ParsedResumeDto target)
     {
         foreach (var block in section.Blocks)
         {
@@ -173,7 +164,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParseSkills(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParseSkills(DetectedResumeSection section, ParsedResumeDto target)
     {
         var lines = section.RawContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
         var tokens = new List<string>();
@@ -235,7 +226,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParseCertifications(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParseCertifications(DetectedResumeSection section, ParsedResumeDto target)
     {
         foreach (var line in section.Blocks.SelectMany(b => b.Lines))
         {
@@ -262,7 +253,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParseProjects(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParseProjects(DetectedResumeSection section, ParsedResumeDto target)
     {
         foreach (var block in section.Blocks)
         {
@@ -301,12 +292,12 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         }
     }
 
-    private void ParseSocialLinks(DetectedResumeSection section, ParsedResumeDto target)
+    private static void ParseSocialLinks(DetectedResumeSection section, ParsedResumeDto target)
     {
         ExtractSocialLinksFromText(section.RawContent, target);
     }
 
-    private void ParseGenericText(string text, ParsedResumeDto target)
+    private static void ParseGenericText(string text, ParsedResumeDto target)
     {
         // Check if there are any emails or phone numbers in unclassified content
         var emailMatch = Regex.Match(text, @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
@@ -320,7 +311,7 @@ public class ResumeSectionItemParser : IResumeSectionItemParser
         ExtractSocialLinksFromText(text, target);
     }
 
-    private void ExtractSocialLinksFromText(string text, ParsedResumeDto target)
+    private static void ExtractSocialLinksFromText(string text, ParsedResumeDto target)
     {
         foreach (Match m in Regex.Matches(text, @"(https?://)?(www\.)?(linkedin\.com|github\.com|stackoverflow\.com|twitter\.com)[^\s\)\u00A0]+", RegexOptions.IgnoreCase))
         {

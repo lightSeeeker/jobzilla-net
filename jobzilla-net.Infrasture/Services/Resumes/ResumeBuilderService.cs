@@ -20,93 +20,86 @@ public class ResumeBuilderService : IResumeBuilderService
         _logger = logger;
     }
 
-    public async Task<ResumeExportViewModel> GetResumeDataAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task<ResumeExportViewModel> GetResumeDataAsync(string userId, int? resumeId = null, CancellationToken cancellationToken = default)
     {
-        var profile = await _context.CandidateProfiles
-            .Include(p => p.Experiences)
-            .Include(p => p.Educations)
-            .Include(p => p.Certifications)
-            .Include(p => p.SocialLinks)
-            .Include(p => p.Projects)
-            .Include(p => p.Skills)
-                .ThenInclude(cs => cs.Skill)
-            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
-
-        var vm = new ResumeExportViewModel();
-
-        if (profile != null)
+        if (resumeId.HasValue)
         {
-            vm.Profile = new CandidateProfileDto
-            {
-                FullName = profile.FullName,
-                ProfessionalTitle = profile.ProfessionalTitle,
-                PhoneNumber = profile.PhoneNumber,
-                Location = profile.Location,
-                Summary = profile.Summary,
-                ExperienceYears = profile.ExperienceYears,
-                ExpectedSalary = profile.ExpectedSalary
-            };
+            var customResumeInfo = await _context.CandidateResumes
+                .Where(r => r.Id == resumeId.Value && r.CandidateProfile!.UserId == userId)
+                .Select(r => new { r.Id })
+                .FirstOrDefaultAsync(cancellationToken);
 
-            vm.Experiences = profile.Experiences.Select(e => new CandidateExperienceViewModel
+            if (customResumeInfo != null)
             {
-                Id = e.Id,
-                CompanyName = e.CompanyName,
-                JobTitle = e.JobTitle,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate,
-                IsCurrentPosition = e.IsCurrentPosition,
-                Description = e.Description,
-                Location = e.Location
-            }).ToList();
+                var doc = await GetResumeDocumentAsync(userId, resumeId, cancellationToken);
+                var customVm = new ResumeExportViewModel
+                {
+                    Profile = new CandidateProfileDto
+                    {
+                        FullName = doc.FullName ?? "",
+                        ProfessionalTitle = doc.ProfessionalTitle,
+                        PhoneNumber = doc.Phone,
+                        Location = doc.Location,
+                        Summary = doc.Summary
+                    }
+                };
 
-            vm.Educations = profile.Educations.Select(e => new CandidateEducationViewModel
-            {
-                Id = e.Id,
-                InstitutionName = e.InstitutionName,
-                Degree = e.Degree,
-                FieldOfStudy = e.FieldOfStudy,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate,
-                IsCurrentlyStudying = e.IsCurrentlyStudying,
-                Description = e.Description
-            }).ToList();
+                if (!string.IsNullOrWhiteSpace(doc.LinkedInUrl)) customVm.SocialLinks.Add(new CandidateSocialLinkViewModel { PlatformName = "LinkedIn", Url = doc.LinkedInUrl });
+                if (!string.IsNullOrWhiteSpace(doc.GitHubUrl)) customVm.SocialLinks.Add(new CandidateSocialLinkViewModel { PlatformName = "GitHub", Url = doc.GitHubUrl });
+                if (!string.IsNullOrWhiteSpace(doc.Website)) customVm.SocialLinks.Add(new CandidateSocialLinkViewModel { PlatformName = "Website", Url = doc.Website });
 
-            vm.Certifications = profile.Certifications.Select(c => new CandidateCertificationViewModel
-            {
-                Id = c.Id,
-                Name = c.Name,
-                IssuingOrganization = c.IssuingOrganization,
-                IssueDate = c.IssueDate,
-                ExpirationDate = c.ExpirationDate,
-                CredentialId = c.CredentialId,
-                CredentialUrl = c.CredentialUrl
-            }).ToList();
-
-            vm.SocialLinks = profile.SocialLinks.Select(s => new CandidateSocialLinkViewModel
-            {
-                Id = s.Id,
-                PlatformName = s.PlatformName,
-                Url = s.Url
-            }).ToList();
-
-            vm.Projects = profile.Projects.Select(p => new CandidateProjectViewModel
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                ProjectUrl = p.ProjectUrl,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                IsOngoing = p.IsOngoing
-            }).ToList();
-
-            vm.Skills = profile.Skills
-                .Where(cs => cs.Skill != null)
-                .Select(cs => cs.Skill!.Name)
-                .ToList();
+                foreach (var sec in doc.Sections)
+                {
+                    if (sec.SectionType == jobzilla_net.Application.Resumes.Dtos.ResumeBuilderSectionType.Experience)
+                    {
+                        foreach (var itm in sec.Items)
+                            customVm.Experiences.Add(new CandidateExperienceViewModel {
+                                JobTitle = itm.GetValue("JobTitle"), CompanyName = itm.GetValue("CompanyName"), Location = itm.GetValue("Location"),
+                                StartDate = DateTime.TryParse(itm.GetValue("StartDate"), out var sd) ? sd : default,
+                                EndDate = DateTime.TryParse(itm.GetValue("EndDate"), out var ed) ? ed : null,
+                                IsCurrentPosition = itm.GetValue("IsCurrent") == "true", Description = itm.GetValue("Description")
+                            });
+                    }
+                    else if (sec.SectionType == jobzilla_net.Application.Resumes.Dtos.ResumeBuilderSectionType.Education)
+                    {
+                        foreach (var itm in sec.Items)
+                            customVm.Educations.Add(new CandidateEducationViewModel {
+                                InstitutionName = itm.GetValue("InstitutionName"), Degree = itm.GetValue("Degree"), FieldOfStudy = itm.GetValue("FieldOfStudy"),
+                                StartDate = DateTime.TryParse(itm.GetValue("StartDate"), out var sd) ? sd : default,
+                                EndDate = DateTime.TryParse(itm.GetValue("EndDate"), out var ed) ? ed : null,
+                                IsCurrentlyStudying = itm.GetValue("IsCurrent") == "true", Description = itm.GetValue("Description")
+                            });
+                    }
+                    else if (sec.SectionType == jobzilla_net.Application.Resumes.Dtos.ResumeBuilderSectionType.Skills)
+                    {
+                        foreach (var itm in sec.Items) if (!string.IsNullOrWhiteSpace(itm.GetValue("Name"))) customVm.Skills.Add(itm.GetValue("Name")!);
+                    }
+                    else if (sec.SectionType == jobzilla_net.Application.Resumes.Dtos.ResumeBuilderSectionType.Certifications)
+                    {
+                        foreach (var itm in sec.Items)
+                            customVm.Certifications.Add(new CandidateCertificationViewModel {
+                                Name = itm.GetValue("Name"), IssuingOrganization = itm.GetValue("IssuingOrganization"),
+                                IssueDate = DateTime.TryParse(itm.GetValue("IssueDate"), out var sd) ? sd : default,
+                                ExpirationDate = DateTime.TryParse(itm.GetValue("ExpirationDate"), out var ed) ? ed : null,
+                                CredentialId = itm.GetValue("CredentialId"), CredentialUrl = itm.GetValue("CredentialUrl")
+                            });
+                    }
+                    else if (sec.SectionType == jobzilla_net.Application.Resumes.Dtos.ResumeBuilderSectionType.Projects)
+                    {
+                        foreach (var itm in sec.Items)
+                            customVm.Projects.Add(new CandidateProjectViewModel {
+                                Name = itm.GetValue("Name"), Description = itm.GetValue("Description"), ProjectUrl = itm.GetValue("ProjectUrl"),
+                                StartDate = DateTime.TryParse(itm.GetValue("StartDate"), out var sd) ? sd : default,
+                                EndDate = DateTime.TryParse(itm.GetValue("EndDate"), out var ed) ? ed : null,
+                                IsOngoing = itm.GetValue("IsOngoing") == "true"
+                            });
+                    }
+                }
+                return customVm;
+            }
         }
 
-        return vm;
+        return new ResumeExportViewModel();
     }
 
     public async Task<bool> UpdateResumeDataAsync(string userId, ResumeExportViewModel model, CancellationToken cancellationToken = default)
@@ -300,7 +293,10 @@ public class ResumeBuilderService : IResumeBuilderService
 
     public async Task<jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto?> GetTemplateByIdAsync(int templateId, CancellationToken cancellationToken = default)
     {
-        var template = await _context.ResumeTemplates.FindAsync(new object[] { templateId }, cancellationToken);
+        var template = await _context.ResumeTemplates
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == templateId, cancellationToken);
+
         if (template == null || !template.IsActive) return null;
 
         return new jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto
@@ -317,6 +313,32 @@ public class ResumeBuilderService : IResumeBuilderService
 
     public async Task<ResumeDocument> GetResumeDocumentAsync(string userId, int? resumeId = null, CancellationToken cancellationToken = default)
     {
+        if (!resumeId.HasValue) return new ResumeDocument();
+
+        var customResume = await _context.CandidateResumes
+            .Where(r => r.Id == resumeId.Value && r.CandidateProfile!.UserId == userId)
+            .Select(r => new { r.IsBuilderGenerated, r.DocumentData })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (customResume == null) return new ResumeDocument();
+
+        // Check for saved JSON resume data first (for both builder-generated and edited uploaded resumes)
+        if (!string.IsNullOrWhiteSpace(customResume.DocumentData))
+        {
+            try
+            {
+                var docData = System.Text.Json.JsonSerializer.Deserialize<ResumeDocument>(
+                    customResume.DocumentData, 
+                    new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+                if (docData != null) return docData;
+            }
+            catch { /* fallback if parsing fails */ }
+        }
+
+        // If it's a builder-generated resume but missing JSON data, return empty (clean scratch resume)
+        if (customResume.IsBuilderGenerated) return new ResumeDocument();
+
+        // FALLBACK: For an uploaded resume that hasn't been edited yet, initialize it from the global profile.
         var profile = await _context.CandidateProfiles
             .Include(p => p.Experiences)
             .Include(p => p.Educations)
@@ -327,24 +349,6 @@ public class ResumeBuilderService : IResumeBuilderService
             .Include(p => p.Skills).ThenInclude(cs => cs.Skill)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
-
-        if (resumeId.HasValue && profile != null)
-        {
-            var customResume = await _context.CandidateResumes
-                .FirstOrDefaultAsync(r => r.Id == resumeId.Value && r.CandidateProfileId == profile.Id, cancellationToken);
-
-            if (customResume != null && customResume.IsBuilderGenerated && !string.IsNullOrWhiteSpace(customResume.DocumentData))
-            {
-                try
-                {
-                    var docData = System.Text.Json.JsonSerializer.Deserialize<ResumeDocument>(customResume.DocumentData, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
-                    if (docData != null) return docData;
-                }
-                catch { /* fallback if parsing fails */ }
-            }
-        }
-
-
 
         var doc = new ResumeDocument();
 
@@ -530,35 +534,24 @@ public class ResumeBuilderService : IResumeBuilderService
 
     public async Task<bool> SaveResumeDocumentAsync(string userId, int? resumeId, ResumeDocument document, CancellationToken cancellationToken = default)
     {
+        if (!resumeId.HasValue) return false;
+
         var profile = await _context.CandidateProfiles
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
 
         if (profile == null) return false;
 
-        if (resumeId.HasValue)
-        {
-            var customResume = await _context.CandidateResumes
-                .FirstOrDefaultAsync(r => r.Id == resumeId.Value && r.CandidateProfileId == profile.Id, cancellationToken);
+        var customResume = await _context.CandidateResumes
+            .FirstOrDefaultAsync(r => r.Id == resumeId.Value && r.CandidateProfileId == profile.Id, cancellationToken);
             
-            if (customResume != null && customResume.IsBuilderGenerated)
-            {
-                customResume.DocumentData = System.Text.Json.JsonSerializer.Serialize(document, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
-                await _context.SaveChangesAsync(cancellationToken);
-                return true;
-            }
+        if (customResume != null)
+        {
+            customResume.DocumentData = System.Text.Json.JsonSerializer.Serialize(document, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+            await _context.SaveChangesAsync(cancellationToken);
+            return true;
         }
 
-        // The dynamic document model is a read-only view for template rendering in the legacy flow.
-        // Edits from the Builder UI are persisted via the individual section-item API endpoints.
-        // This method updates personal info only for the legacy profile.
-        profile.FullName          = document.FullName ?? profile.FullName;
-        profile.ProfessionalTitle = document.ProfessionalTitle;
-        profile.PhoneNumber       = document.Phone;
-        profile.Location          = document.Location;
-        profile.Summary           = document.Summary;
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+        return false;
     }
 
     // ── Reference CRUD ────────────────────────────────────────────────────────

@@ -22,7 +22,7 @@ public class ResumeExportService : IResumeExportService
         _logger = logger;
     }
 
-    public async Task<byte[]?> ExportResumeToPdfAsync(string userId, int templateId, CancellationToken cancellationToken = default)
+    public async Task<byte[]?> ExportResumeToPdfAsync(string userId, int templateId, int? resumeId = null, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Exporting resume to PDF for user {UserId} using template {TemplateId}", userId, templateId);
 
@@ -35,7 +35,7 @@ public class ResumeExportService : IResumeExportService
                 return null;
             }
 
-            var model = await _builderService.GetResumeDataAsync(userId, cancellationToken);
+            var model = await _builderService.GetResumeDataAsync(userId, resumeId, cancellationToken);
             
             // Render HTML string
             var html = await _templateRenderer.RenderTemplateAsync(

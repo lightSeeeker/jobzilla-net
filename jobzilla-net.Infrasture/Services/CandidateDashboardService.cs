@@ -249,15 +249,7 @@ public class CandidateDashboardService : ICandidateDashboardService
     {
         var profile = await GetOrCreateProfileAsync(userId);
 
-        var emptyDoc = new jobzilla_net.Application.Resumes.Dtos.ResumeDocument
-        {
-            FullName = profile.FullName,
-            ProfessionalTitle = profile.ProfessionalTitle,
-            Email = "", // Email is typically from User, so we leave it empty for scratch
-            Phone = profile.PhoneNumber,
-            Location = profile.Location,
-            Summary = profile.Summary
-        };
+        var emptyDoc = new jobzilla_net.Application.Resumes.Dtos.ResumeDocument();
 
         var newResume = new CandidateResume
         {

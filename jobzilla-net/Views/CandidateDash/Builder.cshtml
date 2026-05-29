@@ -37,10 +37,7 @@
                 <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
                     <div class="twm-right-section-panel site-bg-gray">
 
-                        <!-- Status bar -->
-                        <div id="cvb-statusbar" class="cvb-statusbar" style="display:none;">
-                            <span id="cvb-status-text"></span>
-                        </div>
+
 
                         <!-- Builder header -->
                         <div class="cvb-toolbar d-flex justify-content-between align-items-center mb-3">
@@ -51,9 +48,27 @@
                                 <button id="cvb-add-section-btn" class="cvb-btn cvb-btn-primary" title="Add a new section">
                                     <i class="fa fa-plus"></i> Add Section
                                 </button>
-                                <a asp-action="Templates" class="cvb-btn cvb-btn-outline">
+                                <a asp-action="Templates" asp-route-resumeId="@ViewBag.ResumeId" class="cvb-btn cvb-btn-outline">
                                     <i class="fa fa-file-alt"></i> Templates
                                 </a>
+                            </div>
+                        </div>
+
+                        <!-- Sticky Save Bar -->
+                        <div id="cvb-sticky-save-bar" class="cvb-sticky-save-bar mb-4">
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span id="cvb-save-status-icon" style="font-size: 1.5rem; color: #64748b;"><i class="fa fa-cloud"></i></span>
+                                    <div class="d-flex flex-column">
+                                        <span id="cvb-save-status-text" style="font-weight: 700; color: #1e293b; line-height: 1.2;">All changes saved</span>
+                                        <span id="cvb-save-timestamp" style="font-size: 0.8rem; color: #64748b;">Ready</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button id="cvb-save-draft-btn" class="cvb-btn cvb-btn-primary">
+                                        <i class="fa fa-save me-1"></i> Save Draft
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -98,17 +113,19 @@
                                 <div class="row g-3" id="cvb-personal-fields">
                                     <!-- populated by JS from API -->
                                 </div>
-                                <div class="d-flex justify-content-end mt-3">
-                                    <button class="cvb-btn cvb-btn-primary" id="cvb-save-personal">
-                                        <i class="fa fa-save me-1"></i>Save
-                                    </button>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Dynamic sections list -->
                         <div id="cvb-sections-list">
                             <!-- section cards injected by JS -->
+                        </div>
+
+                        <!-- Add Section Bottom Button -->
+                        <div class="d-flex justify-content-center mt-4 mb-2">
+                            <button id="cvb-add-section-btn-bottom" class="cvb-btn cvb-btn-outline" style="border-style: dashed; width: 100%; justify-content: center; padding: 12px; border-width: 2px;">
+                                <i class="fa fa-plus"></i> Add New Section
+                            </button>
                         </div>
 
                         <!-- Empty state -->
@@ -123,7 +140,7 @@
                             <a asp-action="Resumes" class="cvb-btn cvb-btn-outline">
                                 <i class="fa fa-arrow-left me-1"></i> My Resumes
                             </a>
-                            <a asp-action="Templates" class="cvb-btn cvb-btn-primary">
+                            <a asp-action="Templates" asp-route-resumeId="@ViewBag.ResumeId" class="cvb-btn cvb-btn-primary">
                                 Choose Template <i class="fa fa-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -157,20 +174,19 @@
         --cvb-transition:   .18s ease;
     }
 
-    /* Status bar */
-    .cvb-statusbar {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 9999;
-        padding: 8px 20px;
-        font-size: .85rem;
-        font-weight: 600;
-        text-align: center;
-        transition: background var(--cvb-transition);
+    /* Sticky Save Bar */
+    .cvb-sticky-save-bar {
+        position: sticky;
+        bottom: 20px;
+        z-index: 99;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border: 1.5px solid var(--cvb-border);
+        border-radius: var(--cvb-radius);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        padding: 12px 24px;
+        transition: all var(--cvb-transition);
     }
-    .cvb-statusbar.saving  { background: #fef3c7; color:#92400e; }
-    .cvb-statusbar.saved   { background: #d1fae5; color:#065f46; }
-    .cvb-statusbar.error   { background: #fee2e2; color:#991b1b; }
 
     /* Toolbar */
     .cvb-toolbar {
@@ -518,6 +534,12 @@
         wireDrawer();
         wireAddCustomSection();
         initSectionSortable();
+
+        document.getElementById('cvb-save-draft-btn')?.addEventListener('click', () => {
+            clearTimeout(_saveTimer);
+            if (_isDirty) autosave();
+            else updateSaveUI('Already saved', 'fa-check-circle', '#22c55e');
+        });
     });
 
     // ── API helpers ──────────────────────────────────────────────────────────
@@ -545,14 +567,14 @@
     // ── Load document ────────────────────────────────────────────────────────
     async function loadDocument() {
         try {
-            showStatus('Loading…', 'saving');
+            updateSaveUI('Loading…', 'fa-spinner fa-spin', '#00b4d8');
             _document = await apiFetch('/api/resume/document');
+            _lastSavedDataStr = JSON.stringify(_document);
             renderPersonal();
             renderSections();
-            showStatus('Ready', 'saved');
-            setTimeout(() => hideStatus(), 1500);
+            updateSaveUI('All changes saved', 'fa-check-circle', '#22c55e');
         } catch (e) {
-            showStatus('Failed to load resume data.', 'error');
+            updateSaveUI('Failed to load resume.', 'fa-exclamation-triangle', '#ef4444');
             console.error(e);
         }
     }
@@ -570,20 +592,15 @@
     }
 
     function wirePersonalSave() {
-        document.getElementById('cvb-save-personal').addEventListener('click', async () => {
-            const payload = {};
-            document.querySelectorAll('.cvb-personal-field').forEach(el => {
-                payload[el.dataset.key] = el.value || null;
-            });
-            try {
-                showStatus('Saving…', 'saving');
-                await apiFetch('/api/resume/personal', 'PUT', payload);
-                if (_document) Object.assign(_document, payload);
-                showStatus('Saved!', 'saved');
-                setTimeout(() => hideStatus(), 2000);
-            } catch (e) {
-                showStatus('Save failed.', 'error');
-            }
+        document.querySelectorAll('.cvb-personal-field').forEach(el => {
+            const handler = () => {
+                if (_document) {
+                    _document[el.dataset.key] = el.value || null;
+                    scheduleAutosave();
+                }
+            };
+            el.addEventListener('change', handler);
+            el.addEventListener('input', handler);
         });
     }
 
@@ -647,7 +664,10 @@
         const titleEl = card.querySelector('.cvb-section-title-text');
         titleEl.addEventListener('blur', () => {
             const s = _document.sections.find(s => s.id === sec.id);
-            if (s) s.title = titleEl.textContent.trim();
+            if (s) {
+                s.title = titleEl.textContent.trim();
+                scheduleAutosave();
+            }
         });
         // Wire visibility toggle
         card.querySelector('.cvb-visibility-toggle').addEventListener('click', function () {
@@ -656,6 +676,7 @@
                 s.isVisible = !s.isVisible;
                 this.querySelector('i').className = `fa ${s.isVisible ? 'fa-eye' : 'fa-eye-slash'}`;
                 card.classList.toggle('cvb-section-hidden', !s.isVisible);
+                scheduleAutosave();
             }
         });
         // Wire delete
@@ -746,19 +767,7 @@
     }
 
     function debounceSaveSkills(sectionId, skills) {
-        clearTimeout(_saveTimer);
-        _saveTimer = setTimeout(() => saveSkillsToServer(skills), 1800);
-    }
-
-    async function saveSkillsToServer(skills) {
-        try {
-            showStatus('Saving skills…', 'saving');
-            await apiFetch('/api/resume/personal', 'PUT', { ..._document, skills });
-            showStatus('Saved!', 'saved');
-            setTimeout(() => hideStatus(), 2000);
-        } catch (e) {
-            showStatus('Save failed.', 'error');
-        }
+        scheduleAutosave();
     }
 
     // ── Item rendering ────────────────────────────────────────────────────────
@@ -837,8 +846,21 @@
         });
         // Autosave on field change
         container.querySelectorAll('.cvb-item-field').forEach(el => {
-            el.addEventListener('change', () => scheduleAutosave());
-            el.addEventListener('input', () => scheduleAutosave());
+            const handler = () => {
+                const s = _document?.sections?.find(s => s.id === sectionId);
+                const item = s?.items?.find(i => i.id === el.dataset.itemId);
+                if (item) {
+                    let field = item.fields.find(f => f.key === el.dataset.key);
+                    if (!field) {
+                        field = { key: el.dataset.key, label: '', value: '', fieldType: 0 };
+                        item.fields.push(field);
+                    }
+                    field.value = el.type === 'checkbox' ? (el.checked ? 'true' : 'false') : el.value;
+                    scheduleAutosave();
+                }
+            };
+            el.addEventListener('change', handler);
+            el.addEventListener('input', handler);
         });
     }
 
@@ -886,6 +908,7 @@
             if (_document) _document.sections = _document.sections.filter(s => s.id !== sectionId);
             const empty = document.getElementById('cvb-empty-state');
             if (!document.querySelector('#cvb-sections-list .cvb-card')) empty.style.display = '';
+            scheduleAutosave();
         }, 220);
     }
 
@@ -908,6 +931,7 @@
         initSectionSortable();
         initItemSortable(newSec.id);
         closeDrawer();
+        scheduleAutosave();
     }
 
     // ── Drawer ────────────────────────────────────────────────────────────────
@@ -924,6 +948,7 @@
 
     function wireDrawer() {
         document.getElementById('cvb-add-section-btn').addEventListener('click', openDrawer);
+        document.getElementById('cvb-add-section-btn-bottom').addEventListener('click', openDrawer);
         document.getElementById('cvb-drawer-close').addEventListener('click', closeDrawer);
     }
 
@@ -971,6 +996,7 @@
                     const s = _document.sections.find(s => s.id === id);
                     if (s) s.displayOrder = i;
                 });
+                scheduleAutosave();
             }
         });
     }
@@ -991,6 +1017,7 @@
                     const item = s.items.find(it => it.id === id);
                     if (item) item.displayOrder = i;
                 });
+                scheduleAutosave();
             }
         });
     }
@@ -1010,34 +1037,54 @@
     }
 
     // ── Autosave ──────────────────────────────────────────────────────────────
+    let _isDirty = false;
+    let _isSaving = false;
+    let _lastSavedDataStr = null;
+
     function scheduleAutosave() {
+        _isDirty = true;
+        updateSaveUI('Unsaved changes…', 'fa-pencil-alt', '#f59e0b');
         clearTimeout(_saveTimer);
-        showStatus('Unsaved changes…', 'saving');
-        _saveTimer = setTimeout(autosave, 2000);
+        _saveTimer = setTimeout(autosave, 2500);
     }
 
     async function autosave() {
-        if (!_document) return;
+        if (!_document || !_isDirty || _isSaving) return;
+        
+        const currentDataStr = JSON.stringify(_document);
+        if (currentDataStr === _lastSavedDataStr) {
+            _isDirty = false;
+            updateSaveUI('All changes saved', 'fa-check-circle', '#22c55e');
+            return;
+        }
+
+        _isSaving = true;
         try {
-            showStatus('Saving…', 'saving');
+            updateSaveUI('Saving…', 'fa-spinner fa-spin', '#00b4d8');
             await apiFetch('/api/resume/personal', 'PUT', _document);
-            showStatus('Saved automatically', 'saved');
-            setTimeout(() => hideStatus(), 2000);
+            _lastSavedDataStr = currentDataStr;
+            _isDirty = false;
+            
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('cvb-save-timestamp').textContent = `Last saved: ${timeStr}`;
+            updateSaveUI('All changes saved', 'fa-check-circle', '#22c55e');
         } catch (e) {
-            showStatus('Autosave failed.', 'error');
+            updateSaveUI('Save failed. Retrying...', 'fa-exclamation-triangle', '#ef4444');
+            setTimeout(autosave, 5000); // retry
+        } finally {
+            _isSaving = false;
+            if (_isDirty) scheduleAutosave();
         }
     }
 
-    // ── Status bar ────────────────────────────────────────────────────────────
-    function showStatus(msg, state) {
-        const bar = document.getElementById('cvb-statusbar');
-        bar.textContent = msg;
-        bar.className = `cvb-statusbar ${state}`;
-        bar.style.display = '';
-    }
-
-    function hideStatus() {
-        document.getElementById('cvb-statusbar').style.display = 'none';
+    function updateSaveUI(text, iconClass, color) {
+        const textEl = document.getElementById('cvb-save-status-text');
+        if(textEl) textEl.textContent = text;
+        const iconSpan = document.getElementById('cvb-save-status-icon');
+        if(iconSpan) {
+            iconSpan.innerHTML = `<i class="fa ${iconClass}"></i>`;
+            iconSpan.style.color = color;
+        }
     }
 
     // ── Utilities ─────────────────────────────────────────────────────────────

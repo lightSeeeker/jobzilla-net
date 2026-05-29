@@ -2,5 +2,5 @@ namespace jobzilla_net.Application.Resumes.Interfaces;
 
 public interface IResumeExportService
 {
-    Task<byte[]?> ExportResumeToPdfAsync(string userId, int templateId, CancellationToken cancellationToken = default);
+    Task<byte[]?> ExportResumeToPdfAsync(string userId, int templateId, int? resumeId = null, CancellationToken cancellationToken = default);
 }

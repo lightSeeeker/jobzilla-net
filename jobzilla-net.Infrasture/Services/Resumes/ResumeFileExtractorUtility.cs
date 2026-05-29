@@ -9,23 +9,14 @@ using Microsoft.Extensions.Logging;
 
 namespace jobzilla_net.Infrasture.Services.Resumes;
 
-public class BasicResumeFileExtractor : IResumeFileExtractor
+public static class ResumeFileExtractorUtility
 {
-    private readonly ILogger<BasicResumeFileExtractor> _logger;
-
-    public BasicResumeFileExtractor(ILogger<BasicResumeFileExtractor> logger)
-    {
-        _logger = logger;
-    }
-
-    public async Task<string> ExtractTextAsync(string filePath, CancellationToken cancellationToken = default)
+    public static async Task<string> ExtractTextAsync(string filePath, CancellationToken cancellationToken = default)
     {
         if (!File.Exists(filePath))
             throw new FileNotFoundException("Resume file not found.", filePath);
 
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
-
-        _logger.LogInformation("Extracting text from {FilePath} (type: {Ext})", filePath, extension);
 
         return extension switch
         {
@@ -37,7 +28,7 @@ public class BasicResumeFileExtractor : IResumeFileExtractor
         };
     }
 
-    private Task<string> ExtractFromPdfAsync(string filePath)
+    private static Task<string> ExtractFromPdfAsync(string filePath)
     {
         var sb = new StringBuilder();
 
@@ -54,7 +45,7 @@ public class BasicResumeFileExtractor : IResumeFileExtractor
         return Task.FromResult(sb.ToString());
     }
 
-    private Task<string> ExtractFromDocxAsync(string filePath)
+    private static Task<string> ExtractFromDocxAsync(string filePath)
     {
         var sb = new StringBuilder();
 

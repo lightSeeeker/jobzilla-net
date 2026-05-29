@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 using jobzilla_net.Application.Resumes.Dtos;
 using jobzilla_net.Application.Resumes.Interfaces;
 
-namespace jobzilla_net.Infrasture.Services.Resumes;
+namespace jobzilla_net.Application.Resumes.Utilities;
 
-public class ResumeSectionDetector : IResumeSectionDetector
+public static class ResumeSectionDetectorUtility
 {
     private static readonly Dictionary<string, ResumeSectionType> SectionKeywords = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -137,15 +137,15 @@ public class ResumeSectionDetector : IResumeSectionDetector
         "additional", "additional information", "other info", "training"
     };
 
-    public ParsedResumeDocument DetectSections(string rawText)
+    public static ParsedResumeDocument DetectSections(string text)
     {
-        var document = new ParsedResumeDocument { RawText = rawText };
+        var document = new ParsedResumeDocument { RawText = text };
 
-        if (string.IsNullOrWhiteSpace(rawText))
+        if (string.IsNullOrWhiteSpace(text))
             return document;
 
         // Split raw text into individual lines and filter out header/footer noise
-        var lines = rawText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+        var lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Where(line => !IsHeaderOrFooterLine(line))
             .ToArray();
         var matches = new List<HeadingMatch>();
@@ -220,7 +220,7 @@ public class ResumeSectionDetector : IResumeSectionDetector
             {
                 SectionType = ResumeSectionType.PersonalInfo,
                 RawHeading = "Personal Information",
-                RawContent = rawText
+                RawContent = text
             };
             personalInfoSection.Blocks = ExtractBlocks(lines);
             document.Sections.Add(personalInfoSection);

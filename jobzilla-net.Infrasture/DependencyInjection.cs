@@ -71,10 +71,6 @@ public static class DependencyInjection
         services.AddScoped<IEmployerDashboardService, EmployerDashboardService>();
 
         // ── Resume Parsing Pipeline ──────────────────────────────────────────
-        services.AddScoped<IResumeFileExtractor, BasicResumeFileExtractor>();
-        services.AddScoped<IResumeSectionDetector, ResumeSectionDetector>();
-        services.AddScoped<IResumeSectionItemParser, ResumeSectionItemParser>();
-        services.AddScoped<IResumeTextParser, BasicRegexResumeParser>();
         services.AddScoped<IResumeDataSyncService, ResumeDataSyncService>();
         services.AddScoped<IResumeParsingOrchestrator, ResumeParsingOrchestrator>();
         services.AddScoped<IResumeBuilderService, ResumeBuilderService>();

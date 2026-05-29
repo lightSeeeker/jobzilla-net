@@ -6,7 +6,7 @@ namespace jobzilla_net.Application.Resumes.Interfaces;
 public interface IResumeBuilderService
 {
     // ── Legacy form-based API (kept for template export backward-compat) ─────
-    Task<ResumeExportViewModel> GetResumeDataAsync(string userId, CancellationToken cancellationToken = default);
+    Task<ResumeExportViewModel> GetResumeDataAsync(string userId, int? resumeId = null, CancellationToken cancellationToken = default);
     Task<bool> UpdateResumeDataAsync(string userId, ResumeExportViewModel model, CancellationToken cancellationToken = default);
 
     // ── Dynamic document API (new Builder UI) ────────────────────────────────

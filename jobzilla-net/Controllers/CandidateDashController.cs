@@ -213,12 +213,12 @@ public class CandidateDashController : Controller
             if (parseSuccess)
             {
                 TempData["SuccessMessage"] = "Resume uploaded and parsed successfully! You can now edit the extracted fields.";
-                return RedirectToAction(nameof(Builder));
+                return RedirectToAction(nameof(Builder), new { resumeId = resumeDto?.Id });
             }
             else
             {
                 TempData["SuccessMessage"] = "Resume uploaded, but auto-parsing could not extract all fields. Please fill them manually.";
-                return RedirectToAction(nameof(Builder));
+                return RedirectToAction(nameof(Builder), new { resumeId = resumeDto?.Id });
             }
         }
         catch (Exception ex)
@@ -263,8 +263,13 @@ public class CandidateDashController : Controller
     [HttpGet]
     public async Task<IActionResult> Builder(int? resumeId = null)
     {
+        if (resumeId == null)
+        {
+            return RedirectToAction(nameof(Resumes));
+        }
+
         ViewBag.ResumeId = resumeId;
-        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId()); // Legacy model used for fallback/templates
+        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId(), resumeId); // Legacy model used for fallback/templates
         return View(model);
     }
 
@@ -329,19 +334,25 @@ public class CandidateDashController : Controller
     // ── TEMPLATE SYSTEM ──────────────────────────────────────────────────────
 
     [HttpGet]
-    public async Task<IActionResult> Templates()
+    public async Task<IActionResult> Templates(int? resumeId = null)
     {
+        if (resumeId == null)
+        {
+            return RedirectToAction(nameof(Resumes));
+        }
+
+        ViewBag.ResumeId = resumeId;
         var templates = await _resumeBuilderService.GetActiveTemplatesAsync();
         return View(templates);
     }
 
     [HttpGet]
-    public async Task<IActionResult> PreviewTemplate(int id)
+    public async Task<IActionResult> PreviewTemplate(int id, int? resumeId = null)
     {
         var template = await _resumeBuilderService.GetTemplateByIdAsync(id);
         if (template == null) return NotFound("Template not found or inactive.");
 
-        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId());
+        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId(), resumeId);
 
         var htmlContent = await _templateRenderer.RenderTemplateAsync(
             $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",
@@ -351,9 +362,9 @@ public class CandidateDashController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ExportTemplate(int id)
+    public async Task<IActionResult> ExportTemplate(int id, int? resumeId = null)
     {
-        var pdfBytes = await _resumeExportService.ExportResumeToPdfAsync(GetUserId(), id);
+        var pdfBytes = await _resumeExportService.ExportResumeToPdfAsync(GetUserId(), id, resumeId); 
         
         if (pdfBytes == null)
         {
@@ -371,6 +382,7 @@ public class CandidateDashController : Controller
     // All routes under /api/resume/* return JSON for the Builder SPA.
 
     [HttpGet("/api/resume/document")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> ApiGetDocument([FromQuery] int? resumeId, CancellationToken ct)
     {
         try

@@ -6,27 +6,12 @@ using jobzilla_net.Application.Resumes.Dtos;
 using jobzilla_net.Application.Resumes.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace jobzilla_net.Infrasture.Services.Resumes;
+namespace jobzilla_net.Application.Resumes.Utilities;
 
-public class BasicRegexResumeParser : IResumeTextParser
+public static class ResumeTextParserUtility
 {
-    private readonly IResumeSectionDetector _sectionDetector;
-    private readonly IResumeSectionItemParser _itemParser;
-    private readonly ILogger<BasicRegexResumeParser> _logger;
-
-    public BasicRegexResumeParser(
-        IResumeSectionDetector sectionDetector,
-        IResumeSectionItemParser itemParser,
-        ILogger<BasicRegexResumeParser> logger)
+    public static Task<ParsedResumeDto> ParseAsync(string rawText, CancellationToken cancellationToken = default)
     {
-        _sectionDetector = sectionDetector;
-        _itemParser = itemParser;
-        _logger = logger;
-    }
-
-    public Task<ParsedResumeDto> ParseAsync(string rawText, CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Orchestrating resume parsing with dynamic section detector.");
 
         var dto = new ParsedResumeDto();
 
@@ -43,12 +28,12 @@ public class BasicRegexResumeParser : IResumeTextParser
             dto.PhoneNumber = phoneMatch.Value.Trim();
 
         // 2. Call dynamic section detector to group text blocks by section
-        var document = _sectionDetector.DetectSections(rawText);
+        var document = ResumeSectionDetectorUtility.DetectSections(rawText);
 
         // 3. Process each detected section using modular item parser
         foreach (var section in document.Sections)
         {
-            _itemParser.ParseSectionInto(section, dto);
+            ResumeSectionItemParserUtility.ParseSectionInto(section, dto);
         }
 
         // 4. Ensure we have the global name set if the item parser didn't extract it

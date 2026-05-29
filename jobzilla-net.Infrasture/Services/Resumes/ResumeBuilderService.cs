@@ -347,7 +347,11 @@ public class ResumeBuilderService : IResumeBuilderService
                     new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
                 if (docData != null) return docData;
             }
-            catch { /* fallback if parsing fails */ }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[JSON PARSE ERROR]: {ex.Message}");
+                // fallback if parsing fails
+            }
         }
 
         // If it's a builder-generated resume but missing JSON data, return empty (clean scratch resume)

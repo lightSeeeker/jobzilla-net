@@ -9,17 +9,16 @@ public class ResumeField
     public string Key { get; set; } = string.Empty;
     public string? Label { get; set; }
     public string? Value { get; set; }
-    public ResumeFieldType FieldType { get; set; } = ResumeFieldType.Text;
+    public string FieldType { get; set; } = "text";
 }
 
-[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-public enum ResumeFieldType
+public static class ResumeFieldType
 {
-    Text,
-    Textarea,
-    Date,
-    Url,
-    Email,
-    Phone,
-    Checkbox
+    public const string Text = "text";
+    public const string Textarea = "textarea";
+    public const string Date = "date";
+    public const string Url = "url";
+    public const string Email = "email";
+    public const string Phone = "tel";
+    public const string Checkbox = "checkbox";
 }

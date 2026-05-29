@@ -762,7 +762,7 @@
             s.items = skills.map((name, i) => ({
                 id: `sk_${i}`,
                 displayOrder: i,
-                fields: [{ key: 'Name', label: 'Skill', value: name, fieldType: 0 }]
+                fields: [{ key: 'Name', label: 'Skill', value: name, fieldType: 'text' }]
             }));
         }
         debounceSaveSkills(sectionId, skills);
@@ -854,7 +854,7 @@
                 if (item) {
                     let field = item.fields.find(f => f.key === el.dataset.key);
                     if (!field) {
-                        field = { key: el.dataset.key, label: '', value: '', fieldType: 0 };
+                        field = { key: el.dataset.key, label: '', value: '', fieldType: 'text' };
                         item.fields.push(field);
                     }
                     field.value = el.type === 'checkbox' ? (el.checked ? 'true' : 'false') : el.value;
@@ -871,7 +871,7 @@
         const newItem = {
             id: 'new_' + Date.now(),
             displayOrder: 999,
-            fields: fieldDefs.map(f => ({ key: f.key, label: f.label, value: '', fieldType: 0 }))
+            fields: fieldDefs.map(f => ({ key: f.key, label: f.label, value: '', fieldType: f.type || 'text' }))
         };
         const s = _document?.sections?.find(s => s.id === sectionId);
         if (s) s.items.push(newItem);
@@ -890,11 +890,13 @@
             });
         });
         newCard.querySelectorAll('.cvb-item-field').forEach(el => {
-            el.addEventListener('change', (e) => {
+            const handler = (e) => {
                 const field = newItem.fields.find(f => f.key === el.dataset.key);
                 if (field) field.value = el.type === 'checkbox' ? (el.checked ? 'true' : 'false') : el.value;
                 scheduleAutosave();
-            });
+            };
+            el.addEventListener('change', handler);
+            el.addEventListener('input', handler);
         });
         initItemSortable(sectionId);
         newCard.querySelector('.cvb-item-field')?.focus();

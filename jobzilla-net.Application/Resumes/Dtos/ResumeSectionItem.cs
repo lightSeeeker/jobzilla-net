@@ -15,7 +15,7 @@ public class ResumeSectionItem
     public string? GetValue(string key) =>
         Fields.FirstOrDefault(f => f.Key.Equals(key, StringComparison.OrdinalIgnoreCase))?.Value;
 
-    public void SetValue(string key, string? value, string? label = null, ResumeFieldType type = ResumeFieldType.Text)
+    public void SetValue(string key, string? value, string? label = null, string type = ResumeFieldType.Text)
     {
         var field = Fields.FirstOrDefault(f => f.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
         if (field != null)

@@ -17,6 +17,7 @@ public interface IApplicationDbContext
     DbSet<CandidateCertification> CandidateCertifications { get; }
     DbSet<CandidateProject> CandidateProjects { get; }
     DbSet<CandidateSocialLink> CandidateSocialLinks { get; }
+    DbSet<CandidateReference> CandidateReferences { get; }
     DbSet<ResumeTemplate> ResumeTemplates { get; }
     DbSet<SavedJob> SavedJobs { get; }
     DbSet<CandidateSkill> CandidateSkills { get; }

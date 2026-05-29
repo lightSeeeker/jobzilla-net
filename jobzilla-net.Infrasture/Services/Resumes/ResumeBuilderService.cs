@@ -1,5 +1,6 @@
 using jobzilla_net.Application.Candidates.Dtos;
 using jobzilla_net.Application.Common.Interfaces;
+using jobzilla_net.Application.Resumes.Dtos;
 using jobzilla_net.Application.Resumes.Interfaces;
 using jobzilla_net.Application.Resumes.ViewModels;
 using jobzilla_net.Core.Entities;
@@ -310,5 +311,336 @@ public class ResumeBuilderService : IResumeBuilderService
             TemplateFilePath = template.TemplateFilePath,
             PreviewImagePath = template.PreviewImagePath
         };
+    }
+
+    // ── Dynamic Document API ──────────────────────────────────────────────────
+
+    public async Task<ResumeDocument> GetResumeDocumentAsync(string userId, int? resumeId = null, CancellationToken cancellationToken = default)
+    {
+        var profile = await _context.CandidateProfiles
+            .Include(p => p.Experiences)
+            .Include(p => p.Educations)
+            .Include(p => p.Certifications)
+            .Include(p => p.SocialLinks)
+            .Include(p => p.Projects)
+            .Include(p => p.References)
+            .Include(p => p.Skills).ThenInclude(cs => cs.Skill)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+
+        if (resumeId.HasValue && profile != null)
+        {
+            var customResume = await _context.CandidateResumes
+                .FirstOrDefaultAsync(r => r.Id == resumeId.Value && r.CandidateProfileId == profile.Id, cancellationToken);
+
+            if (customResume != null && customResume.IsBuilderGenerated && !string.IsNullOrWhiteSpace(customResume.DocumentData))
+            {
+                try
+                {
+                    var docData = System.Text.Json.JsonSerializer.Deserialize<ResumeDocument>(customResume.DocumentData, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+                    if (docData != null) return docData;
+                }
+                catch { /* fallback if parsing fails */ }
+            }
+        }
+
+
+
+        var doc = new ResumeDocument();
+
+        if (profile == null)
+            return doc;
+
+        // Personal info
+        doc.FullName           = profile.FullName;
+        doc.ProfessionalTitle  = profile.ProfessionalTitle;
+        doc.Phone              = profile.PhoneNumber;
+        doc.Location           = profile.Location;
+        doc.Summary            = profile.Summary;
+
+        // Social links — extract LinkedIn / GitHub separately
+        doc.LinkedInUrl = profile.SocialLinks
+            .FirstOrDefault(s => s.PlatformName != null && s.PlatformName.Contains("linkedin", StringComparison.OrdinalIgnoreCase))?.Url;
+        doc.GitHubUrl = profile.SocialLinks
+            .FirstOrDefault(s => s.PlatformName != null && s.PlatformName.Contains("github", StringComparison.OrdinalIgnoreCase))?.Url;
+        doc.Website = profile.SocialLinks
+            .FirstOrDefault(s => s.PlatformName != null &&
+                !s.PlatformName.Contains("linkedin", StringComparison.OrdinalIgnoreCase) &&
+                !s.PlatformName.Contains("github", StringComparison.OrdinalIgnoreCase))?.Url;
+
+        int order = 0;
+
+        // ── Experience ──────────────────────────────────────────────────────
+        if (profile.Experiences.Any())
+        {
+            var section = new ResumeSection
+            {
+                Id           = "exp",
+                SectionType  = ResumeBuilderSectionType.Experience,
+                Title        = "Work Experience",
+                DisplayOrder = order++,
+                IsVisible    = true
+            };
+            int itemOrder = 0;
+            foreach (var e in profile.Experiences.OrderByDescending(x => x.StartDate))
+            {
+                var item = new ResumeSectionItem { Id = $"exp_{e.Id}", DisplayOrder = itemOrder++ };
+                item.SetValue("JobTitle",    e.JobTitle,    "Job Title");
+                item.SetValue("CompanyName", e.CompanyName, "Company Name");
+                item.SetValue("Location",    e.Location,    "Location");
+                item.SetValue("StartDate",   e.StartDate == default ? null : e.StartDate.ToString("yyyy-MM-dd"), "Start Date", ResumeFieldType.Date);
+                item.SetValue("EndDate",     e.EndDate?.ToString("yyyy-MM-dd"),  "End Date",   ResumeFieldType.Date);
+                item.SetValue("IsCurrent",   e.IsCurrentPosition ? "true" : "false", "Current Position", ResumeFieldType.Checkbox);
+                item.SetValue("Description", e.Description, "Description", ResumeFieldType.Textarea);
+                section.Items.Add(item);
+            }
+            doc.Sections.Add(section);
+        }
+
+        // ── Education ───────────────────────────────────────────────────────
+        if (profile.Educations.Any())
+        {
+            var section = new ResumeSection
+            {
+                Id           = "edu",
+                SectionType  = ResumeBuilderSectionType.Education,
+                Title        = "Education",
+                DisplayOrder = order++,
+                IsVisible    = true
+            };
+            int itemOrder = 0;
+            foreach (var e in profile.Educations.OrderByDescending(x => x.StartDate))
+            {
+                var item = new ResumeSectionItem { Id = $"edu_{e.Id}", DisplayOrder = itemOrder++ };
+                item.SetValue("InstitutionName", e.InstitutionName, "Institution");
+                item.SetValue("Degree",          e.Degree,          "Degree");
+                item.SetValue("FieldOfStudy",    e.FieldOfStudy,    "Field of Study");
+                item.SetValue("StartDate",       e.StartDate == default ? null : e.StartDate.ToString("yyyy-MM-dd"), "Start Date", ResumeFieldType.Date);
+                item.SetValue("EndDate",         e.EndDate?.ToString("yyyy-MM-dd"),  "End Date",   ResumeFieldType.Date);
+                item.SetValue("IsCurrent",       e.IsCurrentlyStudying ? "true" : "false", "Currently Studying", ResumeFieldType.Checkbox);
+                item.SetValue("Description",     e.Description, "Description", ResumeFieldType.Textarea);
+                section.Items.Add(item);
+            }
+            doc.Sections.Add(section);
+        }
+
+        // ── Skills ──────────────────────────────────────────────────────────
+        var skillNames = profile.Skills.Where(cs => cs.Skill != null).Select(cs => cs.Skill!.Name).ToList();
+        if (skillNames.Any())
+        {
+            var section = new ResumeSection
+            {
+                Id           = "skills",
+                SectionType  = ResumeBuilderSectionType.Skills,
+                Title        = "Skills",
+                DisplayOrder = order++,
+                IsVisible    = true
+            };
+            int itemOrder = 0;
+            foreach (var sk in skillNames)
+            {
+                var item = new ResumeSectionItem { Id = $"sk_{itemOrder}", DisplayOrder = itemOrder++ };
+                item.SetValue("Name", sk, "Skill");
+                section.Items.Add(item);
+            }
+            doc.Sections.Add(section);
+        }
+
+        // ── Certifications ──────────────────────────────────────────────────
+        if (profile.Certifications.Any())
+        {
+            var section = new ResumeSection
+            {
+                Id           = "certs",
+                SectionType  = ResumeBuilderSectionType.Certifications,
+                Title        = "Certifications",
+                DisplayOrder = order++,
+                IsVisible    = true
+            };
+            int itemOrder = 0;
+            foreach (var c in profile.Certifications.OrderByDescending(x => x.IssueDate))
+            {
+                var item = new ResumeSectionItem { Id = $"cert_{c.Id}", DisplayOrder = itemOrder++ };
+                item.SetValue("Name",                c.Name,                "Certification Name");
+                item.SetValue("IssuingOrganization", c.IssuingOrganization, "Issuing Organization");
+                item.SetValue("IssueDate",           c.IssueDate == default ? null : c.IssueDate.ToString("yyyy-MM-dd"), "Issue Date",      ResumeFieldType.Date);
+                item.SetValue("ExpirationDate",      c.ExpirationDate?.ToString("yyyy-MM-dd"), "Expiration Date", ResumeFieldType.Date);
+                item.SetValue("CredentialId",        c.CredentialId,  "Credential ID");
+                item.SetValue("CredentialUrl",       c.CredentialUrl, "Credential URL", ResumeFieldType.Url);
+                section.Items.Add(item);
+            }
+            doc.Sections.Add(section);
+        }
+
+        // ── Projects ────────────────────────────────────────────────────────
+        if (profile.Projects.Any())
+        {
+            var section = new ResumeSection
+            {
+                Id           = "projects",
+                SectionType  = ResumeBuilderSectionType.Projects,
+                Title        = "Projects",
+                DisplayOrder = order++,
+                IsVisible    = true
+            };
+            int itemOrder = 0;
+            foreach (var p in profile.Projects.OrderByDescending(x => x.StartDate))
+            {
+                var item = new ResumeSectionItem { Id = $"proj_{p.Id}", DisplayOrder = itemOrder++ };
+                item.SetValue("Name",        p.Name,        "Project Name");
+                item.SetValue("ProjectUrl",  p.ProjectUrl,  "Project URL", ResumeFieldType.Url);
+                item.SetValue("StartDate",   p.StartDate?.ToString("yyyy-MM-dd"), "Start Date", ResumeFieldType.Date);
+                item.SetValue("EndDate",     p.EndDate?.ToString("yyyy-MM-dd"),   "End Date",   ResumeFieldType.Date);
+                item.SetValue("IsOngoing",   p.IsOngoing ? "true" : "false", "Ongoing", ResumeFieldType.Checkbox);
+                item.SetValue("Description", p.Description, "Description", ResumeFieldType.Textarea);
+                section.Items.Add(item);
+            }
+            doc.Sections.Add(section);
+        }
+
+        // ── References ──────────────────────────────────────────────────────
+        if (profile.References.Any())
+        {
+            var section = new ResumeSection
+            {
+                Id           = "refs",
+                SectionType  = ResumeBuilderSectionType.References,
+                Title        = "References",
+                DisplayOrder = order++,
+                IsVisible    = true
+            };
+            int itemOrder = 0;
+            foreach (var r in profile.References.OrderBy(x => x.DisplayOrder))
+            {
+                var item = new ResumeSectionItem { Id = $"ref_{r.Id}", DisplayOrder = itemOrder++ };
+                item.SetValue("ReferenceName", r.ReferenceName, "Reference Name");
+                item.SetValue("Company",       r.Company,       "Company");
+                item.SetValue("Designation",   r.Designation,   "Designation");
+                item.SetValue("Phone",         r.Phone,         "Phone", ResumeFieldType.Phone);
+                item.SetValue("Email",         r.Email,         "Email", ResumeFieldType.Email);
+                item.SetValue("Relationship",  r.Relationship,  "Relationship");
+                item.SetValue("Notes",         r.Notes,         "Notes", ResumeFieldType.Textarea);
+                section.Items.Add(item);
+            }
+            doc.Sections.Add(section);
+        }
+
+        return doc;
+    }
+
+    public async Task<bool> SaveResumeDocumentAsync(string userId, int? resumeId, ResumeDocument document, CancellationToken cancellationToken = default)
+    {
+        var profile = await _context.CandidateProfiles
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+
+        if (profile == null) return false;
+
+        if (resumeId.HasValue)
+        {
+            var customResume = await _context.CandidateResumes
+                .FirstOrDefaultAsync(r => r.Id == resumeId.Value && r.CandidateProfileId == profile.Id, cancellationToken);
+            
+            if (customResume != null && customResume.IsBuilderGenerated)
+            {
+                customResume.DocumentData = System.Text.Json.JsonSerializer.Serialize(document, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+                await _context.SaveChangesAsync(cancellationToken);
+                return true;
+            }
+        }
+
+        // The dynamic document model is a read-only view for template rendering in the legacy flow.
+        // Edits from the Builder UI are persisted via the individual section-item API endpoints.
+        // This method updates personal info only for the legacy profile.
+        profile.FullName          = document.FullName ?? profile.FullName;
+        profile.ProfessionalTitle = document.ProfessionalTitle;
+        profile.PhoneNumber       = document.Phone;
+        profile.Location          = document.Location;
+        profile.Summary           = document.Summary;
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    // ── Reference CRUD ────────────────────────────────────────────────────────
+
+    public async Task<List<ReferenceViewModel>> GetReferencesAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var profileId = await GetProfileIdAsync(userId, cancellationToken);
+        if (profileId == null) return new();
+
+        return await _context.CandidateReferences
+            .Where(r => r.CandidateProfileId == profileId.Value)
+            .AsNoTracking()
+            .OrderBy(r => r.DisplayOrder)
+            .Select(r => new ReferenceViewModel
+            {
+                Id            = r.Id,
+                ReferenceName = r.ReferenceName,
+                Company       = r.Company,
+                Designation   = r.Designation,
+                Phone         = r.Phone,
+                Email         = r.Email,
+                Relationship  = r.Relationship,
+                Notes         = r.Notes,
+                DisplayOrder  = r.DisplayOrder
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ReferenceViewModel?> UpsertReferenceAsync(string userId, ReferenceViewModel model, CancellationToken cancellationToken = default)
+    {
+        var profileId = await GetProfileIdAsync(userId, cancellationToken);
+        if (profileId == null) return null;
+
+        CandidateReference entity;
+        if (model.Id == 0)
+        {
+            entity = new CandidateReference { CandidateProfileId = profileId.Value };
+            _context.CandidateReferences.Add(entity);
+        }
+        else
+        {
+            entity = await _context.CandidateReferences
+                .FirstOrDefaultAsync(r => r.Id == model.Id && r.CandidateProfileId == profileId.Value, cancellationToken)
+                ?? throw new InvalidOperationException($"Reference {model.Id} not found.");
+        }
+
+        entity.ReferenceName = model.ReferenceName;
+        entity.Company       = model.Company;
+        entity.Designation   = model.Designation;
+        entity.Phone         = model.Phone;
+        entity.Email         = model.Email;
+        entity.Relationship  = model.Relationship;
+        entity.Notes         = model.Notes;
+        entity.DisplayOrder  = model.DisplayOrder;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        model.Id = entity.Id;
+        return model;
+    }
+
+    public async Task<bool> DeleteReferenceAsync(string userId, int referenceId, CancellationToken cancellationToken = default)
+    {
+        var profileId = await GetProfileIdAsync(userId, cancellationToken);
+        if (profileId == null) return false;
+
+        var entity = await _context.CandidateReferences
+            .FirstOrDefaultAsync(r => r.Id == referenceId && r.CandidateProfileId == profileId.Value, cancellationToken);
+
+        if (entity == null) return false;
+
+        _context.CandidateReferences.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    private async Task<int?> GetProfileIdAsync(string userId, CancellationToken cancellationToken)
+    {
+        var id = await _context.CandidateProfiles
+            .Where(p => p.UserId == userId)
+            .Select(p => (int?)p.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        return id;
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using DocumentFormat.OpenXml.Packaging;
 using iText.Kernel.Pdf;
@@ -62,9 +63,29 @@ public class BasicResumeFileExtractor : IResumeFileExtractor
 
         if (body != null)
         {
-            foreach (var para in body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Paragraph>())
+            // Process body elements sequentially to keep exact reading and table layout flow
+            foreach (var element in body.ChildElements)
             {
-                sb.AppendLine(para.InnerText);
+                if (element is DocumentFormat.OpenXml.Wordprocessing.Paragraph para)
+                {
+                    sb.AppendLine(para.InnerText);
+                }
+                else if (element is DocumentFormat.OpenXml.Wordprocessing.Table table)
+                {
+                    sb.AppendLine();
+                    foreach (var row in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableRow>())
+                    {
+                        var cells = row.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>()
+                                       .Select(c => c.InnerText.Trim())
+                                       .ToList();
+                        
+                        if (cells.Count > 0)
+                        {
+                            sb.AppendLine("| " + string.Join(" | ", cells) + " |");
+                        }
+                    }
+                    sb.AppendLine();
+                }
             }
         }
 

@@ -57,8 +57,8 @@ public class ResumeDataSyncService : IResumeDataSyncService
             {
                 profile.Experiences.Add(new CandidateExperience
                 {
-                    CompanyName        = exp.CompanyName ?? "Unknown",
-                    JobTitle           = exp.JobTitle    ?? "Unknown",
+                    CompanyName        = exp.CompanyName ?? string.Empty,
+                    JobTitle           = exp.JobTitle    ?? string.Empty,
                     StartDate          = exp.StartDate   ?? DateTime.UtcNow,
                     EndDate            = exp.EndDate,
                     Description        = exp.Description,
@@ -74,9 +74,9 @@ public class ResumeDataSyncService : IResumeDataSyncService
             {
                 profile.Educations.Add(new CandidateEducation
                 {
-                    InstitutionName    = edu.InstitutionName ?? "Unknown",
-                    Degree             = edu.Degree          ?? "Unknown",
-                    FieldOfStudy       = edu.FieldOfStudy    ?? "Unknown",
+                    InstitutionName    = edu.InstitutionName ?? string.Empty,
+                    Degree             = edu.Degree          ?? string.Empty,
+                    FieldOfStudy       = edu.FieldOfStudy    ?? string.Empty,
                     StartDate          = edu.StartDate       ?? DateTime.UtcNow,
                     EndDate            = edu.EndDate,
                     CandidateProfileId = profile.Id
@@ -91,8 +91,8 @@ public class ResumeDataSyncService : IResumeDataSyncService
             {
                 profile.Certifications.Add(new CandidateCertification
                 {
-                    Name                = cert.Name                ?? "Unknown",
-                    IssuingOrganization = cert.IssuingOrganization ?? "Unknown",
+                    Name                = cert.Name                ?? string.Empty,
+                    IssuingOrganization = cert.IssuingOrganization ?? string.Empty,
                     IssueDate           = cert.IssueDate           ?? DateTime.UtcNow,
                     CandidateProfileId  = profile.Id
                 });
@@ -106,9 +106,26 @@ public class ResumeDataSyncService : IResumeDataSyncService
             {
                 profile.SocialLinks.Add(new CandidateSocialLink
                 {
-                    PlatformName       = link.PlatformName ?? "Unknown",
+                    PlatformName       = link.PlatformName ?? string.Empty,
                     Url                = link.Url          ?? string.Empty,
                     CandidateProfileId = profile.Id
+                });
+            }
+        }
+
+        // ── Projects ──────────────────────────────────────────────────────────
+        foreach (var proj in parsedData.Projects)
+        {
+            if (!profile.Projects.Any(p => p.Name == proj.Name))
+            {
+                profile.Projects.Add(new CandidateProject
+                {
+                    Name                = proj.Name ?? string.Empty,
+                    StartDate           = proj.StartDate ?? DateTime.UtcNow,
+                    EndDate             = proj.EndDate,
+                    ProjectUrl          = proj.ProjectUrl,
+                    Description         = proj.Description,
+                    CandidateProfileId  = profile.Id
                 });
             }
         }

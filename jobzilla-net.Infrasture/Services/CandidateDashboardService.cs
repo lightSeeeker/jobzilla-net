@@ -200,6 +200,7 @@ public class CandidateDashboardService : ICandidateDashboardService
                 Title = r.Title,
                 FilePath = r.FilePath,
                 IsDefault = r.IsDefault,
+                IsBuilderGenerated = r.IsBuilderGenerated,
                 CreatedAtUtc = r.CreatedAtUtc
             })
             .ToListAsync();
@@ -226,7 +227,8 @@ public class CandidateDashboardService : ICandidateDashboardService
             CandidateProfileId = profile.Id,
             Title = title,
             FilePath = filePath,
-            IsDefault = isDefault
+            IsDefault = isDefault,
+            IsBuilderGenerated = false
         };
 
         _context.CandidateResumes.Add(newResume);
@@ -238,6 +240,45 @@ public class CandidateDashboardService : ICandidateDashboardService
             Title = newResume.Title,
             FilePath = newResume.FilePath,
             IsDefault = newResume.IsDefault,
+            IsBuilderGenerated = newResume.IsBuilderGenerated,
+            CreatedAtUtc = newResume.CreatedAtUtc
+        };
+    }
+
+    public async Task<CandidateResumeDto?> CreateScratchResumeAsync(string userId, string title)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+
+        var emptyDoc = new jobzilla_net.Application.Resumes.Dtos.ResumeDocument
+        {
+            FullName = profile.FullName,
+            ProfessionalTitle = profile.ProfessionalTitle,
+            Email = "", // Email is typically from User, so we leave it empty for scratch
+            Phone = profile.PhoneNumber,
+            Location = profile.Location,
+            Summary = profile.Summary
+        };
+
+        var newResume = new CandidateResume
+        {
+            CandidateProfileId = profile.Id,
+            Title = title,
+            FilePath = "", // Not a physical file
+            IsDefault = false,
+            IsBuilderGenerated = true,
+            DocumentData = System.Text.Json.JsonSerializer.Serialize(emptyDoc, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase })
+        };
+
+        _context.CandidateResumes.Add(newResume);
+        await _context.SaveChangesAsync(CancellationToken.None);
+
+        return new CandidateResumeDto
+        {
+            Id = newResume.Id,
+            Title = newResume.Title,
+            FilePath = newResume.FilePath,
+            IsDefault = newResume.IsDefault,
+            IsBuilderGenerated = newResume.IsBuilderGenerated,
             CreatedAtUtc = newResume.CreatedAtUtc
         };
     }

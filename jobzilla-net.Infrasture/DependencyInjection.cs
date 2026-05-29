@@ -3,9 +3,11 @@ using jobzilla_net.Application.Candidates;
 using jobzilla_net.Application.Common.Interfaces;
 using jobzilla_net.Application.Employers;
 using jobzilla_net.Application.Jobs;
+using jobzilla_net.Application.Resumes.Interfaces;
 using jobzilla_net.Infrasture.Identity;
 using jobzilla_net.Infrasture.Persistence;
 using jobzilla_net.Infrasture.Services;
+using jobzilla_net.Infrasture.Services.Resumes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -46,13 +48,13 @@ public static class DependencyInjection
         // users to the correct login page rather than throwing a 404.
         services.ConfigureApplicationCookie(options =>
         {
-            options.LoginPath        = "/Account/Login";
-            options.LogoutPath       = "/Account/Logout";
+            options.LoginPath = "/Account/Login";
+            options.LogoutPath = "/Account/Logout";
             options.AccessDeniedPath = "/Account/AccessDenied";
 
             // Prevent the cookie from expiring during an active session
             options.SlidingExpiration = true;
-            options.ExpireTimeSpan    = TimeSpan.FromHours(8);
+            options.ExpireTimeSpan = TimeSpan.FromHours(8);
         });
 
         // Bind IApplicationDbContext to the already-registered ApplicationDbContext
@@ -69,14 +71,16 @@ public static class DependencyInjection
         services.AddScoped<IEmployerDashboardService, EmployerDashboardService>();
 
         // ── Resume Parsing Pipeline ──────────────────────────────────────────
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeFileExtractor, jobzilla_net.Infrasture.Services.Resumes.BasicResumeFileExtractor>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeTextParser, jobzilla_net.Infrasture.Services.Resumes.BasicRegexResumeParser>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeDataSyncService, jobzilla_net.Infrasture.Services.Resumes.ResumeDataSyncService>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeParsingOrchestrator, jobzilla_net.Infrasture.Services.Resumes.ResumeParsingOrchestrator>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService, jobzilla_net.Infrasture.Services.Resumes.ResumeBuilderService>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer, jobzilla_net.Infrasture.Services.Resumes.RazorTemplateRenderer>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IPdfGenerator, jobzilla_net.Infrasture.Services.Resumes.SelectPdfGenerator>();
-        services.AddScoped<jobzilla_net.Application.Resumes.Interfaces.IResumeExportService, jobzilla_net.Infrasture.Services.Resumes.ResumeExportService>();
+        services.AddScoped<IResumeFileExtractor, BasicResumeFileExtractor>();
+        services.AddScoped<IResumeSectionDetector, ResumeSectionDetector>();
+        services.AddScoped<IResumeSectionItemParser, ResumeSectionItemParser>();
+        services.AddScoped<IResumeTextParser, BasicRegexResumeParser>();
+        services.AddScoped<IResumeDataSyncService, ResumeDataSyncService>();
+        services.AddScoped<IResumeParsingOrchestrator, ResumeParsingOrchestrator>();
+        services.AddScoped<IResumeBuilderService, ResumeBuilderService>();
+        services.AddScoped<ITemplateRenderer, RazorTemplateRenderer>();
+        services.AddScoped<IPdfGenerator, SelectPdfGenerator>();
+        services.AddScoped<IResumeExportService, ResumeExportService>();
 
         return services;
     }

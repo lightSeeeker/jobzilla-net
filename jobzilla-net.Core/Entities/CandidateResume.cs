@@ -9,4 +9,6 @@ public class CandidateResume : AuditableEntity
     public string Title { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
     public bool IsDefault { get; set; }
+    public string? DocumentData { get; set; }
+    public bool IsBuilderGenerated { get; set; }
 }

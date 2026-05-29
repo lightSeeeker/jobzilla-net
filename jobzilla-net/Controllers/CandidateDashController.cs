@@ -230,12 +230,41 @@ public class CandidateDashController : Controller
         return RedirectToAction(nameof(Resumes));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateResumeScratch(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            TempData["ErrorMessage"] = "Please provide a resume title.";
+            return RedirectToAction(nameof(Resumes));
+        }
+
+        try
+        {
+            var newResume = await _dashboardService.CreateScratchResumeAsync(GetUserId(), title);
+            if (newResume != null)
+            {
+                TempData["SuccessMessage"] = "New resume created successfully!";
+                return RedirectToAction(nameof(Builder), new { resumeId = newResume.Id });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating scratch resume for user {UserId}", GetUserId());
+        }
+
+        TempData["ErrorMessage"] = "Failed to create resume.";
+        return RedirectToAction(nameof(Resumes));
+    }
+
     // ── RESUME BUILDER (Parsed Data Editor) ──────────────────────────────────
 
     [HttpGet]
-    public async Task<IActionResult> Builder()
+    public async Task<IActionResult> Builder(int? resumeId = null)
     {
-        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId());
+        ViewBag.ResumeId = resumeId;
+        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId()); // Legacy model used for fallback/templates
         return View(model);
     }
 
@@ -337,4 +366,81 @@ public class CandidateDashController : Controller
 
         return File(pdfBytes, "application/pdf", fileName);
     }
+
+    // ── RESUME BUILDER JSON API ──────────────────────────────────────────────
+    // All routes under /api/resume/* return JSON for the Builder SPA.
+
+    [HttpGet("/api/resume/document")]
+    public async Task<IActionResult> ApiGetDocument([FromQuery] int? resumeId, CancellationToken ct)
+    {
+        try
+        {
+            var doc = await _resumeBuilderService.GetResumeDocumentAsync(GetUserId(), resumeId, ct);
+            return Ok(doc);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "ApiGetDocument failed for user {UserId}", GetUserId());
+            return StatusCode(500, new { error = "Failed to load resume document." });
+        }
+    }
+
+    [HttpPut("/api/resume/personal")]
+    public async Task<IActionResult> ApiSavePersonal(
+        [FromQuery] int? resumeId,
+        [FromBody] jobzilla_net.Application.Resumes.Dtos.ResumeDocument body,
+        CancellationToken ct)
+    {
+        if (body == null) return BadRequest(new { error = "Empty payload." });
+        var ok = await _resumeBuilderService.SaveResumeDocumentAsync(GetUserId(), resumeId, body, ct);
+        return ok ? Ok(new { success = true }) : StatusCode(500, new { error = "Save failed." });
+    }
+
+    // ── Section items (per existing EF entities) ─────────────────────────────
+
+    [HttpPost("/api/resume/experience")]
+    public async Task<IActionResult> ApiAddExperience(
+        [FromBody] jobzilla_net.Application.Resumes.ViewModels.CandidateExperienceViewModel body,
+        CancellationToken ct)
+    {
+        if (body == null) return BadRequest();
+        var ok = await _resumeBuilderService.UpdateResumeDataAsync(GetUserId(),
+            new jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+            {
+                Experiences = new() { body }
+            }, ct);
+        // Reload and return full document
+        if (!ok) return StatusCode(500, new { error = "Save failed." });
+        var doc = await _resumeBuilderService.GetResumeDocumentAsync(GetUserId(), null, ct);
+        return Ok(new { success = true, document = doc });
+    }
+
+    // ── References CRUD ──────────────────────────────────────────────────────
+
+    [HttpGet("/api/resume/references")]
+    public async Task<IActionResult> ApiGetReferences(CancellationToken ct)
+    {
+        var refs = await _resumeBuilderService.GetReferencesAsync(GetUserId(), ct);
+        return Ok(refs);
+    }
+
+    [HttpPost("/api/resume/references")]
+    public async Task<IActionResult> ApiUpsertReference(
+        [FromBody] jobzilla_net.Application.Resumes.ViewModels.ReferenceViewModel body,
+        CancellationToken ct)
+    {
+        if (body == null || string.IsNullOrWhiteSpace(body.ReferenceName))
+            return BadRequest(new { error = "ReferenceName is required." });
+
+        var result = await _resumeBuilderService.UpsertReferenceAsync(GetUserId(), body, ct);
+        return result != null ? Ok(result) : StatusCode(500, new { error = "Save failed." });
+    }
+
+    [HttpDelete("/api/resume/references/{id:int}")]
+    public async Task<IActionResult> ApiDeleteReference(int id, CancellationToken ct)
+    {
+        var ok = await _resumeBuilderService.DeleteReferenceAsync(GetUserId(), id, ct);
+        return ok ? Ok(new { success = true }) : NotFound(new { error = "Reference not found." });
+    }
 }
+

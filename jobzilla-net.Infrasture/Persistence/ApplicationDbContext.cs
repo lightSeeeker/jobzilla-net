@@ -29,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<CandidateCertification> CandidateCertifications => Set<CandidateCertification>();
     public DbSet<CandidateProject> CandidateProjects => Set<CandidateProject>();
     public DbSet<CandidateSocialLink> CandidateSocialLinks => Set<CandidateSocialLink>();
+    public DbSet<CandidateReference> CandidateReferences => Set<CandidateReference>();
     public DbSet<ResumeTemplate> ResumeTemplates => Set<ResumeTemplate>();
     public DbSet<SavedJob> SavedJobs => Set<SavedJob>();
     public DbSet<CandidateSkill> CandidateSkills => Set<CandidateSkill>();

@@ -12,6 +12,7 @@ public class ParsedResumeDto
     public List<string> Skills { get; set; } = new();
     public List<ParsedCertificationDto> Certifications { get; set; } = new();
     public List<ParsedSocialLinkDto> SocialLinks { get; set; } = new();
+    public List<ParsedProjectDto> Projects { get; set; } = new();
 }
 
 public class ParsedExperienceDto
@@ -44,3 +45,13 @@ public class ParsedSocialLinkDto
     public string? PlatformName { get; set; }
     public string? Url { get; set; }
 }
+
+public class ParsedProjectDto
+{
+    public string? Name { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public string? ProjectUrl { get; set; }
+    public string? Description { get; set; }
+}
+

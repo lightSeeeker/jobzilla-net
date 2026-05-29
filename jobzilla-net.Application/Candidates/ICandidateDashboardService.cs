@@ -22,4 +22,6 @@ public interface ICandidateDashboardService
     Task<bool> DeleteResumeAsync(string userId, int resumeId);
     
     Task<bool> SetDefaultResumeAsync(string userId, int resumeId);
+
+    Task<CandidateResumeDto?> CreateScratchResumeAsync(string userId, string title);
 }

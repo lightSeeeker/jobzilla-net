@@ -1,0 +1,12 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+<div class="resume-skills-list">
+    @foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+    {
+        var n = item.GetValue("Name");
+        if (!string.IsNullOrWhiteSpace(n))
+        {
+            <span class="resume-skill-tag">@n</span>
+        }
+    }
+</div>

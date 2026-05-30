@@ -1,0 +1,38 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+@{
+    string FormatDate(string? val, string fmt = "MMM yyyy")
+    {
+        if (string.IsNullOrWhiteSpace(val)) return "";
+        if (DateTime.TryParse(val, out var d)) return d.ToString(fmt);
+        return val;
+    }
+}
+@foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+{
+    var n = item.GetValue("Name");
+    var pu = item.GetValue("ProjectUrl");
+    var sd = FormatDate(item.GetValue("StartDate"));
+    var ed = item.GetValue("IsOngoing") == "true" ? "Ongoing" : FormatDate(item.GetValue("EndDate"));
+    var de = item.GetValue("Description")?.Replace("<", "&lt;").Replace(">", "&gt;");
+    
+    <div class="resume-item">
+        <div class="resume-item-header">
+            <span class="resume-item-title">
+                @n
+                @if (!string.IsNullOrWhiteSpace(pu))
+                {
+                    <text> — <a href="@pu" target="_blank" class="resume-link">View Project</a></text>
+                }
+            </span>
+            @if (!string.IsNullOrWhiteSpace(sd))
+            {
+                <span class="resume-item-date">@sd – @ed</span>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(de))
+        {
+            <div class="resume-item-desc">@Html.Raw(de.Replace("\n", "<br/>"))</div>
+        }
+    </div>
+}

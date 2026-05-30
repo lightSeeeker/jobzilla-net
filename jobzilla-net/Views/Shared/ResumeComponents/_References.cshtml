@@ -1,0 +1,30 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+<div class="resume-references-grid">
+    @foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+    {
+        var rn = item.GetValue("ReferenceName");
+        var rc = item.GetValue("Company");
+        var rr = item.GetValue("Designation");
+        var rph = item.GetValue("Phone");
+        var rem = item.GetValue("Email");
+        
+        <div class="resume-item resume-reference-item">
+            <div class="resume-item-title">@rn</div>
+            @if (!string.IsNullOrWhiteSpace(rr))
+            {
+                <div class="resume-item-subtitle">
+                    @rr @if (!string.IsNullOrWhiteSpace(rc)) { <text>@Html.Raw(" &mdash; ") @rc</text> }
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(rph))
+            {
+                <div class="resume-item-desc">@rph</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(rem))
+            {
+                <div class="resume-item-desc">@rem</div>
+            }
+        </div>
+    }
+</div>

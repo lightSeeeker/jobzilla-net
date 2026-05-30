@@ -1,0 +1,26 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+@{
+    string FormatDate(string? val, string fmt = "yyyy")
+    {
+        if (string.IsNullOrWhiteSpace(val)) return "";
+        if (DateTime.TryParse(val, out var d)) return d.ToString(fmt);
+        return val;
+    }
+}
+@foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+{
+    var inst = item.GetValue("InstitutionName");
+    var deg = item.GetValue("Degree");
+    var fld = item.GetValue("FieldOfStudy");
+    var sd = FormatDate(item.GetValue("StartDate"));
+    var ed = item.GetValue("IsCurrent") == "true" ? "Present" : FormatDate(item.GetValue("EndDate"));
+    
+    <div class="resume-item">
+        <div class="resume-item-header">
+            <span class="resume-item-title">@deg @if (!string.IsNullOrWhiteSpace(fld)) { <text>in @fld</text> }</span>
+            <span class="resume-item-date">@sd – @ed</span>
+        </div>
+        <div class="resume-item-subtitle">@inst</div>
+    </div>
+}

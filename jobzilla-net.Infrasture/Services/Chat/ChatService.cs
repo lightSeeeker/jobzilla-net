@@ -45,6 +45,9 @@ public class ChatService : IChatService
 
         if (existingConv != null)
         {
+            existingConv.IsDeletedByCandidate = false;
+            existingConv.IsDeletedByEmployer = false;
+
             var systemMessageBody = $"[System]: Referenced job application for '{application.JobPost?.Title}'";
             var lastMessage = await _context.Messages
                 .Where(m => m.ConversationId == existingConv.Id)
@@ -104,8 +107,10 @@ public class ChatService : IChatService
             .Include(c => c.JobApplication)
                 .ThenInclude(a => a!.CandidateProfile)
             .Include(c => c.Messages)
-            .Where(c => c.JobApplication!.JobPost!.EmployerProfile!.UserId == userId ||
-                        c.JobApplication!.CandidateProfile!.UserId == userId)
+            .Where(c => 
+                (c.JobApplication!.JobPost!.EmployerProfile!.UserId == userId && !c.IsDeletedByEmployer) ||
+                (c.JobApplication!.CandidateProfile!.UserId == userId && !c.IsDeletedByCandidate)
+            )
             .OrderByDescending(c => c.Messages.Max(m => (DateTime?)m.SentAtUtc) ?? c.CreatedAtUtc)
             .ToListAsync();
 
@@ -185,7 +190,11 @@ public class ChatService : IChatService
             MessageId = m.Id,
             ConversationId = m.ConversationId,
             SenderUserId = m.SenderUserId,
-            Body = m.Body,
+            Body = m.IsDeleted ? "This message was deleted." : m.Body,
+            AttachmentUrl = m.IsDeleted ? null : m.AttachmentUrl,
+            AttachmentName = m.IsDeleted ? null : m.AttachmentName,
+            EditedAtUtc = m.EditedAtUtc,
+            IsDeleted = m.IsDeleted,
             SentAtUtc = m.SentAtUtc,
             IsMine = m.SenderUserId == userId,
             // Simple mapping for names - in a real app, we'd lookup the sender's name dynamically or store it.
@@ -198,7 +207,7 @@ public class ChatService : IChatService
         }).ToList();
     }
 
-    public async Task<MessageDto> SaveMessageAsync(int conversationId, string userId, string body)
+    public async Task<MessageDto> SaveMessageAsync(int conversationId, string userId, string body, string? attachmentUrl = null, string? attachmentName = null)
     {
         var conversation = await _context.Conversations
             .Include(c => c.JobApplication)
@@ -217,11 +226,16 @@ public class ChatService : IChatService
         if (!isEmployer && !isCandidate)
             throw new UnauthorizedAccessException("Not authorized.");
 
+        conversation.IsDeletedByCandidate = false;
+        conversation.IsDeletedByEmployer = false;
+
         var message = new Message
         {
             ConversationId = conversationId,
             SenderUserId = userId,
             Body = body,
+            AttachmentUrl = attachmentUrl,
+            AttachmentName = attachmentName,
             SentAtUtc = DateTime.UtcNow
         };
 
@@ -234,10 +248,88 @@ public class ChatService : IChatService
             ConversationId = message.ConversationId,
             SenderUserId = message.SenderUserId,
             Body = message.Body,
+            AttachmentUrl = message.AttachmentUrl,
+            AttachmentName = message.AttachmentName,
             SentAtUtc = message.SentAtUtc,
             IsMine = true,
             SenderName = "Me",
             SenderImageUrl = isEmployer ? conversation.JobApplication!.JobPost!.EmployerProfile!.LogoPath : conversation.JobApplication!.CandidateProfile!.ProfileImagePath
         };
+    }
+
+    public async Task<MessageDto> EditMessageAsync(int messageId, string userId, string newBody)
+    {
+        var msg = await _context.Messages
+            .Include(m => m.Conversation)
+                .ThenInclude(c => c!.JobApplication)
+                    .ThenInclude(a => a!.JobPost)
+                        .ThenInclude(p => p!.EmployerProfile)
+            .Include(m => m.Conversation)
+                .ThenInclude(c => c!.JobApplication)
+                    .ThenInclude(a => a!.CandidateProfile)
+            .FirstOrDefaultAsync(m => m.Id == messageId);
+
+        if (msg == null) throw new ArgumentException("Message not found.");
+        if (msg.SenderUserId != userId) throw new UnauthorizedAccessException();
+        if (msg.IsDeleted) throw new InvalidOperationException("Cannot edit deleted message.");
+        if (msg.Body.StartsWith("[System]:")) throw new InvalidOperationException("Cannot edit system message.");
+
+        msg.Body = newBody;
+        msg.EditedAtUtc = DateTime.UtcNow;
+        await _context.SaveChangesAsync(CancellationToken.None);
+
+        bool isEmployer = msg.Conversation!.JobApplication?.JobPost?.EmployerProfile?.UserId == userId;
+
+        return new MessageDto
+        {
+            MessageId = msg.Id,
+            ConversationId = msg.ConversationId,
+            SenderUserId = msg.SenderUserId,
+            Body = msg.Body,
+            AttachmentUrl = msg.AttachmentUrl,
+            AttachmentName = msg.AttachmentName,
+            EditedAtUtc = msg.EditedAtUtc,
+            IsDeleted = msg.IsDeleted,
+            SentAtUtc = msg.SentAtUtc,
+            IsMine = true,
+            SenderName = "Me",
+            SenderImageUrl = isEmployer ? msg.Conversation.JobApplication!.JobPost!.EmployerProfile!.LogoPath : msg.Conversation.JobApplication!.CandidateProfile!.ProfileImagePath
+        };
+    }
+
+    public async Task DeleteMessageAsync(int messageId, string userId)
+    {
+        var msg = await _context.Messages.FindAsync(messageId);
+        if (msg == null) throw new ArgumentException("Message not found.");
+        if (msg.SenderUserId != userId) throw new UnauthorizedAccessException();
+        if (msg.Body.StartsWith("[System]:")) throw new InvalidOperationException("Cannot delete system message.");
+
+        msg.IsDeleted = true;
+        msg.Body = ""; 
+        msg.AttachmentUrl = null;
+        msg.AttachmentName = null;
+        await _context.SaveChangesAsync(CancellationToken.None);
+    }
+
+    public async Task DeleteConversationAsync(int conversationId, string userId)
+    {
+        var conv = await _context.Conversations
+            .Include(c => c.JobApplication)
+                .ThenInclude(a => a!.JobPost)
+                .ThenInclude(p => p!.EmployerProfile)
+            .Include(c => c.JobApplication)
+                .ThenInclude(a => a!.CandidateProfile)
+            .FirstOrDefaultAsync(c => c.Id == conversationId);
+
+        if (conv == null) throw new ArgumentException("Conversation not found.");
+
+        bool isEmployer = conv.JobApplication?.JobPost?.EmployerProfile?.UserId == userId;
+        bool isCandidate = conv.JobApplication?.CandidateProfile?.UserId == userId;
+
+        if (isEmployer) conv.IsDeletedByEmployer = true;
+        else if (isCandidate) conv.IsDeletedByCandidate = true;
+        else throw new UnauthorizedAccessException();
+
+        await _context.SaveChangesAsync(CancellationToken.None);
     }
 }

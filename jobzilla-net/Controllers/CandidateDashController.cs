@@ -368,6 +368,10 @@ public class CandidateDashController : Controller
         }
 
         var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId(), resumeId);
+        
+        model.TemplateId = id;
+        model.ResumeId = resumeId;
+        model.IsExport = false;
 
         var htmlContent = await _templateRenderer.RenderTemplateAsync(
             $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",

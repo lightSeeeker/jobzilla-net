@@ -23,5 +23,11 @@ public class ResumeExportViewModel
 
     // References (new — stored separately from the parsed profile data)
     public List<ReferenceViewModel> References { get; set; } = new();
+
+    // ── Rendering Context ──────────────────────────────────────────────────
+    // Added to support dynamic UI controls (download buttons) vs PDF export.
+    public int? TemplateId { get; set; }
+    public int? ResumeId { get; set; }
+    public bool IsExport { get; set; }
 }
 

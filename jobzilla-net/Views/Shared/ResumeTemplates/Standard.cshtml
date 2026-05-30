@@ -32,13 +32,16 @@
     </style>
 </head>
 <body>
-    <div class="action-bar d-print-none">
-        <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
-        @if (ViewBag.TemplateId != null)
-        {
-            <a href="/CandidateDash/ExportTemplate?id=@ViewBag.TemplateId" class="btn">Download as PDF</a>
-        }
-    </div>
+    @if (!Model.IsExport)
+    {
+        <div class="action-bar d-print-none">
+            <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
+            @if (Model.TemplateId.HasValue)
+            {
+                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
+            }
+        </div>
+    }
 
     <div class="resume-container">
 

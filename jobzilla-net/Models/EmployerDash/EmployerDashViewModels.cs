@@ -1,4 +1,5 @@
 using jobzilla_net.Application.Employers.Dtos;
+using Microsoft.AspNetCore.Http;
 
 namespace jobzilla_net.Models.EmployerDash;
 
@@ -10,6 +11,7 @@ public class EmployerDashOverviewViewModel
 public class EmployerDashProfileViewModel
 {
     public EmployerProfileDto Profile { get; set; } = new();
+    public IFormFile? LogoImage { get; set; }
 }
 
 public class EmployerDashJobsViewModel

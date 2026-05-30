@@ -1,4 +1,5 @@
 @model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
 @{
     Layout = null;
     var sections = Model.GetUnifiedSections();
@@ -80,6 +81,15 @@
 
     <div class="resume-container">
         <div class="header">
+            @{
+                var imgSrc = Model.GetProfileImageDataUri(WebHostEnvironment.WebRootPath);
+            }
+            @if (!string.IsNullOrEmpty(imgSrc))
+            {
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <img src="@imgSrc" alt="Profile Picture" style="width: 120px; height: 120px; object-fit: cover; border-radius: 4px; border: 1px solid #111;" />
+                </div>
+            }
             <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
             <div class="title">@(Model.Profile?.ProfessionalTitle ?? "Professional Title")</div>
             

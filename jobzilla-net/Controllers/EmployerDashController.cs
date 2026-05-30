@@ -11,10 +11,12 @@ namespace jobzilla_net.Controllers;
 public class EmployerDashController : Controller
 {
     private readonly IEmployerDashboardService _dashboardService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public EmployerDashController(IEmployerDashboardService dashboardService)
+    public EmployerDashController(IEmployerDashboardService dashboardService, IWebHostEnvironment webHostEnvironment)
     {
         _dashboardService = dashboardService;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     private string GetUserId()
@@ -68,6 +70,40 @@ public class EmployerDashController : Controller
         if (!ModelState.IsValid)
         {
             return View(model);
+        }
+
+        if (model.LogoImage != null && model.LogoImage.Length > 0)
+        {
+            if (model.LogoImage.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError(string.Empty, "File size must not exceed 5MB.");
+                return View(model);
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var extension = Path.GetExtension(model.LogoImage.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(string.Empty, "Invalid file format. Please upload an image (JPG, PNG, GIF).");
+                return View(model);
+            }
+
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "logos");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.LogoImage.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await model.LogoImage.CopyToAsync(fileStream);
+            }
+
+            model.Profile.LogoPath = "/uploads/logos/" + uniqueFileName;
         }
 
         var success = await _dashboardService.UpdateProfileAsync(GetUserId(), model.Profile);

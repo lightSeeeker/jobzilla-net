@@ -1,4 +1,5 @@
 @model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
 @{
     Layout = null;
     var sections = Model.GetUnifiedSections();
@@ -76,9 +77,22 @@
     }
 
     <div class="resume-container">
-        <div class="header">
-            <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
-            <div class="title">// @(Model.Profile?.ProfessionalTitle ?? "Professional Title")</div>
+        <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
+                <div class="title">// @(Model.Profile?.ProfessionalTitle ?? "Professional Title")</div>
+            </div>
+            @{
+                var imgSrc = Model.GetProfileImageDataUri(WebHostEnvironment.WebRootPath);
+            }
+            @if (!string.IsNullOrEmpty(imgSrc))
+            {
+                <div style="flex-shrink: 0; margin-left: 20px;">
+                    <img src="@imgSrc" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px dashed #569cd6;" />
+                </div>
+            }
+        </div>
+        <div class="header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 20px; margin-top: -15px;">
             
             <div class="contact-info">
                 @if (!string.IsNullOrWhiteSpace(Model.Profile?.Email)) { <span>email: "@Model.Profile.Email",</span> }

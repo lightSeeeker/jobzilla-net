@@ -11,6 +11,7 @@ public class ResumeDocument
     public string? FullName { get; set; }
     public string? ProfessionalTitle { get; set; }
     public string? Email { get; set; }
+    public string? ProfileImagePath { get; set; }
     public string? Phone { get; set; }
     public string? Location { get; set; }
     public string? Website { get; set; }

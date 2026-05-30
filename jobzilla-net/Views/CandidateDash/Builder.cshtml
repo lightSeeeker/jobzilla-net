@@ -93,6 +93,22 @@
                                 </button>
                             </div>
                             <div class="cvb-card-body" id="cvb-personal-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="form-group">
+                                            <label class="form-label small fw-bold">Resume Profile Picture (Optional)</label>
+                                            <div class="ls-inputicon-box d-flex align-items-center gap-3">
+                                                <div id="cvb-resume-image-preview" style="display:none; margin-bottom:10px;">
+                                                    <img id="cvb-resume-image-img" src="" alt="Resume Picture" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <input type="file" id="cvb-resume-image-input" class="form-control" accept="image/*" />
+                                                    <div class="text-muted small mt-1">Upload a specific photo for this resume to override your main profile picture. Max 5MB.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row g-3" id="cvb-personal-fields">
                                     <!-- populated by JS from API -->
                                 </div>
@@ -591,6 +607,17 @@
             col.innerHTML = buildFieldHtml(f.key, f.label, _document?.[f.key] ?? '', f.type, 'cvb-personal-field');
             container.appendChild(col);
         });
+
+        // Resume Image logic
+        const imgPreview = document.getElementById('cvb-resume-image-preview');
+        const imgEl = document.getElementById('cvb-resume-image-img');
+        if (_document?.profileImagePath) {
+            imgEl.src = _document.profileImagePath;
+            imgPreview.style.display = 'block';
+        } else {
+            imgPreview.style.display = 'none';
+            imgEl.src = '';
+        }
     }
 
     function wirePersonalSave() {
@@ -604,6 +631,41 @@
             el.addEventListener('change', handler);
             el.addEventListener('input', handler);
         });
+
+        const imageInput = document.getElementById('cvb-resume-image-input');
+        if (imageInput) {
+            imageInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    updateSaveUI('Uploading...', 'fa-spinner fa-spin', '#00b4d8');
+                    const opts = {
+                        method: 'POST',
+                        headers: { 'RequestVerificationToken': getToken() },
+                        body: formData
+                    };
+                    const r = await fetch('/api/resume/image', opts);
+                    if (!r.ok) {
+                        const err = await r.json();
+                        throw new Error(err.error || 'Upload failed');
+                    }
+                    const data = await r.json();
+                    if (_document) {
+                        _document.profileImagePath = data.url;
+                        renderPersonal(); // refresh preview
+                        scheduleAutosave();
+                    }
+                } catch (err) {
+                    updateSaveUI('Upload failed', 'fa-exclamation-triangle', '#ef4444');
+                    console.error(err);
+                    alert(err.message);
+                }
+            });
+        }
     }
 
     // ── Sections rendering ────────────────────────────────────────────────────

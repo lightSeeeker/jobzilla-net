@@ -21,6 +21,38 @@ public class ResumeExportViewModel
     // collections above when it is not null, enabling fully dynamic section rendering.
     public ResumeDocument? Document { get; set; }
 
+    public string? ProfileImagePath => string.IsNullOrWhiteSpace(Document?.ProfileImagePath) 
+        ? Profile?.ProfileImagePath 
+        : Document.ProfileImagePath;
+
+    public string? GetProfileImageDataUri(string webRootPath)
+    {
+        if (string.IsNullOrWhiteSpace(ProfileImagePath)) return null;
+
+        try
+        {
+            // Remove leading slash if present
+            var relativePath = ProfileImagePath.TrimStart('~', '/');
+            var physicalPath = Path.Combine(webRootPath, relativePath.Replace("/", "\\"));
+
+            if (File.Exists(physicalPath))
+            {
+                var bytes = File.ReadAllBytes(physicalPath);
+                var ext = Path.GetExtension(physicalPath).ToLowerInvariant();
+                var mimeType = ext switch
+                {
+                    ".png" => "image/png",
+                    ".gif" => "image/gif",
+                    _ => "image/jpeg"
+                };
+                return $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}";
+            }
+        }
+        catch { /* Ignore errors and fallback to relative URL */ }
+
+        return ProfileImagePath;
+    }
+
     // References (new — stored separately from the parsed profile data)
     public List<ReferenceViewModel> References { get; set; } = new();
 

@@ -64,6 +64,24 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Validate that the user actually has the role they selected to log in as (e.g. Candidate vs Employer)
+                if (!string.IsNullOrEmpty(model.UserType) && !roles.Contains(model.UserType))
+                {
+                    await _signInManager.SignOutAsync();
+                    string errorMsg = $"Invalid account type. You are not registered as a {model.UserType}.";
+                    
+                    if (isAjax) return BadRequest(new { success = false, message = errorMsg });
+                    
+                    ModelState.AddModelError(string.Empty, errorMsg);
+                    return View(model);
+                }
+            }
+
             _logger.LogInformation("User {Email} logged in.", model.Email);
 
             if (isAjax)
@@ -73,16 +91,12 @@ public class AccountController : Controller
                 {
                     returnUrl = model.ReturnUrl;
                 }
-                else
+                else if (user is not null)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
-                    if (user is not null)
-                    {
-                        var roles = await _userManager.GetRolesAsync(user);
-                        if (roles.Contains("Admin"))     returnUrl = Url.Action("Index", "Dashboard") ?? "/";
-                        else if (roles.Contains("Employer"))  returnUrl = Url.Action("Index", "EmployerDash") ?? "/";
-                        else if (roles.Contains("Candidate")) returnUrl = Url.Action("Index", "CandidateDash") ?? "/";
-                    }
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Admin"))     returnUrl = Url.Action("Index", "Dashboard") ?? "/";
+                    else if (roles.Contains("Employer"))  returnUrl = Url.Action("Index", "EmployerDash") ?? "/";
+                    else if (roles.Contains("Candidate")) returnUrl = Url.Action("Index", "CandidateDash") ?? "/";
                 }
                 return Json(new { success = true, redirectUrl = returnUrl });
             }

@@ -1,0 +1,16 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+<div class="resume-custom-section">
+    @foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+    {
+        <div class="resume-item resume-custom-item">
+            @foreach (var field in item.Fields.Where(f => !string.IsNullOrWhiteSpace(f.Value)))
+            {
+                <div class="resume-item-field">
+                    <span class="resume-field-label">@field.Label:</span>
+                    <span class="resume-field-value">@Html.Raw(field.Value?.Replace("\n", "<br/>"))</span>
+                </div>
+            }
+        </div>
+    }
+</div>

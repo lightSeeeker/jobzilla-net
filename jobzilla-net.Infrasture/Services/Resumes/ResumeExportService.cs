@@ -37,6 +37,10 @@ public class ResumeExportService : IResumeExportService
 
             var model = await _builderService.GetResumeDataAsync(userId, resumeId, cancellationToken);
             
+            model.TemplateId = templateId;
+            model.ResumeId = resumeId;
+            model.IsExport = true;
+
             // Render HTML string
             var html = await _templateRenderer.RenderTemplateAsync(
                 $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml", 

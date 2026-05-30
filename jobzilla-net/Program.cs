@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using jobzilla_net.Infrasture.Persistence;
+using jobzilla_net.Core.Entities;
 using jobzilla_net.Infrasture;
 using jobzilla_net.Infrasture.Seed;
 
@@ -5,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
@@ -34,5 +39,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapHub<jobzilla_net.Hubs.ChatHub>("/chathub");
 
 app.Run();

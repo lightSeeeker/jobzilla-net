@@ -21,7 +21,7 @@
     </div>
 }
 
-<form asp-action="Profile" method="post">
+<form asp-action="Profile" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <!--Basic Information-->
@@ -32,6 +32,22 @@
         <div class="panel-body wt-panel-body p-a20 m-b30 ">
             <div class="row">
                 
+                <div class="col-xl-12 col-lg-12 col-md-12 mb-4">
+                    <div class="form-group">
+                        <label>Company Logo</label>
+                        <div class="ls-inputicon-box">
+                            @if (!string.IsNullOrEmpty(Model.Profile.LogoPath))
+                            {
+                                <div class="mb-3">
+                                    <img src="@Model.Profile.LogoPath" alt="Company Logo" style="max-width: 150px; border-radius: 8px;" />
+                                </div>
+                            }
+                            <input type="file" asp-for="LogoImage" class="form-control" accept="image/*" />
+                            <i class="fs-input-icon fa fa-image"></i>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-xl-4 col-lg-12 col-md-12">
                     <div class="form-group">
                         <label asp-for="Profile.CompanyName">Company Name</label>

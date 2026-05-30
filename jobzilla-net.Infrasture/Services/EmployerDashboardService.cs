@@ -152,7 +152,7 @@ public class EmployerDashboardService : IEmployerDashboardService
         };
     }
 
-    public async Task<PagedResult<EmployerJobApplicationDto>> GetApplicationsAsync(string userId, int page, int pageSize)
+    public async Task<PagedResult<EmployerJobApplicationDto>> GetApplicationsAsync(string userId, int page, int pageSize, int? jobId = null)
     {
         var profile = await GetOrCreateProfileAsync(userId);
 
@@ -160,8 +160,14 @@ public class EmployerDashboardService : IEmployerDashboardService
             .Include(a => a.JobPost)
             .Include(a => a.CandidateProfile)
             .Include(a => a.CandidateResume)
-            .Where(a => a.JobPost!.EmployerProfileId == profile.Id)
-            .OrderByDescending(a => a.AppliedAtUtc);
+            .Where(a => a.JobPost!.EmployerProfileId == profile.Id);
+
+        if (jobId.HasValue)
+        {
+            query = query.Where(a => a.JobPostId == jobId.Value);
+        }
+
+        query = query.OrderByDescending(a => a.AppliedAtUtc);
 
         var totalItems = await query.CountAsync();
         var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -261,8 +267,31 @@ public class EmployerDashboardService : IEmployerDashboardService
         };
 
         _context.JobPosts.Add(job);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(CancellationToken.None);
         return job.Id;
+    }
+
+    public async Task<int> CalculateAtsScoreAsync(string userId, int applicationId)
+    {
+        var profile = await GetOrCreateProfileAsync(userId);
+        var application = await _context.JobApplications
+            .Include(a => a.JobPost)
+            .Include(a => a.CandidateProfile)
+            .Include(a => a.CandidateResume)
+            .FirstOrDefaultAsync(a => a.Id == applicationId && a.JobPost!.EmployerProfileId == profile.Id);
+
+        if (application == null || application.JobPost == null)
+            return 0;
+
+        var jobText = $"{application.JobPost.Title} {application.JobPost.Description} {application.JobPost.Requirements}";
+        var resumeText = application.CandidateProfile?.Summary ?? "";
+
+        if (application.CandidateResume != null && !string.IsNullOrWhiteSpace(application.CandidateResume.DocumentData))
+        {
+            resumeText += " " + application.CandidateResume.DocumentData;
+        }
+
+        return jobzilla_net.Application.Common.Utils.AtsScoringUtility.CalculateScore(jobText, resumeText);
     }
 
     public async Task<bool> UpdateJobAsync(string userId, int jobId, EmployerJobCreateUpdateDto dto)

@@ -75,6 +75,14 @@
                                                                         <span class="fa fa-eye"></span>
                                                                     </a>
                                                                 </li>
+                                                                <li>
+                                                                    <form asp-action="StartChat" method="post" class="m-0 p-0">
+                                                                        <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                                                                        <button type="submit" class="btn btn-sm btn-outline-info p-1 ml-2" title="Message Employer" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                            <span class="fa fa-comments"></span>
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </div>

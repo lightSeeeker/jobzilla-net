@@ -8,5 +8,8 @@ public class Conversation : AuditableEntity
     public int? JobApplicationId { get; set; }
     public JobApplication? JobApplication { get; set; }
 
+    public bool IsDeletedByCandidate { get; set; }
+    public bool IsDeletedByEmployer { get; set; }
+
     public ICollection<Message> Messages { get; set; } = new List<Message>();
 }

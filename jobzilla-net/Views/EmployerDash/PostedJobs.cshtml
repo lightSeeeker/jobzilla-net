@@ -63,7 +63,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><a asp-controller="Candidates" asp-action="Index" class="site-text-primary">@job.ApplicationsCount Applied</a></td>
+                                <td><a asp-controller="EmployerDash" asp-action="Applications" asp-route-jobId="@job.JobPostId" class="site-text-primary">@job.ApplicationsCount Applied</a></td>
                                 <td>@job.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
                                 <td>
                                     @if(job.Status == "Active")

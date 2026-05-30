@@ -69,6 +69,7 @@ public static class DependencyInjection
         services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<ICandidateDashboardService, CandidateDashboardService>();
         services.AddScoped<IEmployerDashboardService, EmployerDashboardService>();
+        services.AddScoped<jobzilla_net.Application.Chat.IChatService, jobzilla_net.Infrasture.Services.Chat.ChatService>();
 
         // ── Resume Parsing Pipeline ──────────────────────────────────────────
         services.AddScoped<IResumeDataSyncService, ResumeDataSyncService>();

@@ -701,6 +701,12 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeletedByCandidate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeletedByEmployer")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("JobApplicationId")
                         .HasColumnType("int");
 
@@ -1136,6 +1142,12 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AttachmentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1144,6 +1156,9 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EditedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -1258,21 +1273,51 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         {
                             Id = 1,
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "A clean, professional template suitable for all industries.",
+                            Description = "A clean, balanced layout with subtle colors suitable for modern professionals.",
                             IsActive = true,
                             IsDeleted = false,
-                            Name = "Standard Professional",
-                            TemplateFilePath = "Standard"
+                            Name = "Modern Professional",
+                            TemplateFilePath = "ModernProfessional"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "A sleek, modern design with vibrant accents for creative roles.",
+                            Description = "Traditional and sophisticated, perfect for senior corporate roles.",
                             IsActive = true,
                             IsDeleted = false,
-                            Name = "Modern Creative",
-                            TemplateFilePath = "Modern"
+                            Name = "Executive Corporate",
+                            TemplateFilePath = "ExecutiveCorporate"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Strictly single column, text-focused format designed to pass cleanly through tracking systems.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "ATS Optimized",
+                            TemplateFilePath = "AtsOptimized"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Bold typography and vibrant accents for creative and design-focused roles.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Creative Designer",
+                            TemplateFilePath = "CreativeDesigner"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Clean and structured with tech-focused elements, resembling technical documentation.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Technical Developer",
+                            TemplateFilePath = "TechnicalDeveloper"
                         });
                 });
 

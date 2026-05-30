@@ -211,18 +211,45 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             new ResumeTemplate
             {
                 Id = 1,
-                Name = "Standard Professional",
-                Description = "A clean, professional template suitable for all industries.",
-                TemplateFilePath = "Standard", // Corresponds to Standard.cshtml
+                Name = "Modern Professional",
+                Description = "A clean, balanced layout with subtle colors suitable for modern professionals.",
+                TemplateFilePath = "ModernProfessional",
                 IsActive = true,
                 CreatedAtUtc = SeedDate
             },
             new ResumeTemplate
             {
                 Id = 2,
-                Name = "Modern Creative",
-                Description = "A sleek, modern design with vibrant accents for creative roles.",
-                TemplateFilePath = "Modern", // Corresponds to Modern.cshtml
+                Name = "Executive Corporate",
+                Description = "Traditional and sophisticated, perfect for senior corporate roles.",
+                TemplateFilePath = "ExecutiveCorporate",
+                IsActive = true,
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 3,
+                Name = "ATS Optimized",
+                Description = "Strictly single column, text-focused format designed to pass cleanly through tracking systems.",
+                TemplateFilePath = "AtsOptimized",
+                IsActive = true,
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 4,
+                Name = "Creative Designer",
+                Description = "Bold typography and vibrant accents for creative and design-focused roles.",
+                TemplateFilePath = "CreativeDesigner",
+                IsActive = true,
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 5,
+                Name = "Technical Developer",
+                Description = "Clean and structured with tech-focused elements, resembling technical documentation.",
+                TemplateFilePath = "TechnicalDeveloper",
                 IsActive = true,
                 CreatedAtUtc = SeedDate
             });

@@ -32,15 +32,22 @@ public class ResumeBuilderService : IResumeBuilderService
             if (customResumeInfo != null)
             {
                 var doc = await GetResumeDocumentAsync(userId, resumeId, cancellationToken);
+                
+                var profile = await _context.CandidateProfiles
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+
                 var customVm = new ResumeExportViewModel
                 {
+                    Document = doc,
                     Profile = new CandidateProfileDto
                     {
-                        FullName = doc.FullName ?? "",
-                        ProfessionalTitle = doc.ProfessionalTitle,
-                        PhoneNumber = doc.Phone,
-                        Location = doc.Location,
-                        Summary = doc.Summary
+                        FullName = string.IsNullOrWhiteSpace(doc.FullName) ? (profile?.FullName ?? "") : doc.FullName,
+                        ProfessionalTitle = string.IsNullOrWhiteSpace(doc.ProfessionalTitle) ? profile?.ProfessionalTitle : doc.ProfessionalTitle,
+                        PhoneNumber = string.IsNullOrWhiteSpace(doc.Phone) ? profile?.PhoneNumber : doc.Phone,
+                        Location = string.IsNullOrWhiteSpace(doc.Location) ? profile?.Location : doc.Location,
+                        Summary = string.IsNullOrWhiteSpace(doc.Summary) ? profile?.Summary : doc.Summary,
+                        ProfileImagePath = string.IsNullOrWhiteSpace(doc.ProfileImagePath) ? profile?.ProfileImagePath : doc.ProfileImagePath
                     }
                 };
 
@@ -99,7 +106,48 @@ public class ResumeBuilderService : IResumeBuilderService
             }
         }
 
-        return new ResumeExportViewModel();
+        var fallbackProfile = await _context.CandidateProfiles
+            .Include(p => p.Experiences)
+            .Include(p => p.Educations)
+            .Include(p => p.Certifications)
+            .Include(p => p.SocialLinks)
+            .Include(p => p.Projects)
+            .Include(p => p.Skills).ThenInclude(cs => cs.Skill)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+
+        if (fallbackProfile == null) return new ResumeExportViewModel();
+
+        var fallbackVm = new ResumeExportViewModel
+        {
+            Profile = new CandidateProfileDto
+            {
+                FullName = fallbackProfile.FullName ?? "",
+                ProfessionalTitle = fallbackProfile.ProfessionalTitle,
+                PhoneNumber = fallbackProfile.PhoneNumber,
+                Location = fallbackProfile.Location,
+                Summary = fallbackProfile.Summary,
+                ProfileImagePath = fallbackProfile.ProfileImagePath
+            },
+            Experiences = fallbackProfile.Experiences.Select(e => new CandidateExperienceViewModel {
+                Id = e.Id, JobTitle = e.JobTitle, CompanyName = e.CompanyName, Location = e.Location, StartDate = e.StartDate, EndDate = e.EndDate, IsCurrentPosition = e.IsCurrentPosition, Description = e.Description
+            }).ToList(),
+            Educations = fallbackProfile.Educations.Select(e => new CandidateEducationViewModel {
+                Id = e.Id, InstitutionName = e.InstitutionName, Degree = e.Degree, FieldOfStudy = e.FieldOfStudy, StartDate = e.StartDate, EndDate = e.EndDate, IsCurrentlyStudying = e.IsCurrentlyStudying, Description = e.Description
+            }).ToList(),
+            Certifications = fallbackProfile.Certifications.Select(c => new CandidateCertificationViewModel {
+                Id = c.Id, Name = c.Name, IssuingOrganization = c.IssuingOrganization, IssueDate = c.IssueDate, ExpirationDate = c.ExpirationDate, CredentialId = c.CredentialId, CredentialUrl = c.CredentialUrl
+            }).ToList(),
+            SocialLinks = fallbackProfile.SocialLinks.Select(s => new CandidateSocialLinkViewModel {
+                Id = s.Id, PlatformName = s.PlatformName, Url = s.Url
+            }).ToList(),
+            Projects = fallbackProfile.Projects.Select(p => new CandidateProjectViewModel {
+                Id = p.Id, Name = p.Name, Description = p.Description, ProjectUrl = p.ProjectUrl, StartDate = p.StartDate, EndDate = p.EndDate, IsOngoing = p.IsOngoing
+            }).ToList(),
+            Skills = fallbackProfile.Skills?.Where(cs => cs.Skill != null).Select(cs => cs.Skill!.Name).ToList() ?? new List<string>()
+        };
+
+        return fallbackVm;
     }
 
     public async Task<bool> UpdateResumeDataAsync(string userId, ResumeExportViewModel model, CancellationToken cancellationToken = default)
@@ -380,6 +428,7 @@ public class ResumeBuilderService : IResumeBuilderService
         doc.Phone              = profile.PhoneNumber;
         doc.Location           = profile.Location;
         doc.Summary            = profile.Summary;
+        doc.ProfileImagePath   = profile.ProfileImagePath;
 
         // Social links — extract LinkedIn / GitHub separately
         doc.LinkedInUrl = profile.SocialLinks

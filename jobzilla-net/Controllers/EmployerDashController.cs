@@ -11,10 +11,12 @@ namespace jobzilla_net.Controllers;
 public class EmployerDashController : Controller
 {
     private readonly IEmployerDashboardService _dashboardService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public EmployerDashController(IEmployerDashboardService dashboardService)
+    public EmployerDashController(IEmployerDashboardService dashboardService, IWebHostEnvironment webHostEnvironment)
     {
         _dashboardService = dashboardService;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     private string GetUserId()
@@ -70,6 +72,40 @@ public class EmployerDashController : Controller
             return View(model);
         }
 
+        if (model.LogoImage != null && model.LogoImage.Length > 0)
+        {
+            if (model.LogoImage.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError(string.Empty, "File size must not exceed 5MB.");
+                return View(model);
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var extension = Path.GetExtension(model.LogoImage.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(string.Empty, "Invalid file format. Please upload an image (JPG, PNG, GIF).");
+                return View(model);
+            }
+
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "logos");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.LogoImage.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await model.LogoImage.CopyToAsync(fileStream);
+            }
+
+            model.Profile.LogoPath = "/uploads/logos/" + uniqueFileName;
+        }
+
         var success = await _dashboardService.UpdateProfileAsync(GetUserId(), model.Profile);
 
         if (success)
@@ -101,17 +137,26 @@ public class EmployerDashController : Controller
     // ── APPLICATIONS ─────────────────────────────────────────────────────────
 
     [HttpGet]
-    public async Task<IActionResult> Applications(int page = 1)
+    public async Task<IActionResult> Applications(int page = 1, int? jobId = null)
     {
         const int pageSize = 10;
-        var applications = await _dashboardService.GetApplicationsAsync(GetUserId(), page, pageSize);
+        var applications = await _dashboardService.GetApplicationsAsync(GetUserId(), page, pageSize, jobId);
         
         var viewModel = new EmployerDashApplicationsViewModel
         {
             Applications = applications
         };
 
+        ViewBag.JobId = jobId;
+
         return View(viewModel);
+    }
+
+    [HttpGet("/api/employer/ats-score/{applicationId}")]
+    public async Task<IActionResult> ApiGetAtsScore(int applicationId)
+    {
+        var score = await _dashboardService.CalculateAtsScoreAsync(GetUserId(), applicationId);
+        return Ok(new { score });
     }
 
     [HttpPost]
@@ -131,6 +176,34 @@ public class EmployerDashController : Controller
 
         return RedirectToAction(nameof(Applications));
     }
+    // ── CHAT ─────────────────────────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult Chat(int? conversationId)
+    {
+        ViewBag.ConversationId = conversationId;
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> StartChat(int applicationId, [FromServices] jobzilla_net.Application.Chat.IChatService chatService)
+    {
+        try
+        {
+            var conversationId = await chatService.StartOrGetConversationAsync(applicationId, GetUserId());
+            return RedirectToAction(nameof(Chat), new { conversationId = conversationId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (ArgumentException)
+        {
+            return NotFound();
+        }
+    }
+
     // ── JOBS CRUD ────────────────────────────────────────────────────────────
 
     [HttpGet]

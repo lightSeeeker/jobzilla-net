@@ -1,6 +1,22 @@
 @model jobzilla_net.Models.CandidateDash.CandidateDashOverviewViewModel
+@inject jobzilla_net.Application.Common.Interfaces.IApplicationDbContext DbContext
+@using System.Security.Claims
 @{
     var activePage = ViewData["ActivePage"]?.ToString() ?? "";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var profileImage = "/images/user-avtar/pic4.jpg";
+    var fullName = "Candidate";
+    var professionalTitle = "IT Professional";
+    if (userId != null)
+    {
+        var profile = DbContext.CandidateProfiles.FirstOrDefault(p => p.UserId == userId);
+        if (profile != null)
+        {
+            if (!string.IsNullOrEmpty(profile.ProfileImagePath)) profileImage = profile.ProfileImagePath;
+            if (!string.IsNullOrEmpty(profile.FullName)) fullName = profile.FullName;
+            if (!string.IsNullOrEmpty(profile.ProfessionalTitle)) professionalTitle = profile.ProfessionalTitle;
+        }
+    }
 }
 
 <div class="col-xl-3 col-lg-4 col-md-12 rightSidebar m-b30">
@@ -8,7 +24,7 @@
     <div class="side-bar-st-1">
         
         <div class="twm-candidate-profile-pic">
-            <img src="@(Model?.Overview?.RecentApplications?.FirstOrDefault()?.CompanyLogoPath ?? "/images/user-avtar/pic4.jpg")" alt="">
+            <img src="@profileImage" alt="@fullName">
             <div class="upload-btn-wrapper">
                 <div id="upload-image-grid"></div>
                 <button class="site-button button-sm">Upload Photo</button>
@@ -17,9 +33,9 @@
         </div>
         <div class="twm-mid-content text-center">
             <a href="javascript:;" class="twm-job-title">
-                <h4>Candidate</h4>
+                <h4>@fullName</h4>
             </a>
-            <p>IT Professional</p>
+            <p>@professionalTitle</p>
         </div>
        
         <div class="twm-nav-list-1">
@@ -35,7 +51,7 @@
                 <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
                 <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-bell"></i> Job Alerts</a></li>
                 <li><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-fingerprint"></i> Change Password</a></li>
-                <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-comments"></i> Chat</a></li>
+                <li class="@(activePage == "Chat" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Chat"><i class="fa fa-comments"></i> Chat</a></li>
                 <li><a asp-controller="Blogs" asp-action="Manage"><i class="fa fa-newspaper"></i> My Blogs</a></li>
                 <li>
                     <form asp-controller="Account" asp-action="Logout" method="post" id="candidateLogoutForm" style="display: none;"></form>

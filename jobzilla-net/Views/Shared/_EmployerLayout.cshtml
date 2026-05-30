@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+@inject jobzilla_net.Application.Common.Interfaces.IApplicationDbContext DbContext
+@using System.Security.Claims
+@{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var profileImage = "/images/user-avtar/pic4.jpg";
+    if (userId != null)
+    {
+        var profile = DbContext.EmployerProfiles.FirstOrDefault(p => p.UserId == userId);
+        if (profile != null && !string.IsNullOrEmpty(profile.LogoPath))
+        {
+            profileImage = profile.LogoPath;
+        }
+    }
+}
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -64,7 +78,7 @@
                                             <a href="javascript:;" class="dropdown-toggle" id="ID-ACCOUNT_dropdown" data-bs-toggle="dropdown">
                                                 <div class="user-name text-black">
                                                     <span>
-                                                        <img src="~/images/user-avtar/pic4.jpg" alt="">
+                                                        <img src="@profileImage" alt="">
                                                     </span>@User.Identity?.Name
                                                 </div> 
                                             </a>

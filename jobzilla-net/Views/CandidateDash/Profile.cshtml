@@ -38,7 +38,7 @@
 
                 <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
                     <div class="twm-right-section-panel site-bg-gray">
-                        <form asp-controller="CandidateDash" asp-action="Profile" method="post">
+                        <form asp-controller="CandidateDash" asp-action="Profile" method="post" enctype="multipart/form-data">
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3 font-weight-bold"></div>
                             
                             @if (TempData["SuccessMessage"] != null)
@@ -55,6 +55,22 @@
                                     
                                     <div class="row">
                                                         
+                                            <div class="col-xl-12 col-lg-12 col-md-12 mb-4">
+                                                <div class="form-group">
+                                                    <label>Profile Picture</label>
+                                                    <div class="ls-inputicon-box">
+                                                        @if (!string.IsNullOrEmpty(Model.Profile.ProfileImagePath))
+                                                        {
+                                                            <div class="mb-3">
+                                                                <img src="@Model.Profile.ProfileImagePath" alt="Profile Picture" style="max-width: 150px; border-radius: 8px;" />
+                                                            </div>
+                                                        }
+                                                        <input type="file" asp-for="ProfileImage" class="form-control" accept="image/*" />
+                                                        <i class="fs-input-icon fa fa-image"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <div class="col-xl-6 col-lg-6 col-md-12">
                                                 <div class="form-group">
                                                     <label>Your Name</label>

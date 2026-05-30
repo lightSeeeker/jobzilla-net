@@ -132,6 +132,9 @@
                                                                 <a href="/CandidateDash/Builder?resumeId=@resume.Id" title="Edit Builder Resume" data-bs-toggle="tooltip" data-bs-placement="top">
                                                                     <i class="fa fa-edit text-primary"></i>
                                                                 </a>
+                                                                <a href="/CandidateDash/ExportTemplate?id=@(resume.TemplateId ?? 1)&resumeId=@resume.Id" class="ms-2" title="Download PDF" data-bs-toggle="tooltip" data-bs-placement="top" target="_blank">
+                                                                    <i class="fa fa-download text-success"></i>
+                                                                </a>
                                                             }
                                                             else
                                                             {

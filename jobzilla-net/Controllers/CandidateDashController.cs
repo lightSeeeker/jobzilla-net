@@ -15,6 +15,7 @@ public class CandidateDashController : Controller
     private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService _resumeBuilderService;
     private readonly jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer _templateRenderer;
     private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeExportService _resumeExportService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILogger<CandidateDashController> _logger;
 
     public CandidateDashController(
@@ -23,6 +24,7 @@ public class CandidateDashController : Controller
         jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService resumeBuilderService,
         jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer templateRenderer,
         jobzilla_net.Application.Resumes.Interfaces.IResumeExportService resumeExportService,
+        IWebHostEnvironment webHostEnvironment,
         ILogger<CandidateDashController> logger)
     {
         _dashboardService = dashboardService;
@@ -30,6 +32,7 @@ public class CandidateDashController : Controller
         _resumeBuilderService = resumeBuilderService;
         _templateRenderer = templateRenderer;
         _resumeExportService = resumeExportService;
+        _webHostEnvironment = webHostEnvironment;
         _logger = logger;
     }
 
@@ -116,6 +119,40 @@ public class CandidateDashController : Controller
         if (!ModelState.IsValid)
         {
             return View(model);
+        }
+
+        if (model.ProfileImage != null && model.ProfileImage.Length > 0)
+        {
+            if (model.ProfileImage.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError(string.Empty, "File size must not exceed 5MB.");
+                return View(model);
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var extension = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(string.Empty, "Invalid file format. Please upload an image (JPG, PNG, GIF).");
+                return View(model);
+            }
+
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ProfileImage.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await model.ProfileImage.CopyToAsync(fileStream);
+            }
+
+            model.Profile.ProfileImagePath = "/uploads/profiles/" + uniqueFileName;
         }
 
         var success = await _dashboardService.UpdateProfileAsync(GetUserId(), model.Profile);
@@ -368,6 +405,10 @@ public class CandidateDashController : Controller
         }
 
         var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId(), resumeId);
+        
+        model.TemplateId = id;
+        model.ResumeId = resumeId;
+        model.IsExport = false;
 
         var htmlContent = await _templateRenderer.RenderTemplateAsync(
             $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",
@@ -423,6 +464,30 @@ public class CandidateDashController : Controller
         return ok ? Ok(new { success = true }) : StatusCode(500, new { error = "Save failed." });
     }
 
+    [HttpPost("/api/resume/image")]
+    public async Task<IActionResult> ApiUploadResumeImage(IFormFile file)
+    {
+        if (file == null || file.Length == 0) return BadRequest(new { error = "No file uploaded." });
+        if (file.Length > 5 * 1024 * 1024) return BadRequest(new { error = "File size must not exceed 5MB." });
+        
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(extension)) return BadRequest(new { error = "Invalid file format." });
+
+        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "resumes");
+        if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(fileStream);
+        }
+
+        return Ok(new { url = "/uploads/resumes/" + uniqueFileName });
+    }
+
     // ── Section items (per existing EF entities) ─────────────────────────────
 
     [HttpPost("/api/resume/experience")]
@@ -468,6 +533,49 @@ public class CandidateDashController : Controller
     {
         var ok = await _resumeBuilderService.DeleteReferenceAsync(GetUserId(), id, ct);
         return ok ? Ok(new { success = true }) : NotFound(new { error = "Reference not found." });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ApplyJob([FromForm] int jobId, [FromForm] int resumeId, [FromForm] string? coverLetter)
+    {
+        var result = await _dashboardService.ApplyForJobAsync(GetUserId(), jobId, resumeId, coverLetter);
+        
+        if (result.Success)
+        {
+            return Json(new { success = true, message = result.Message });
+        }
+        else
+        {
+            return Json(new { success = false, message = result.Message });
+        }
+    }
+
+    // ── CHAT ─────────────────────────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult Chat(int? conversationId)
+    {
+        ViewBag.ConversationId = conversationId;
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> StartChat(int applicationId, [FromServices] jobzilla_net.Application.Chat.IChatService chatService)
+    {
+        try
+        {
+            var conversationId = await chatService.StartOrGetConversationAsync(applicationId, GetUserId());
+            return RedirectToAction(nameof(Chat), new { conversationId = conversationId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (ArgumentException)
+        {
+            return NotFound();
+        }
     }
 }
 

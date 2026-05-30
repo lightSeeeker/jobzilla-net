@@ -1,0 +1,46 @@
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+
+<style>
+    /* Base reset & typography defaults */
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* PDF page-break handling to prevent awkward cuts across A4 pages */
+    .resume-item, .resume-section-title, .resume-item-header {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Resume Container Sizing (Export vs Preview) */
+    @if (Model.IsExport)
+    {
+        <text>
+        .resume-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            background: #fff;
+            overflow: hidden;
+            min-height: 296mm;
+            box-sizing: border-box;
+        }
+        </text>
+    }
+    else
+    {
+        <text>
+        .resume-container {
+            margin: 0 auto;
+            background: #fff;
+            overflow: hidden;
+            box-sizing: border-box;
+            /* Box shadows and padding differ by template */
+        }
+        </text>
+    }
+</style>

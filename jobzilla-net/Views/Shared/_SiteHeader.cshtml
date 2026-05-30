@@ -103,13 +103,9 @@
                                     </ul>                                                                 
                                 </li>
                                 }
-                                <li class="has-child"><a href="javascript:;">Pages</a>
-                                    <ul class="sub-menu">
-                                        <li><a asp-controller="Home" asp-action="About">About Us</a></li> 
-                                        <li><a asp-controller="Home" asp-action="Faq">FAQ's</a></li>
-                                        <li><a asp-controller="Home" asp-action="ComingSoon">Coming soon</a></li>
-                                    </ul>                                                                
-                                </li>
+                                <li><a asp-controller="Home" asp-action="About">About Us</a></li>
+                                <li><a asp-controller="Home" asp-action="Faq">FAQ's</a></li>
+                                <li><a asp-controller="Home" asp-action="ComingSoon">Coming soon</a></li>
 @if (isCandidate)
                                 {
                                 <li class="has-child"><a href="javascript:;">Candidate Panel</a>
@@ -150,11 +146,6 @@
                                         <div class="twm-nav-btn-left">
                                             <a class="twm-nav-sign-up" data-bs-toggle="modal" href="#sign_up_popup" role="button">
                                                 <i class="feather-log-in"></i> Sign Up
-                                            </a>
-                                        </div>
-                                        <div class="twm-nav-btn-right">
-                                            <a asp-controller="Account" asp-action="Login" class="twm-nav-post-a-job">
-                                                <i class="feather-briefcase"></i> Post a job
                                             </a>
                                         </div>
                                     }

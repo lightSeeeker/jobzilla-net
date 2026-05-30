@@ -35,7 +35,7 @@
                 <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
                 <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-bell"></i> Job Alerts</a></li>
                 <li><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-fingerprint"></i> Change Password</a></li>
-                <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-comments"></i> Chat</a></li>
+                <li class="@(activePage == "Chat" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Chat"><i class="fa fa-comments"></i> Chat</a></li>
                 <li><a asp-controller="Blogs" asp-action="Manage"><i class="fa fa-newspaper"></i> My Blogs</a></li>
                 <li>
                     <form asp-controller="Account" asp-action="Logout" method="post" id="candidateLogoutForm" style="display: none;"></form>

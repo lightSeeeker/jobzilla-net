@@ -484,5 +484,33 @@ public class CandidateDashController : Controller
             return Json(new { success = false, message = result.Message });
         }
     }
+
+    // ── CHAT ─────────────────────────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult Chat(int? conversationId)
+    {
+        ViewBag.ConversationId = conversationId;
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> StartChat(int applicationId, [FromServices] jobzilla_net.Application.Chat.IChatService chatService)
+    {
+        try
+        {
+            var conversationId = await chatService.StartOrGetConversationAsync(applicationId, GetUserId());
+            return RedirectToAction(nameof(Chat), new { conversationId = conversationId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (ArgumentException)
+        {
+            return NotFound();
+        }
+    }
 }
 

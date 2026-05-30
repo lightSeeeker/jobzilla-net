@@ -32,6 +32,10 @@
                 <a asp-controller="Blogs" asp-action="Manage"><i class="fa fa-newspaper"></i><span class="admin-nav-text">My Blogs</span></a>
             </li>
             
+            <li class="@(currentAction == "Chat" ? "active" : "")">
+                <a asp-controller="EmployerDash" asp-action="Chat"><i class="fa fa-comments"></i><span class="admin-nav-text">Chat</span></a>
+            </li>
+            
             <li>
                 <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormSidebar" style="display: none;"></form>
                 <a href="javascript:document.getElementById('logoutFormSidebar').submit()"><i class="fa fa-share-square"></i><span class="admin-nav-text">Logout</span></a>

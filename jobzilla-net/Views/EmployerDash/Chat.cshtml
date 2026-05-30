@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Employer Chat";
+    Layout = "~/Views/Shared/_EmployerLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Employer Chat</h2>
+    <div class="breadcrumbs"><a asp-controller="Home" asp-action="Index">Home</a><span>Chat</span></div>
+</div>
+
+<div class="twm-right-section-panel site-bg-gray">
+    <div class="wt-admin-dashboard-msg-2 twm-dashboard-style-2">
+        <partial name="_ChatPanel" model="ViewBag.ConversationId" />
+    </div>
+</div>

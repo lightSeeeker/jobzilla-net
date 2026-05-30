@@ -116,11 +116,19 @@
                                             </form>
 
                                             <div class="twm-table-controls d-inline-block ml-2">
-                                                <ul class="twm-DT-controls-icon list-unstyled mb-0">
+                                                <ul class="twm-DT-controls-icon list-unstyled mb-0 d-flex gap-2">
                                                     <li>
-                                                        <a href="@(!string.IsNullOrEmpty(app.ResumePath) ? app.ResumePath : "#")" title="View Resume" data-bs-toggle="tooltip" data-bs-placement="top" target="_blank">
+                                                        <a href="@(!string.IsNullOrEmpty(app.ResumePath) ? app.ResumePath : "#")" title="View Resume" data-bs-toggle="tooltip" data-bs-placement="top" target="_blank" class="btn btn-sm btn-outline-primary p-1">
                                                             <span class="fa fa-eye"></span>
                                                         </a>
+                                                    </li>
+                                                    <li>
+                                                        <form asp-action="StartChat" method="post" class="m-0 p-0 d-inline">
+                                                            <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                                                            <button type="submit" class="btn btn-sm btn-outline-info p-1" title="Message Candidate" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                <span class="fa fa-comments"></span>
+                                                            </button>
+                                                        </form>
                                                     </li>
                                                 </ul>
                                             </div>

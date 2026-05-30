@@ -1,0 +1,255 @@
+@model int?
+
+<div class="twm-right-section-panel site-bg-gray">
+    <div class="wt-admin-dashboard-msg-2 twm-dashboard-style-2">
+        
+        <!-- Left Msg section (Conversations List) -->
+        <div class="wt-dashboard-msg-user-list">
+            <div class="user-msg-list-btn-outer">
+                <button class="user-msg-list-btn-close">Close</button>
+                <button class="user-msg-list-btn-open">User Message</button>
+            </div>
+            
+            <div class="wt-dashboard-msg-search">
+                <div class="input-group">
+                    <input class="form-control" id="chatSearchInput" placeholder="Search Messages" type="text">
+                    <button class="btn" type="button"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+            
+            <!-- user msg list start -->
+            <div id="msg-list-wrap" class="wt-dashboard-msg-search-list scrollbar-macosx">
+                <div class="text-center p-3" id="conversationsLoading">
+                    <i class="fa fa-spinner fa-spin"></i> Loading...
+                </div>
+                <div id="conversationsContainer"></div>
+            </div>
+            <!-- user msg list End -->
+        </div>
+        
+        <!-- Right Msg section (Messages Area) -->
+        <div class="wt-dashboard-msg-box" id="activeChatBox" style="display: none;">
+            <div class="single-msg-user-name-box">
+                <div class="single-msg-short-discription">
+                    <h4 class="single-msg-user-name" id="activeChatName">Loading...</h4>
+                    <span id="activeChatJob"></span>
+                </div>
+            </div>
+            
+            <div id="msg-chat-wrap" class="single-user-msg-conversation scrollbar-macosx">
+                <div class="text-center p-3" id="messagesLoading" style="display: none;">
+                    <i class="fa fa-spinner fa-spin"></i> Loading messages...
+                </div>
+                <div id="messagesContainer"></div>
+            </div>
+            
+            <div class="single-msg-reply-comment">
+                <div class="input-group">
+                    <textarea class="form-control" id="chatMessageInput" placeholder="Type a message here" rows="2"></textarea>
+                    <button class="btn" type="button" id="chatSendBtn"><i class="fa fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<input type="hidden" id="initialConversationId" value="@(Model)" />
+
+<!-- SignalR Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let activeConversationId = document.getElementById('initialConversationId').value;
+    let initialLoad = true;
+    let myUserId = ''; // Optional: fetched or inferred
+    
+    const conversationsContainer = document.getElementById('conversationsContainer');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const activeChatBox = document.getElementById('activeChatBox');
+    
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const chatMessageInput = document.getElementById('chatMessageInput');
+    
+    // Initialize SignalR Connection
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chathub")
+        .withAutomaticReconnect()
+        .build();
+
+    connection.on("ReceiveMessage", function (message) {
+        // If message is for the currently active conversation, render it
+        if (activeConversationId == message.conversationId) {
+            appendMessage(message);
+            scrollToBottom();
+        }
+        // Always refresh conversations list to update unread count / last message
+        loadConversations();
+    });
+
+    connection.start().catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    // Load Conversations
+    async function loadConversations() {
+        try {
+            const response = await fetch('/api/chat/conversations');
+            if (response.ok) {
+                const convs = await response.json();
+                document.getElementById('conversationsLoading').style.display = 'none';
+                conversationsContainer.innerHTML = '';
+                
+                convs.forEach(c => {
+                    const pic = c.otherPartyImageUrl || '/images/user-avtar/pic1.jpg';
+                    const time = c.lastMessageAtUtc ? new Date(c.lastMessageAtUtc).toLocaleDateString() : '';
+                    
+                    const div = document.createElement('div');
+                    div.className = `wt-dashboard-msg-search-list-wrap ${activeConversationId == c.conversationId ? 'active-chat' : ''}`;
+                    div.dataset.id = c.conversationId;
+                    div.innerHTML = `
+                        <a href="javascript:;" class="msg-user-info clearfix">
+                            <div class="msg-user-timing">${time} ${c.unreadCount > 0 ? `<span class="badge bg-danger rounded-circle">${c.unreadCount}</span>` : ''}</div>
+                            <div class="msg-user-info-pic"><img src="${pic}" alt=""></div>
+                            <div class="msg-user-info-text">
+                                <div class="msg-user-name">${c.otherPartyName}</div>
+                                <div class="msg-user-discription">${c.jobTitle}</div>
+                                <div class="msg-user-discription text-muted" style="font-size:11px">${c.lastMessage || 'No messages yet'}</div>
+                            </div>
+                        </a>
+                    `;
+                    div.addEventListener('click', () => {
+                        openConversation(c);
+                    });
+                    conversationsContainer.appendChild(div);
+                });
+
+                if (initialLoad && activeConversationId) {
+                    const targetConv = convs.find(c => c.conversationId == activeConversationId);
+                    if (targetConv) {
+                        openConversation(targetConv, false);
+                    }
+                }
+                initialLoad = false;
+            }
+        } catch (error) {
+            console.error('Failed to load conversations', error);
+        }
+    }
+
+    async function openConversation(conv, skipHistoryLoad = false) {
+        activeConversationId = conv.conversationId;
+        
+        // Update UI
+        activeChatBox.style.display = 'block';
+        document.getElementById('activeChatName').textContent = conv.otherPartyName;
+        document.getElementById('activeChatJob').textContent = conv.subject;
+        
+        // Update active class directly without full reload
+        updateActiveChatClass();
+        
+        if (!skipHistoryLoad) {
+            messagesContainer.innerHTML = '';
+            document.getElementById('messagesLoading').style.display = 'block';
+            
+            try {
+                const response = await fetch(`/api/chat/conversations/${activeConversationId}/messages`);
+                if (response.ok) {
+                    const msgs = await response.json();
+                    document.getElementById('messagesLoading').style.display = 'none';
+                    msgs.forEach(m => appendMessage(m));
+                    scrollToBottom();
+                    
+                    // Trigger a load to clear unread badges, but it won't re-trigger openConversation since initialLoad is false
+                    loadConversations();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    function updateActiveChatClass() {
+        const wraps = document.querySelectorAll('.wt-dashboard-msg-search-list-wrap');
+        wraps.forEach(w => w.classList.remove('active-chat'));
+        const activeWrap = document.querySelector(`.wt-dashboard-msg-search-list-wrap[data-id="${activeConversationId}"]`);
+        if (activeWrap) activeWrap.classList.add('active-chat');
+    }
+
+    function appendMessage(m) {
+        const wrap = document.createElement('div');
+        
+        // Handle System Messages
+        if (m.body && m.body.startsWith('[System]:')) {
+            const sysText = m.body.replace('[System]:', '').trim();
+            wrap.className = 'text-center my-3';
+            wrap.innerHTML = `<span class="badge bg-secondary" style="font-weight: normal; font-size: 12px; padding: 5px 10px;">${sysText}</span>`;
+            messagesContainer.appendChild(wrap);
+            return;
+        }
+
+        const pic = m.senderImageUrl || '/images/user-avtar/pic1.jpg';
+        const time = new Date(m.sentAtUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        wrap.className = `single-user-comment-wrap ${m.isMine ? 'sigle-user-reply' : ''}`;
+        
+        const rowClass = m.isMine ? 'justify-content-end' : '';
+        
+        wrap.innerHTML = `
+            <div class="row ${rowClass}">
+                <div class="col-xl-9 col-lg-12">
+                    <div class="single-user-comment-block clearfix">
+                        <div class="single-user-com-pic"><img src="${pic}" alt=""></div>
+                        <div class="single-user-com-text">${m.body}</div>
+                        <div class="single-user-msg-time">${time}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        messagesContainer.appendChild(wrap);
+    }
+
+    function scrollToBottom() {
+        const wrap = document.getElementById('msg-chat-wrap');
+        wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    chatSendBtn.addEventListener('click', async function() {
+        const body = chatMessageInput.value.trim();
+        if (!body || !activeConversationId) return;
+        
+        chatMessageInput.value = '';
+        
+        try {
+            const response = await fetch(`/api/chat/conversations/${activeConversationId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ body })
+            });
+            
+            if (response.ok) {
+                const msg = await response.json();
+                appendMessage(msg);
+                scrollToBottom();
+                loadConversations(); // update last message
+            }
+        } catch(error) {
+            console.error('Send error', error);
+        }
+    });
+
+    chatMessageInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatSendBtn.click();
+        }
+    });
+
+    // Init
+    loadConversations();
+});
+</script>
+<style>
+.active-chat { background-color: #f1f1f1; border-left: 4px solid #1967d2; }
+</style>

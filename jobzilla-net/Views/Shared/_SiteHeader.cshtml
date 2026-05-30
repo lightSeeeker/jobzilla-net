@@ -1,3 +1,12 @@
+@using Microsoft.AspNetCore.Identity
+@using jobzilla_net.Infrasture.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isEmployer = isAuthenticated && User.IsInRole("Employer");
+    var isCandidate = isAuthenticated && User.IsInRole("Candidate");
+}
         <!-- HEADER START -->
         <header  class="site-header header-style-3 mobile-sider-drawer-menu">
 
@@ -80,48 +89,40 @@
                                         <li><a asp-controller="Jobs" asp-action="Details">Apply Jobs</a></li>
                                     </ul>      *@                                                            
                                 </li>
-                                <li class="has-child"><a href="javascript:;">Employers</a>
+@if (isEmployer)
+                                {
+                                <li class="has-child"><a href="javascript:;">Employer Panel</a>
                                     <ul class="sub-menu">
-                                        <li><a asp-controller="Employers" asp-action="Index">Employers</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="Index">Dashboard</a></li>
                                         <li><a asp-controller="EmployerDash" asp-action="Profile">Profile</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="Applications">Resume</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="Applications">Applications</a></li>
                                         <li><a asp-controller="EmployerDash" asp-action="PostedJobs">Manage Jobs</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="PostedJobs">Post A Jobs</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="Index">Transaction</a></li>
+                                        <li><a asp-controller="EmployerDash" asp-action="PostJob">Post A Job</a></li>
                                         <li><a asp-controller="Candidates" asp-action="Index">Browse Candidates</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="Profile">Change Password</a></li>
-                                        <li><a asp-controller="Account" asp-action="Register">Register Fresher</a></li>
-                                        <li><a asp-controller="Account" asp-action="Register">Register Professionals</a></li>
+                                        <li><a asp-controller="Chat" asp-action="Index">Chat</a></li>
                                     </ul>                                                                 
                                 </li>
+                                }
                                 <li class="has-child"><a href="javascript:;">Pages</a>
                                     <ul class="sub-menu">
-                                        <li><a asp-controller="Home" asp-action="Index">About Us</a></li> 
-                                        <li><a asp-controller="Home" asp-action="Index">Pricing</a></li> 
-                                        <li><a asp-controller="Home" asp-action="Index">Error-404</a></li>
-                                        <li><a asp-controller="Home" asp-action="Index">FAQ's</a></li>
-                                        <li><a asp-controller="Home" asp-action="Index">Contact Us</a></li>
-                                        <li><a asp-controller="Home" asp-action="Index">Under Maintenance</a></li>
-                                        <li><a asp-controller="Home" asp-action="Index">Coming soon</a></li>
-                                        <li><a asp-controller="Account" asp-action="Login">Login</a></li>
-                                        <li><a asp-controller="Home" asp-action="Index">After Login</a></li>
-                                        <li><a asp-controller="Home" asp-action="Index">Icons</a></li> 
+                                        <li><a asp-controller="Home" asp-action="About">About Us</a></li> 
+                                        <li><a asp-controller="Home" asp-action="Faq">FAQ's</a></li>
+                                        <li><a asp-controller="Home" asp-action="ComingSoon">Coming soon</a></li>
                                     </ul>                                                                
                                 </li>
-                                <li class="has-child"><a href="javascript:;">Candidates</a>
+@if (isCandidate)
+                                {
+                                <li class="has-child"><a href="javascript:;">Candidate Panel</a>
                                     <ul class="sub-menu">
-                                        <li><a asp-controller="Candidates" asp-action="Index">Candidates</a></li>
                                         <li><a asp-controller="CandidateDash" asp-action="Index">Dashboard</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Profile">My Pfofile</a></li>
+                                        <li><a asp-controller="CandidateDash" asp-action="Profile">My Profile</a></li>
                                         <li><a asp-controller="CandidateDash" asp-action="AppliedJobs">Applied Jobs</a></li>
                                         <li><a asp-controller="CandidateDash" asp-action="Resumes">My Resume</a></li>
                                         <li><a asp-controller="CandidateDash" asp-action="SavedJobs">Saved Jobs</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Resumes">CV Manager</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Index">Job Alerts</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Profile">Change Passeord</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Index">Chat</a></li>
+                                        <li><a asp-controller="Chat" asp-action="Index">Chat</a></li>
                                     </ul>                                                                
                                 </li>
+                                }
                                 <li class="has-child"><a asp-controller="Blogs" asp-action="Index">Blog</a>
                                    @*  <ul class="sub-menu">
                                         <li><a asp-controller="Blogs" asp-action="Index">Blog</a></li>                                        
@@ -144,16 +145,37 @@
                             </div>
                             <div class="extra-cell">
                                 <div class="header-nav-btn-section">
-                                    <div class="twm-nav-btn-left">
-                                        <a class="twm-nav-sign-up" data-bs-toggle="modal" href="#sign_up_popup" role="button">
-                                            <i class="feather-log-in"></i> Sign Up
-                                        </a>
-                                    </div>
-                                    <div class="twm-nav-btn-right">
-                                        <a asp-controller="EmployerDash" asp-action="PostedJobs" class="twm-nav-post-a-job">
-                                            <i class="feather-briefcase"></i> Post a job
-                                        </a>
-                                    </div>
+                                    @if (!isAuthenticated)
+                                    {
+                                        <div class="twm-nav-btn-left">
+                                            <a class="twm-nav-sign-up" data-bs-toggle="modal" href="#sign_up_popup" role="button">
+                                                <i class="feather-log-in"></i> Sign Up
+                                            </a>
+                                        </div>
+                                        <div class="twm-nav-btn-right">
+                                            <a asp-controller="Account" asp-action="Login" class="twm-nav-post-a-job">
+                                                <i class="feather-briefcase"></i> Post a job
+                                            </a>
+                                        </div>
+                                    }
+                                    else if (isEmployer)
+                                    {
+                                        <div class="twm-nav-btn-right">
+                                            <a asp-controller="EmployerDash" asp-action="PostedJobs" class="twm-nav-post-a-job">
+                                                <i class="feather-briefcase"></i> Post a job
+                                            </a>
+                                        </div>
+                                    }
+                                    @if (isAuthenticated)
+                                    {
+                                        <div class="twm-nav-btn-left" style="margin-left: 15px;">
+                                            <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
+                                                <button type="submit" class="btn twm-nav-sign-up btn-link border-0" style="padding: 10px 20px; font-weight: 500;">
+                                                    <i class="feather-log-out"></i> Logout
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
                                 </div>
                             </div> 
                                 

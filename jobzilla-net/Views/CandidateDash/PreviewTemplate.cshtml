@@ -1,0 +1,222 @@
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@{
+    ViewData["Title"] = "Customize Template";
+    ViewData["ActivePage"] = "Templates";
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+    <div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+        <div class="overlay-main site-bg-white opacity-01"></div>
+        <div class="container">
+            <div class="wt-bnr-inr-entry">
+                <div class="banner-title-outer">
+                    <div class="banner-title-name">
+                        <h2 class="wt-title">Customize Template</h2>
+                    </div>
+                </div>
+                <div>
+                    <ul class="wt-breadcrumb breadcrumb-style-2">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-action="Templates" asp-route-resumeId="@Model.ResumeId">Templates</a></li>
+                        <li>Customize</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-full p-t120 p-b90 site-bg-white">
+        <div class="container-fluid" style="max-width: 1600px;">
+            <div class="row g-4">
+                
+                <!-- LEFT SIDEBAR: Controls -->
+                <div class="col-xl-3 col-lg-4 col-md-12">
+                    <div class="twm-right-section-panel site-bg-gray" style="position: sticky; top: 120px; max-height: calc(100vh - 140px); overflow-y: auto;">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="m-0" style="font-weight:700;color:#1a1a2e;">
+                                <i class="fa fa-paint-brush me-2" style="color:#00b4d8;"></i>Design
+                            </h4>
+                            <a asp-action="ExportTemplate" asp-route-id="@Model.TemplateId" asp-route-resumeId="@Model.ResumeId" class="site-button primary" target="_blank" title="Download as PDF">
+                                <i class="fa fa-download"></i> PDF
+                            </a>
+                        </div>
+                        
+                        <p class="text-muted small mb-4">Customize the colors and layout of your resume. Changes are saved automatically.</p>
+
+                        <!-- COLOR THEMES -->
+                        <div class="mb-5">
+                            <h5 style="font-size: 1rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+                                Color Themes
+                            </h5>
+                            <div id="palette-container" class="d-flex flex-wrap gap-2">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+
+                        <!-- SECTION SORTING -->
+                        <div class="mb-4">
+                            <h5 style="font-size: 1rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+                                Reorder Sections
+                            </h5>
+                            <p class="text-muted small mb-3">Drag to reorder sections.</p>
+                            
+                            <div id="sections-list" class="list-group">
+                                @if (Model.Document != null && Model.Document.Sections.Any())
+                                {
+                                    foreach (var sec in Model.Document.Sections.OrderBy(s => s.DisplayOrder))
+                                    {
+                                        <div class="list-group-item d-flex justify-content-between align-items-center" 
+                                             data-id="@sec.Id" 
+                                             style="cursor: grab; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e2e8f0;">
+                                            <div>
+                                                <i class="fa fa-grip-vertical me-3 text-muted"></i>
+                                                <span style="font-weight: 600;">@sec.Title</span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- RIGHT STAGE: Live Preview -->
+                <div class="col-xl-9 col-lg-8 col-md-12">
+                    <div style="background: #cbd5e1; padding: 40px; border-radius: 12px; display: flex; justify-content: center; min-height: 800px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);">
+                        <iframe id="resume-preview-frame" 
+                                src="/CandidateDash/SkeletonPreview?id=@Model.TemplateId&resumeId=@Model.ResumeId" 
+                                style="width: 100%; max-width: 900px; height: 1200px; border: none; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.2);"
+                                title="Live Preview">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- CONTENT END -->
+
+@Html.AntiForgeryToken()
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+<script>
+    const ALL_PALETTES = @Html.Raw(ViewBag.PalettesJson);
+    const templateSlug = "@ViewBag.TemplateSlug";
+    const templateId = @Model.TemplateId;
+    const resumeId = @Model.ResumeId;
+    const currentDocument = @Html.Raw(Model.Document != null ? System.Text.Json.JsonSerializer.Serialize(Model.Document) : "null");
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initPalettes();
+        initSortable();
+    });
+
+    // ── Color Palette Logic ──
+    function initPalettes() {
+        const container = document.getElementById('palette-container');
+        const palettes = ALL_PALETTES[templateSlug] || [];
+        
+        if (palettes.length === 0) {
+            container.innerHTML = '<p class="text-muted small">No preset colors available for this template.</p>';
+            return;
+        }
+
+        palettes.forEach((palette, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn p-0 border-0 rounded-circle';
+            btn.style.width = '36px';
+            btn.style.height = '36px';
+            btn.style.backgroundColor = palette.swatch;
+            btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.15)';
+            btn.style.transition = 'transform 0.2s';
+            btn.title = palette.name;
+            
+            btn.onmouseover = () => btn.style.transform = 'scale(1.15)';
+            btn.onmouseout = () => btn.style.transform = 'scale(1)';
+
+            btn.onclick = () => {
+                // Instantly update the iframe CSS variables
+                const iframe = document.getElementById('resume-preview-frame');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'applyColors',
+                        colors: palette.colors
+                    }, '*');
+                }
+                
+                // Save to DB
+                saveColors(palette.colors);
+            };
+
+            container.appendChild(btn);
+        });
+    }
+
+    async function saveColors(colors) {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        try {
+            await fetch('/CandidateDash/SaveColorSettings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({
+                    templateId: templateId,
+                    resumeId: resumeId,
+                    colors: colors
+                })
+            });
+        } catch (e) {
+            console.error('Failed to save colors', e);
+        }
+    }
+
+    // ── Section Sorting Logic ──
+    function initSortable() {
+        const list = document.getElementById('sections-list');
+        if (!list || !currentDocument) return;
+
+        Sortable.create(list, {
+            animation: 150,
+            ghostClass: 'bg-light',
+            onEnd: async function () {
+                // Reorder currentDocument.Sections based on DOM order
+                const newOrderIds = Array.from(list.children).map(el => el.dataset.id);
+                
+                newOrderIds.forEach((id, index) => {
+                    const sec = currentDocument.Sections.find(s => s.Id == id);
+                    if (sec) sec.DisplayOrder = index;
+                });
+                
+                // Save to DB via Builder API
+                await saveDocument(currentDocument);
+                
+                // Reload iframe to reflect new layout
+                const iframe = document.getElementById('resume-preview-frame');
+                if (iframe) iframe.contentWindow.location.reload();
+            }
+        });
+    }
+
+    async function saveDocument(doc) {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        try {
+            await fetch('/api/resume/personal', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(doc)
+            });
+        } catch (e) {
+            console.error('Failed to save document', e);
+        }
+    }
+</script>

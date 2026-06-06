@@ -19,31 +19,50 @@
             }
 
             .resume-container {
-                display: flex; /* FIX: was missing, caused vertical stacking */
-                align-items: stretch;
                 font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 color: #333;
                 line-height: 1.6;
-                @if (!Model.IsExport)
+                box-sizing: border-box;
+                @if (Model.IsExport)
                 {
-                    <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                        border-radius: 8px;
-                        max-width: 850px;
+                    <text>
+                    /* Faux column background for PDF */
+                    background: linear-gradient(to right, var(--mp-sidebar-bg) 0%, var(--mp-sidebar-bg) 32%, #ffffff 32%, #ffffff 100%);
+                    </text>
+                }
+                else
+                {
+                    <text>
+                    display: flex;
+                    align-items: stretch;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    border-radius: 8px;
+                    max-width: 850px;
                     </text>
                 }
             }
 
+            .resume-container::after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
             .sidebar {
+                @if (Model.IsExport) { <text>float: left; background: transparent !important;</text> }
                 width: 32%;
                 background: var(--mp-sidebar-bg);
                 color: #fff;
                 padding: 40px 30px;
+                box-sizing: border-box;
             }
 
             .main-content {
+                @if (Model.IsExport) { <text>float: right; background: transparent !important;</text> }
                 width: 68%;
                 padding: 40px;
                 background: #fff;
+                box-sizing: border-box;
             }
 
             .name {
@@ -264,16 +283,6 @@
             }
         </div>
     </div>
-    <script>
-            // Real-time palette updates from the parent Templates page via postMessage
-            window.addEventListener('message', function (e) {
-                if (e.data && e.data.type === 'applyColors') {
-                    var root = document.documentElement;
-                    Object.entries(e.data.colors).forEach(function (entry) {
-                        root.style.setProperty(entry[0], entry[1]);
-                    });
-                }
-            });
-    </script>
+
 </body>
 </html>

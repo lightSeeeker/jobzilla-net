@@ -11,7 +11,22 @@
     }
     
     /* PDF page-break handling to prevent awkward cuts across A4 pages */
-    .resume-item, .resume-section-title, .resume-item-header {
+    .resume-item {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        display: block; /* Required for page-break-inside to work reliably */
+    }
+    .resume-section-title {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+    }
+    .resume-item-header {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+    }
+    .resume-skills-list, .resume-references-grid {
         page-break-inside: avoid;
         break-inside: avoid;
     }
@@ -44,3 +59,15 @@
         </text>
     }
 </style>
+
+<script>
+    // Universal listener for real-time color updates in the Preview Editor
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+    });
+</script>

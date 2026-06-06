@@ -478,11 +478,11 @@ public class CandidateDashController : Controller
         model.ResumeId = resumeId;
         model.IsExport = false;
 
-        var htmlContent = await _templateRenderer.RenderTemplateAsync(
-            $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",
-            model);
+        ViewBag.PalettesJson = BuildPalettesJson();
+        ViewBag.TemplateSlug = System.IO.Path.GetFileNameWithoutExtension(template.TemplateFilePath ?? "").ToLower();
+        ViewBag.TemplateName = template.Name;
 
-        return Content(htmlContent, "text/html");
+        return View(model);
     }
 
     /// <summary>

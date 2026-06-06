@@ -69,5 +69,25 @@
                 root.style.setProperty(entry[0], entry[1]);
             });
         }
+        if (e.data && e.data.type === 'reorderSections') {
+            const mainContainer = document.querySelector('.main-content') || document.querySelector('.resume-container');
+            const sidebarContainer = document.querySelector('.sidebar');
+            
+            if (e.data.isMultiColumn && sidebarContainer && mainContainer) {
+                e.data.sidebar.forEach(id => {
+                    const el = document.querySelector(`[data-section-id="${id}"]`);
+                    if (el) sidebarContainer.appendChild(el);
+                });
+                e.data.main.forEach(id => {
+                    const el = document.querySelector(`[data-section-id="${id}"]`);
+                    if (el) mainContainer.appendChild(el);
+                });
+            } else if (mainContainer) {
+                e.data.main.forEach(id => {
+                    const el = document.querySelector(`[data-section-id="${id}"]`);
+                    if (el) mainContainer.appendChild(el);
+                });
+            }
+        }
     });
 </script>

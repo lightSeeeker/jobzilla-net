@@ -116,8 +116,10 @@
             
             @foreach (var sec in sections.Where(s => s.IsVisible))
             {
-                <div class="resume-section-title">@sec.Title</div>
-                @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
+                <div class="cvb-section-wrapper" data-section-id="@sec.Id">
+                    <div class="resume-section-title">@sec.Title</div>
+                    @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
+                </div>
             }
         </div>
     </div>

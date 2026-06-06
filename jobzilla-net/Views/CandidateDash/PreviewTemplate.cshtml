@@ -236,9 +236,14 @@
                     const mainList = document.getElementById('main-sections-list');
                     const sidebarList = document.getElementById('sidebar-sections-list');
                     
+                    const mainIds = [];
+                    const sidebarIds = [];
+
                     // Process Main
                     Array.from(mainList.children).forEach((el, index) => {
-                        const sec = currentDocument.Sections.find(s => s.Id == el.dataset.id);
+                        const id = el.dataset.id;
+                        mainIds.push(id);
+                        const sec = currentDocument.Sections.find(s => s.Id == id);
                         if (sec) {
                             sec.DisplayOrder = index;
                             sec.ColumnPlacement = "Main";
@@ -247,30 +252,51 @@
                     
                     // Process Sidebar
                     Array.from(sidebarList.children).forEach((el, index) => {
-                        const sec = currentDocument.Sections.find(s => s.Id == el.dataset.id);
+                        const id = el.dataset.id;
+                        sidebarIds.push(id);
+                        const sec = currentDocument.Sections.find(s => s.Id == id);
                         if (sec) {
                             sec.DisplayOrder = index;
                             sec.ColumnPlacement = "Sidebar";
                         }
                     });
+
+                    const iframe = document.getElementById('resume-preview-frame');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'reorderSections',
+                            isMultiColumn: true,
+                            main: mainIds,
+                            sidebar: sidebarIds
+                        }, '*');
+                    }
                 } else {
                     const list = document.getElementById('sections-list');
+                    const mainIds = [];
                     if (list) {
                         Array.from(list.children).forEach((el, index) => {
-                            const sec = currentDocument.Sections.find(s => s.Id == el.dataset.id);
+                            const id = el.dataset.id;
+                            mainIds.push(id);
+                            const sec = currentDocument.Sections.find(s => s.Id == id);
                             if (sec) {
                                 sec.DisplayOrder = index;
                             }
                         });
                     }
+
+                    const iframe = document.getElementById('resume-preview-frame');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'reorderSections',
+                            isMultiColumn: false,
+                            main: mainIds,
+                            sidebar: []
+                        }, '*');
+                    }
                 }
                 
-                // Save to DB via Builder API
-                await saveDocument(currentDocument);
-                
-                // Reload iframe to reflect new layout
-                const iframe = document.getElementById('resume-preview-frame');
-                if (iframe) iframe.contentWindow.location.reload();
+                // Save to DB via Builder API in the background
+                saveDocument(currentDocument);
             }
         };
 

@@ -76,8 +76,37 @@
         margin-right: 0 !important;
         border-right: none !important;
     }
+    
+    /* Flexbox layout for chat box to fix overlapping perfectly */
     .wt-admin-dashboard-msg-2.twm-dashboard-style-2 .wt-dashboard-msg-box {
         width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: calc(100vh - 150px) !important;
+        min-height: 750px !important;
+    }
+    
+    /* The messages container takes up all remaining space */
+    .wt-admin-dashboard-msg-2 .single-user-msg-conversation {
+        flex: 1 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 20px !important;
+        margin: 0 !important;
+    }
+    
+    /* Ensure the input box stays statically at the bottom */
+    .wt-admin-dashboard-msg-2 .single-msg-reply-comment {
+        position: static !important;
+        bottom: auto !important;
+        flex-shrink: 0 !important;
+        border-top: 1px solid #eee;
+    }
+
+    /* Increase height for the conversations list */
+    .wt-admin-dashboard-msg-2 .wt-dashboard-msg-search-list {
+        height: calc(100vh - 250px) !important;
+        min-height: 700px !important;
     }
 </style>
 

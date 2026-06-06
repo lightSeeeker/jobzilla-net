@@ -767,7 +767,7 @@
             <div class="cvb-field-group mb-3">
                 <label>Skills (press Enter or comma to add)</label>
                 <div class="cvb-skills-input" id="cvb-skills-box-${sec.id}">
-                    ${skills.map(s => `<span class="cvb-skill-chip">${escHtml(s)}<button class="cvb-chip-del" title="Remove">&times;</button></span>`).join('')}
+                    ${skills.map(s => `<span class="cvb-skill-chip">${escHtml(s.replace(/×/g, '').trim())}<button class="cvb-chip-del" title="Remove">&times;</button></span>`).join('')}
                     <input class="cvb-skill-chip-input" id="cvb-skill-input-${sec.id}" placeholder="Type a skill…" data-section-id="${sec.id}" />
                 </div>
             </div>
@@ -818,7 +818,13 @@
     }
 
     function syncSkills(sectionId, box) {
-        const skills = [...box.querySelectorAll('.cvb-skill-chip')].map(c => c.textContent.trim()).filter(Boolean);
+        const skills = [...box.querySelectorAll('.cvb-skill-chip')].map(c => {
+            let text = '';
+            for (let node of c.childNodes) {
+                if (node.nodeType === 3) text += node.textContent;
+            }
+            return text.replace(/×/g, '').trim();
+        }).filter(Boolean);
         const s = _document?.sections?.find(s => s.id === sectionId);
         if (s) {
             s.items = skills.map((name, i) => ({

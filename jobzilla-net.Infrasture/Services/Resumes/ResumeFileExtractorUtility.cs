@@ -37,8 +37,13 @@ public static class ResumeFileExtractorUtility
 
         for (int page = 1; page <= pdf.GetNumberOfPages(); page++)
         {
-            var strategy = new LocationTextExtractionStrategy();
+            var strategy = new ColumnAwareTextExtractionStrategy();
             var text = PdfTextExtractor.GetTextFromPage(pdf.GetPage(page), strategy);
+            
+            // Normalize multiple blank lines and spaces
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\r\n|\r", "\n");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n{3,}", "\n\n");
+            
             sb.AppendLine(text);
         }
 
@@ -54,7 +59,6 @@ public static class ResumeFileExtractorUtility
 
         if (body != null)
         {
-            // Process body elements sequentially to keep exact reading and table layout flow
             foreach (var element in body.ChildElements)
             {
                 if (element is DocumentFormat.OpenXml.Wordprocessing.Paragraph para)
@@ -64,15 +68,12 @@ public static class ResumeFileExtractorUtility
                 else if (element is DocumentFormat.OpenXml.Wordprocessing.Table table)
                 {
                     sb.AppendLine();
-                    foreach (var row in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableRow>())
+                    foreach (var cell in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>())
                     {
-                        var cells = row.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>()
-                                       .Select(c => c.InnerText.Trim())
-                                       .ToList();
-                        
-                        if (cells.Count > 0)
+                        var cellText = cell.InnerText.Trim();
+                        if (!string.IsNullOrWhiteSpace(cellText))
                         {
-                            sb.AppendLine("| " + string.Join(" | ", cells) + " |");
+                            sb.AppendLine(cellText);
                         }
                     }
                     sb.AppendLine();
@@ -81,5 +82,77 @@ public static class ResumeFileExtractorUtility
         }
 
         return Task.FromResult(sb.ToString());
+    }
+
+    private class ColumnAwareTextExtractionStrategy : ITextExtractionStrategy
+    {
+        private readonly List<TextChunk> _chunks = new();
+
+        public void EventOccurred(iText.Kernel.Pdf.Canvas.Parser.Data.IEventData data, iText.Kernel.Pdf.Canvas.Parser.EventType type)
+        {
+            if (type == iText.Kernel.Pdf.Canvas.Parser.EventType.RENDER_TEXT)
+            {
+                var renderInfo = (iText.Kernel.Pdf.Canvas.Parser.Data.TextRenderInfo)data;
+                var startPoint = renderInfo.GetBaseline().GetStartPoint();
+                var endPoint = renderInfo.GetAscentLine().GetEndPoint();
+                
+                _chunks.Add(new TextChunk
+                {
+                    Text = renderInfo.GetText(),
+                    X = startPoint.Get(0),
+                    Y = startPoint.Get(1),
+                    Right = endPoint.Get(0)
+                });
+            }
+        }
+
+        public ICollection<iText.Kernel.Pdf.Canvas.Parser.EventType> GetSupportedEvents()
+        {
+            return new[] { iText.Kernel.Pdf.Canvas.Parser.EventType.RENDER_TEXT };
+        }
+
+        public string GetResultantText()
+        {
+            if (_chunks.Count == 0) return string.Empty;
+
+            // Group chunks into columns by rounding X to nearest 150 points (~2 inches).
+            // Then order by Column (left to right), then Y (top to bottom).
+            var sortedChunks = _chunks
+                .OrderBy(c => Math.Round(c.X / 150.0) * 150)
+                .ThenByDescending(c => c.Y)
+                .ThenBy(c => c.X)
+                .ToList();
+
+            var sb = new StringBuilder();
+            float lastY = -1;
+            float lastX = -1;
+
+            foreach (var chunk in sortedChunks)
+            {
+                if (lastY != -1 && Math.Abs(chunk.Y - lastY) > 5)
+                {
+                    sb.AppendLine();
+                }
+                else if (lastX != -1 && chunk.X - lastX > 10)
+                {
+                    sb.Append(" ");
+                }
+                
+                sb.Append(chunk.Text);
+                
+                lastY = chunk.Y;
+                lastX = chunk.Right;
+            }
+
+            return sb.ToString();
+        }
+
+        private class TextChunk
+        {
+            public string Text { get; set; } = string.Empty;
+            public float X { get; set; }
+            public float Y { get; set; }
+            public float Right { get; set; }
+        }
     }
 }

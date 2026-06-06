@@ -21,11 +21,11 @@ public static class ResumeTextParserUtility
         // 1. Extract global emails and phone numbers across full text first as fallback
         var emailMatch = Regex.Match(rawText, @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
         if (emailMatch.Success)
-            dto.Email = emailMatch.Value;
+            dto.PersonalInfo.Email = emailMatch.Value.ToLower().Trim();
 
-        var phoneMatch = Regex.Match(rawText, @"(\+?\d[\d\s\-().]{7,}\d)");
+        var phoneMatch = Regex.Match(rawText, @"\+?[\d\s\-\(\)]{7,20}");
         if (phoneMatch.Success)
-            dto.PhoneNumber = phoneMatch.Value.Trim();
+            dto.PersonalInfo.Phone = Regex.Replace(phoneMatch.Value.Trim(), @"[^\d+]", "");
 
         // 2. Call dynamic section detector to group text blocks by section
         var document = ResumeSectionDetectorUtility.DetectSections(rawText);
@@ -37,16 +37,25 @@ public static class ResumeTextParserUtility
         }
 
         // 4. Ensure we have the global name set if the item parser didn't extract it
-        if (string.IsNullOrWhiteSpace(dto.FullName))
+        if (string.IsNullOrWhiteSpace(dto.PersonalInfo.FullName))
         {
             var lines = rawText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var line in lines.Take(10))
             {
                 if (!line.Contains('@') && !Regex.IsMatch(line, @"\d{3}") &&
-                    line.Length >= 4 && line.Length <= 60 &&
+                    line.Length >= 2 && line.Length <= 60 &&
                     !Regex.IsMatch(line, @"^(RESUME|CV|CURRICULUM|PROFILE|SUMMARY|EXPERIENCE|EDUCATION|CONTACT)$", RegexOptions.IgnoreCase))
                 {
-                    dto.FullName = line.Trim();
+                    dto.PersonalInfo.FullName = line.Trim();
+                    var nameParts = dto.PersonalInfo.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (nameParts.Length >= 1)
+                    {
+                        dto.PersonalInfo.FirstName = nameParts[0];
+                        if (nameParts.Length > 1)
+                        {
+                            dto.PersonalInfo.LastName = string.Join(" ", nameParts.Skip(1));
+                        }
+                    }
                     break;
                 }
             }

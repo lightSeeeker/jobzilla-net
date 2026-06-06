@@ -9,356 +9,157 @@ namespace jobzilla_net.Application.Resumes.Utilities;
 
 public static class ResumeSectionDetectorUtility
 {
-    private static readonly Dictionary<string, ResumeSectionType> SectionKeywords = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, ResumeSectionType> CanonicalSections = new(StringComparer.OrdinalIgnoreCase)
     {
-        // Personal Info / Contact
-        { "contact", ResumeSectionType.PersonalInfo },
-        { "contact info", ResumeSectionType.PersonalInfo },
-        { "contact information", ResumeSectionType.PersonalInfo },
-        { "personal info", ResumeSectionType.PersonalInfo },
-        { "personal information", ResumeSectionType.PersonalInfo },
-        { "personal details", ResumeSectionType.PersonalInfo },
-        { "address", ResumeSectionType.PersonalInfo },
-        { "candidate information", ResumeSectionType.PersonalInfo },
+        { "PROFILE", ResumeSectionType.Summary },
+        { "SUMMARY", ResumeSectionType.Summary },
+        { "OBJECTIVE", ResumeSectionType.Summary },
+        { "ABOUT ME", ResumeSectionType.Summary },
+        { "PROFESSIONAL SUMMARY", ResumeSectionType.Summary },
+        { "CAREER SUMMARY", ResumeSectionType.Summary },
+        { "EXECUTIVE SUMMARY", ResumeSectionType.Summary },
+        
+        { "EXPERIENCE", ResumeSectionType.Experience },
+        { "WORK EXPERIENCE", ResumeSectionType.Experience },
+        { "PROFESSIONAL EXPERIENCE", ResumeSectionType.Experience },
+        { "EMPLOYMENT HISTORY", ResumeSectionType.Experience },
+        { "WORK HISTORY", ResumeSectionType.Experience },
+        { "CAREER HISTORY", ResumeSectionType.Experience },
+        { "EMPLOYMENT", ResumeSectionType.Experience },
 
-        // Summary / Profile
-        { "summary", ResumeSectionType.Summary },
-        { "professional summary", ResumeSectionType.Summary },
-        { "career summary", ResumeSectionType.Summary },
-        { "summary of qualifications", ResumeSectionType.Summary },
-        { "objective", ResumeSectionType.Summary },
-        { "career objective", ResumeSectionType.Summary },
-        { "profile", ResumeSectionType.Summary },
-        { "professional profile", ResumeSectionType.Summary },
-        { "about me", ResumeSectionType.Summary },
-        { "about", ResumeSectionType.Summary },
+        { "EDUCATION", ResumeSectionType.Education },
+        { "ACADEMIC BACKGROUND", ResumeSectionType.Education },
+        { "QUALIFICATIONS", ResumeSectionType.Education },
+        { "ACADEMIC HISTORY", ResumeSectionType.Education },
 
-        // Experience
-        { "experience", ResumeSectionType.Experience },
-        { "work experience", ResumeSectionType.Experience },
-        { "professional experience", ResumeSectionType.Experience },
-        { "employment history", ResumeSectionType.Experience },
-        { "work history", ResumeSectionType.Experience },
-        { "career history", ResumeSectionType.Experience },
-        { "professional background", ResumeSectionType.Experience },
-        { "experience history", ResumeSectionType.Experience },
-        { "jobs", ResumeSectionType.Experience },
-        { "employment", ResumeSectionType.Experience },
-        { "professional record", ResumeSectionType.Experience },
+        { "SKILLS", ResumeSectionType.Skills },
+        { "TECHNICAL SKILLS", ResumeSectionType.Skills },
+        { "CORE COMPETENCIES", ResumeSectionType.Skills },
+        { "KEY SKILLS", ResumeSectionType.Skills },
+        { "TECHNOLOGIES", ResumeSectionType.Skills },
+        { "TECH STACK", ResumeSectionType.Skills },
 
-        // Education
-        { "education", ResumeSectionType.Education },
-        { "academic", ResumeSectionType.Education },
-        { "academic history", ResumeSectionType.Education },
-        { "academic background", ResumeSectionType.Education },
-        { "qualifications", ResumeSectionType.Education },
-        { "educational background", ResumeSectionType.Education },
-        { "education & credentials", ResumeSectionType.Education },
-        { "education history", ResumeSectionType.Education },
-        { "degrees", ResumeSectionType.Education },
-        { "academic qualifications", ResumeSectionType.Education },
+        { "PROJECTS", ResumeSectionType.Projects },
+        { "KEY PROJECTS", ResumeSectionType.Projects },
+        { "NOTABLE PROJECTS", ResumeSectionType.Projects },
+        { "PORTFOLIO", ResumeSectionType.Projects },
+        { "PROJECT EXPERIENCE", ResumeSectionType.Projects },
 
-        // Skills
-        { "skills", ResumeSectionType.Skills },
-        { "technical skills", ResumeSectionType.Skills },
-        { "core competencies", ResumeSectionType.Skills },
-        { "areas of expertise", ResumeSectionType.Skills },
-        { "expertise", ResumeSectionType.Skills },
-        { "technologies", ResumeSectionType.Skills },
-        { "key skills", ResumeSectionType.Skills },
-        { "professional skills", ResumeSectionType.Skills },
-        { "skills & tools", ResumeSectionType.Skills },
-        { "skills summary", ResumeSectionType.Skills },
-        { "technologies & skills", ResumeSectionType.Skills },
-        { "languages & technologies", ResumeSectionType.Skills },
-        { "it skills", ResumeSectionType.Skills },
+        { "CONTACT", ResumeSectionType.PersonalInfo },
+        { "CONTACT INFORMATION", ResumeSectionType.PersonalInfo },
+        { "PERSONAL DETAILS", ResumeSectionType.PersonalInfo },
+        { "GET IN TOUCH", ResumeSectionType.PersonalInfo },
 
-        // Certifications
-        { "certifications", ResumeSectionType.Certifications },
-        { "certification", ResumeSectionType.Certifications },
-        { "licenses", ResumeSectionType.Certifications },
-        { "licenses & certifications", ResumeSectionType.Certifications },
-        { "credentials", ResumeSectionType.Certifications },
-        { "certificates", ResumeSectionType.Certifications },
-        { "courses", ResumeSectionType.Certifications },
-        { "professional development", ResumeSectionType.Certifications },
+        { "CERTIFICATIONS", ResumeSectionType.Certifications },
+        { "COURSES", ResumeSectionType.Certifications },
+        { "LICENSES", ResumeSectionType.Certifications },
+        { "AWARDS", ResumeSectionType.Certifications },
+        { "ACHIEVEMENTS", ResumeSectionType.Certifications },
 
-        // Projects
-        { "projects", ResumeSectionType.Projects },
-        { "personal projects", ResumeSectionType.Projects },
-        { "academic projects", ResumeSectionType.Projects },
-        { "key projects", ResumeSectionType.Projects },
-        { "selected projects", ResumeSectionType.Projects },
-        { "portfolio", ResumeSectionType.Projects },
-        { "project experience", ResumeSectionType.Projects },
+        { "LANGUAGES", ResumeSectionType.Languages },
+        { "LANGUAGE PROFICIENCY", ResumeSectionType.Languages },
 
-        // Languages
-        { "languages", ResumeSectionType.Languages },
-        { "language proficiency", ResumeSectionType.Languages },
-        { "spoken languages", ResumeSectionType.Languages },
-
-        // Achievements
-        { "achievements", ResumeSectionType.Achievements },
-        { "key achievements", ResumeSectionType.Achievements },
-        { "accomplishments", ResumeSectionType.Achievements },
-        { "major achievements", ResumeSectionType.Achievements },
-
-        // Awards
-        { "awards", ResumeSectionType.Awards },
-        { "honors", ResumeSectionType.Awards },
-        { "awards & honors", ResumeSectionType.Awards },
-        { "honorable mentions", ResumeSectionType.Awards },
-
-        // Volunteer
-        { "volunteer", ResumeSectionType.Volunteer },
-        { "volunteer experience", ResumeSectionType.Volunteer },
-        { "volunteering", ResumeSectionType.Volunteer },
-        { "community service", ResumeSectionType.Volunteer },
-
-        // Publications
-        { "publications", ResumeSectionType.Publications },
-        { "research", ResumeSectionType.Publications },
-        { "patents", ResumeSectionType.Publications },
-        { "papers", ResumeSectionType.Publications },
-        { "books", ResumeSectionType.Publications },
-
-        // Social Links
-        { "social", ResumeSectionType.SocialLinks },
-        { "links", ResumeSectionType.SocialLinks },
-        { "social links", ResumeSectionType.SocialLinks },
-        { "social profiles", ResumeSectionType.SocialLinks },
-        { "profiles", ResumeSectionType.SocialLinks }
+        { "REFERENCES", ResumeSectionType.References },
+        { "REFERENCES AVAILABLE UPON REQUEST", ResumeSectionType.References }
     };
 
-    private static readonly string[] CustomSectionKeywords = new[]
+    public static ParsedResumeDocument DetectSections(string rawText)
     {
-        "interests", "hobbies", "references", "affiliations", "activities",
-        "extracurricular", "extracurricular activities", "memberships",
-        "additional", "additional information", "other info", "training"
-    };
+        var document = new ParsedResumeDocument();
+        if (string.IsNullOrWhiteSpace(rawText)) return document;
 
-    public static ParsedResumeDocument DetectSections(string text)
-    {
-        var document = new ParsedResumeDocument { RawText = text };
+        var lines = rawText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        
+        var currentSection = new DetectedResumeSection { SectionType = ResumeSectionType.Unknown };
+        var currentBlock = new DetectedSectionBlock();
 
-        if (string.IsNullOrWhiteSpace(text))
-            return document;
-
-        // Split raw text into individual lines and filter out header/footer noise
-        var lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Where(line => !IsHeaderOrFooterLine(line))
-            .ToArray();
-        var matches = new List<HeadingMatch>();
-
-        for (int i = 0; i < lines.Length; i++)
+        foreach (var originalLine in lines)
         {
-            var line = lines[i];
-            if (string.IsNullOrWhiteSpace(line)) continue;
-
-            var cleaned = CleanHeadingText(line);
-            if (string.IsNullOrWhiteSpace(cleaned)) continue;
-
-            bool isHeading = false;
-            ResumeSectionType type = ResumeSectionType.Unknown;
-
-            // Rule 1: Matches known section keyword exactly
-            if (SectionKeywords.TryGetValue(cleaned, out type))
+            var trimmed = originalLine.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed))
             {
-                isHeading = true;
-            }
-            // Rule 2: Matches custom/unknown section keywords exactly
-            else if (CustomSectionKeywords.Contains(cleaned, StringComparer.OrdinalIgnoreCase))
-            {
-                isHeading = true;
-                type = ResumeSectionType.Unknown;
-            }
-            // Rule 3: Line has markdown heading format (e.g. ## Heading or ### Heading)
-            else if (Regex.IsMatch(line.Trim(), @"^#{1,4}\s+.+$"))
-            {
-                isHeading = true;
-                var rawClean = Regex.Replace(line.Trim(), @"^#+\s+", "");
-                var mappedClean = CleanHeadingText(rawClean);
-                if (SectionKeywords.TryGetValue(mappedClean, out var t))
+                if (currentBlock.Lines.Count > 0)
                 {
-                    type = t;
+                    currentSection.Blocks.Add(currentBlock);
+                    currentBlock = new DetectedSectionBlock();
                 }
-                else
-                {
-                    type = ResumeSectionType.Unknown;
-                }
-            }
-            // Rule 4: Followed by a separator line (e.g. ------ or ======)
-            else if (i + 1 < lines.Length && IsSeparatorLine(lines[i + 1]))
-            {
-                isHeading = true;
-                if (SectionKeywords.TryGetValue(cleaned, out var t))
-                {
-                    type = t;
-                }
-                else
-                {
-                    type = ResumeSectionType.Unknown;
-                }
+                continue;
             }
 
-            if (isHeading)
+            var matchedType = TryMatchHeading(trimmed);
+
+            if (matchedType != null)
             {
-                matches.Add(new HeadingMatch
+                // Push previous block if has data
+                if (currentBlock.Lines.Count > 0)
                 {
-                    LineIndex = i,
-                    Type = type,
-                    RawHeading = cleaned
-                });
+                    currentSection.Blocks.Add(currentBlock);
+                    currentBlock = new DetectedSectionBlock();
+                }
+                // Push previous section
+                if (currentSection.Blocks.Count > 0 || currentSection.SectionType != ResumeSectionType.Unknown)
+                {
+                    document.Sections.Add(currentSection);
+                }
+
+                currentSection = new DetectedResumeSection { SectionType = matchedType.Value };
+                // Optionally store the heading line itself in the block or skip it.
+                // We skip adding it to block lines to avoid parsing headings as job titles.
+                continue;
             }
+
+            currentBlock.Lines.Add(originalLine);
+            currentSection.RawContent += originalLine + Environment.NewLine;
         }
 
-        // Now split the text using the detected headings
-        if (matches.Count == 0)
+        if (currentBlock.Lines.Count > 0)
         {
-            // If no headings detected, put everything in PersonalInfo
-            var personalInfoSection = new DetectedResumeSection
-            {
-                SectionType = ResumeSectionType.PersonalInfo,
-                RawHeading = "Personal Information",
-                RawContent = text
-            };
-            personalInfoSection.Blocks = ExtractBlocks(lines);
-            document.Sections.Add(personalInfoSection);
+            currentSection.Blocks.Add(currentBlock);
         }
-        else
+        if (currentSection.Blocks.Count > 0 || currentSection.SectionType != ResumeSectionType.Unknown)
         {
-            // Handle pre-heading content (if any) as PersonalInfo
-            var firstHeadingIndex = matches[0].LineIndex;
-            if (firstHeadingIndex > 0)
-            {
-                var preLines = lines.Take(firstHeadingIndex).ToArray();
-                var preText = string.Join(Environment.NewLine, preLines);
-                if (!string.IsNullOrWhiteSpace(preText))
-                {
-                    var personalInfoSection = new DetectedResumeSection
-                    {
-                        SectionType = ResumeSectionType.PersonalInfo,
-                        RawHeading = "Personal Information",
-                        RawContent = preText
-                    };
-                    personalInfoSection.Blocks = ExtractBlocks(preLines);
-                    document.Sections.Add(personalInfoSection);
-                }
-            }
-
-            // Create sections for each heading
-            for (int k = 0; k < matches.Count; k++)
-            {
-                var currentMatch = matches[k];
-                var nextMatchIndex = (k + 1 < matches.Count) ? matches[k + 1].LineIndex : lines.Length;
-
-                // Content starts after the heading line
-                int contentStart = currentMatch.LineIndex + 1;
-                // If followed by a separator line, skip it as well
-                if (contentStart < lines.Length && IsSeparatorLine(lines[contentStart]))
-                {
-                    contentStart++;
-                }
-
-                int contentEnd = nextMatchIndex;
-                // If the next heading is preceded by a separator line, exclude it from content
-                if (contentEnd - 1 > contentStart && IsSeparatorLine(lines[contentEnd - 1]))
-                {
-                    contentEnd--;
-                }
-
-                var sectionLines = lines.Skip(contentStart).Take(contentEnd - contentStart).ToArray();
-                var sectionContentText = string.Join(Environment.NewLine, sectionLines);
-
-                var section = new DetectedResumeSection
-                {
-                    SectionType = currentMatch.Type,
-                    RawHeading = currentMatch.RawHeading,
-                    RawContent = sectionContentText
-                };
-                section.Blocks = ExtractBlocks(sectionLines);
-
-                document.Sections.Add(section);
-            }
+            document.Sections.Add(currentSection);
         }
 
         return document;
     }
 
-    private static string CleanHeadingText(string raw)
+    private static ResumeSectionType? TryMatchHeading(string line)
     {
-        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
-        var cleaned = raw.Trim();
-
-        // Strip surrounding Markdown stars, underscores, brackets, etc.
-        cleaned = Regex.Replace(cleaned, @"^[#*=\-\[\]\s:]+", "");
-        cleaned = Regex.Replace(cleaned, @"[#*=\-\[\]\s:]+$", "");
-
-        return cleaned.Trim();
-    }
-
-    private static bool IsSeparatorLine(string line)
-    {
-        if (string.IsNullOrWhiteSpace(line)) return false;
-        var trimmed = line.Trim();
-        if (trimmed.Length < 3) return false;
-
-        // Matches lines consisting solely of hyphens, equals, asterisks, underscores, tildes, hashes
-        return Regex.IsMatch(trimmed, @"^[=\-\*_#~]+$");
-    }
-
-    private static bool IsHeaderOrFooterLine(string line)
-    {
-        if (string.IsNullOrWhiteSpace(line)) return false;
-        var trimmed = line.Trim();
+        var cleaned = Regex.Replace(line, @"^[#*=\-\[\]\s:]+", "");
+        cleaned = Regex.Replace(cleaned, @"[#*=\-\[\]\s:]+$", "").Trim();
         
-        // Matches "Page X", "Page X of Y", "X of Y", "1 / 3" or lines containing just page numbers
-        if (Regex.IsMatch(trimmed, @"^page\s*[-–]?\s*\d+(\s*of\s*\d+)?$", RegexOptions.IgnoreCase))
-            return true;
-        if (Regex.IsMatch(trimmed, @"^\d+\s*/\s*\d+$"))
-            return true;
-        if (Regex.IsMatch(trimmed, @"^-\s*\d+\s*-$"))
-            return true;
-        if (Regex.IsMatch(trimmed, @"^[\d\s]+$") && trimmed.Length <= 3) // single numbers
-            return true;
-            
-        return false;
-    }
+        if (cleaned.Length > 45 || cleaned.Length < 3) return null;
 
-    private static List<DetectedSectionBlock> ExtractBlocks(IEnumerable<string> lines)
-    {
-        var blocks = new List<DetectedSectionBlock>();
-        var currentBlockLines = new List<string>();
+        // Is ALL CAPS or Title Case (no sentence punctuation)?
+        bool isAllCaps = cleaned.ToUpperInvariant() == cleaned && Regex.IsMatch(cleaned, @"[A-Z]");
+        bool isTitleCase = !Regex.IsMatch(cleaned, @"[.!?]$");
 
-        foreach (var line in lines)
+        if (!isAllCaps && !isTitleCase) return null;
+
+        // Perfect dictionary match
+        if (CanonicalSections.TryGetValue(cleaned, out var sectionType))
         {
-            var trimmed = line.Trim();
-            if (string.IsNullOrWhiteSpace(trimmed))
+            return sectionType;
+        }
+
+        // Partial match for known keywords if ALL CAPS or short Title Case
+        if (isAllCaps || (isTitleCase && cleaned.Length < 30))
+        {
+            var tokens = cleaned.ToUpperInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var token in tokens)
             {
-                if (currentBlockLines.Count > 0)
+                if (CanonicalSections.TryGetValue(token, out var st))
                 {
-                    blocks.Add(new DetectedSectionBlock { Lines = currentBlockLines });
-                    currentBlockLines = new List<string>();
+                    // If a single word matches (like EXPERIENCE or SKILLS), treat it as a match
+                    if (token == "EXPERIENCE" || token == "SKILLS" || token == "EDUCATION" || token == "PROFILE" || token == "PROJECTS")
+                    {
+                        return st;
+                    }
                 }
             }
-            else
-            {
-                currentBlockLines.Add(line);
-            }
         }
 
-        if (currentBlockLines.Count > 0)
-        {
-            blocks.Add(new DetectedSectionBlock { Lines = currentBlockLines });
-        }
-
-        return blocks;
-    }
-
-    private class HeadingMatch
-    {
-        public int LineIndex { get; set; }
-        public ResumeSectionType Type { get; set; }
-        public string RawHeading { get; set; } = string.Empty;
+        return null;
     }
 }

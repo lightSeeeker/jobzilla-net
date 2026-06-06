@@ -11,11 +11,18 @@
     <title>@(Model.Profile?.FullName ?? "Resume") - Technical Developer</title>
     @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
     <style>
+        :root {
+            --td-bg:      #1e1e1e;
+            --td-name:    #ce9178;
+            --td-keyword: #569cd6;
+            --td-fn:      #4ec9b0;
+            --td-section: #c586c0;
+        }
         .resume-container {
             font-family: 'Consolas', 'Courier New', Courier, monospace;
             color: #d4d4d4;
             line-height: 1.5;
-            background-color: #1e1e1e;
+            background-color: var(--td-bg);
             padding: 40px;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-radius: 4px; max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
@@ -24,25 +31,25 @@
             border-bottom: 1px solid #555;
             padding-bottom: 20px;
         }
-        .name { font-size: 2em; font-weight: bold; margin: 0 0 5px; color: #ce9178; }
-        .name::before { content: "const developer = \""; color: #569cd6; font-weight: normal; font-size: 0.5em; }
-        .name::after { content: "\";"; color: #569cd6; font-weight: normal; font-size: 0.5em; }
-        .title { font-size: 1.1em; color: #569cd6; margin-bottom: 15px; }
+        .name { font-size: 2em; font-weight: bold; margin: 0 0 5px; color: var(--td-name); }
+        .name::before { content: "const developer = \""; color: var(--td-keyword); font-weight: normal; font-size: 0.5em; }
+        .name::after { content: "\";"; color: var(--td-keyword); font-weight: normal; font-size: 0.5em; }
+        .title { font-size: 1.1em; color: var(--td-keyword); margin-bottom: 15px; }
         .contact-info { display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.9em; color: #9cdcfe; }
         
         .resume-section-title {
             font-size: 1.2em;
-            color: #c586c0;
+            color: var(--td-section);
             margin-bottom: 15px;
             margin-top: 30px;
             font-weight: bold;
         }
-        .resume-section-title::before { content: "class "; color: #569cd6; }
+        .resume-section-title::before { content: "class "; color: var(--td-keyword); }
         .resume-section-title::after { content: " {"; color: #d4d4d4; }
         
         .resume-item { margin-bottom: 20px; padding-left: 20px; border-left: 1px dashed #444; }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-        .resume-item-title { font-weight: bold; color: #4ec9b0; font-size: 1.05em; }
+        .resume-item-title { font-weight: bold; color: var(--td-fn); font-size: 1.05em; }
         .resume-item-date { font-size: 0.85em; color: #608b4e; }
         .resume-item-subtitle { font-size: 0.95em; color: #dcdcaa; margin-bottom: 8px; }
         .resume-item-desc { font-size: 0.9em; color: #d4d4d4; }
@@ -58,17 +65,18 @@
         .section-end::before { content: "}"; color: #d4d4d4; display: block; margin-top: 10px; font-weight: bold; font-size: 1.2em; }
         
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #fff; color: #000; font-family: Arial, sans-serif; }
-        .btn { padding: 10px 20px; background: #007acc; color: white; text-decoration: none; border-radius: 0; margin: 0 5px; display: inline-block; cursor: pointer; border: none; }
+        .btn { padding: 10px 20px; background: var(--td-keyword); color: white; text-decoration: none; border-radius: 0; margin: 0 5px; display: inline-block; cursor: pointer; border: none; }
         .btn-secondary { background: #333; }
         
         a.resume-link { color: #3794ff; }
     </style>
+    @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
     @if (!Model.IsExport)
     {
         <div class="action-bar d-print-none">
-            <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
+            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
             @if (Model.TemplateId.HasValue)
             {
                 <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
@@ -128,5 +136,15 @@
             <div class="section-end"></div>
         }
     </div>
+<script>
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+    });
+</script>
 </body>
 </html>

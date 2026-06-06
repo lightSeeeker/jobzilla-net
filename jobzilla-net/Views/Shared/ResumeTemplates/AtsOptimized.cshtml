@@ -10,6 +10,9 @@
     <title>@(Model.Profile?.FullName ?? "Resume") - ATS Optimized</title>
     @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
     <style>
+        :root {
+            --ats-primary: #000000;
+        }
         .resume-container {
             font-family: Arial, Helvetica, sans-serif;
             color: #000;
@@ -22,7 +25,7 @@
             text-align: center;
             margin-bottom: 25px;
         }
-        .name { font-size: 24px; font-weight: bold; margin: 0 0 5px; text-transform: uppercase; }
+        .name { font-size: 24px; font-weight: bold; margin: 0 0 5px; text-transform: uppercase; color: var(--ats-primary); }
         .contact-info { font-size: 14px; margin-bottom: 15px; }
         .contact-info span { margin: 0 5px; }
         
@@ -30,7 +33,8 @@
             font-size: 16px;
             text-transform: uppercase;
             font-weight: bold;
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid var(--ats-primary);
+            color: var(--ats-primary);
             padding-bottom: 3px;
             margin-bottom: 15px;
             margin-top: 20px;
@@ -56,15 +60,16 @@
         .resume-field-label { font-weight: bold; margin-right: 5px; }
         
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #f0f0f0; }
-        .btn { padding: 10px 20px; background: #000; color: white; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: sans-serif; }
+        .btn { padding: 10px 20px; background: var(--ats-primary); color: white; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: sans-serif; }
         .btn-secondary { background: #555; }
     </style>
+    @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
     @if (!Model.IsExport)
     {
         <div class="action-bar d-print-none">
-            <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
+            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
             @if (Model.TemplateId.HasValue)
             {
                 <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
@@ -107,5 +112,15 @@
             @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
         }
     </div>
+<script>
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+    });
+</script>
 </body>
 </html>

@@ -389,8 +389,76 @@ public class CandidateDashController : Controller
 
         ViewBag.ResumeId = resumeId;
         ViewBag.ActiveTemplateId = activeTemplateId;
+        ViewBag.PalettesJson = BuildPalettesJson();
         var templates = await _resumeBuilderService.GetActiveTemplatesAsync();
         return View(templates);
+    }
+
+    /// <summary>
+    /// Returns palette definitions as a pre-serialized JSON string so the Razor view
+    /// does not have to deal with complex nested generic types in @{ } code blocks.
+    /// Shape: { [templateFilePathSlug]: [ { name, swatch, colors: {var:hex} } ] }
+    /// </summary>
+    private static string BuildPalettesJson()
+    {
+        var palettes = new Dictionary<string, object[]>
+        {
+            ["modernprofessional"] = new object[]
+            {
+                new { name = "Navy Teal",        swatch = "#48a9a6", colors = new { __mp_sidebar_bg = "#2b3a4a", __mp_accent = "#48a9a6" } },
+                new { name = "Midnight Gold",    swatch = "#e2b04f", colors = new { __mp_sidebar_bg = "#1a1a2e", __mp_accent = "#e2b04f" } },
+                new { name = "Forest Sage",      swatch = "#7bc8a4", colors = new { __mp_sidebar_bg = "#2d4a3e", __mp_accent = "#7bc8a4" } },
+                new { name = "Slate Coral",      swatch = "#e8837a", colors = new { __mp_sidebar_bg = "#3d3d5c", __mp_accent = "#e8837a" } },
+                new { name = "Charcoal Crimson", swatch = "#c0392b", colors = new { __mp_sidebar_bg = "#2c1810", __mp_accent = "#c0392b" } },
+            },
+            ["executivecorporate"] = new object[]
+            {
+                new { name = "Classic Black",  swatch = "#111111", colors = new { __ec_primary = "#111111", __ec_accent = "#444444" } },
+                new { name = "Navy Blue",      swatch = "#2980b9", colors = new { __ec_primary = "#1a3a5c", __ec_accent = "#2980b9" } },
+                new { name = "Burgundy",       swatch = "#8e1c1c", colors = new { __ec_primary = "#4a0e0e", __ec_accent = "#8e1c1c" } },
+                new { name = "Forest",         swatch = "#2d7a3a", colors = new { __ec_primary = "#1a3a1e", __ec_accent = "#2d7a3a" } },
+                new { name = "Warm Graphite",  swatch = "#7f8c8d", colors = new { __ec_primary = "#2c2c2c", __ec_accent = "#7f8c8d" } },
+            },
+            ["atsoptimized"] = new object[]
+            {
+                new { name = "Pure Black",  swatch = "#000000", colors = new { __ats_primary = "#000000" } },
+                new { name = "Navy",        swatch = "#1a3a5c", colors = new { __ats_primary = "#1a3a5c" } },
+                new { name = "Dark Green",  swatch = "#1a4a1e", colors = new { __ats_primary = "#1a4a1e" } },
+                new { name = "Deep Red",    swatch = "#7a0000", colors = new { __ats_primary = "#7a0000" } },
+                new { name = "Slate",       swatch = "#2c3e50", colors = new { __ats_primary = "#2c3e50" } },
+            },
+            ["creativedesigner"] = new object[]
+            {
+                new { name = "Sunset Orange",  swatch = "#ff7e5f", colors = new { __cd_header_from = "#ff7e5f", __cd_header_to = "#feb47b", __cd_accent = "#ff7e5f" } },
+                new { name = "Purple Passion", swatch = "#8e44ad", colors = new { __cd_header_from = "#8e44ad", __cd_header_to = "#a569bd", __cd_accent = "#8e44ad" } },
+                new { name = "Ocean Blue",     swatch = "#1a6fa8", colors = new { __cd_header_from = "#1a6fa8", __cd_header_to = "#3498db", __cd_accent = "#1a6fa8" } },
+                new { name = "Emerald",        swatch = "#1a7a3a", colors = new { __cd_header_from = "#1a7a3a", __cd_header_to = "#27ae60", __cd_accent = "#1a7a3a" } },
+                new { name = "Rose Gold",      swatch = "#c0392b", colors = new { __cd_header_from = "#c0392b", __cd_header_to = "#e74c3c", __cd_accent = "#c0392b" } },
+            },
+            ["technicaldeveloper"] = new object[]
+            {
+                new { name = "VS Dark",        swatch = "#4ec9b0", colors = new { __td_bg = "#1e1e1e", __td_name = "#ce9178", __td_keyword = "#569cd6", __td_fn = "#4ec9b0", __td_section = "#c586c0" } },
+                new { name = "Monokai",        swatch = "#a6e22e", colors = new { __td_bg = "#272822", __td_name = "#f92672", __td_keyword = "#66d9ef", __td_fn = "#a6e22e", __td_section = "#fd971f" } },
+                new { name = "Dracula",        swatch = "#50fa7b", colors = new { __td_bg = "#282a36", __td_name = "#ff79c6", __td_keyword = "#8be9fd", __td_fn = "#50fa7b", __td_section = "#bd93f9" } },
+                new { name = "Solarized Dark", swatch = "#859900", colors = new { __td_bg = "#002b36", __td_name = "#268bd2", __td_keyword = "#2aa198", __td_fn = "#859900", __td_section = "#d33682" } },
+                new { name = "Nord",           swatch = "#a3be8c", colors = new { __td_bg = "#2e3440", __td_name = "#88c0d0", __td_keyword = "#81a1c1", __td_fn = "#a3be8c", __td_section = "#b48ead" } },
+            },
+        };
+
+        // Serialize with camelCase and then fix the key underscores back to dashes.
+        // Anonymous type property names cannot contain dashes, so we used double-underscores
+        // as a placeholder (e.g. __mp_accent → --mp-accent).
+        var json = System.Text.Json.JsonSerializer.Serialize(palettes,
+            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+
+        // Replace __ prefix + underscores → CSS variable dashes: __mp_accent → --mp-accent
+        json = System.Text.RegularExpressions.Regex.Replace(json, @"""__([\w_]+)"":", m =>
+        {
+            var cssVar = "--" + m.Groups[1].Value.Replace('_', '-');
+            return $"\"{cssVar}\":";
+        });
+
+        return json;
     }
 
     [HttpGet]
@@ -417,6 +485,30 @@ public class CandidateDashController : Controller
         return Content(htmlContent, "text/html");
     }
 
+    /// <summary>
+    /// Read-only template render used exclusively for the in-card iframe preview on the Templates page.
+    /// Intentionally does NOT call SetTemplateForResumeAsync so loading previews never changes
+    /// the candidate's active template as a side effect.
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> SkeletonPreview(int id, int? resumeId = null)
+    {
+        var template = await _resumeBuilderService.GetTemplateByIdAsync(id);
+        if (template == null) return NotFound();
+
+        var model = await _resumeBuilderService.GetResumeDataAsync(GetUserId(), resumeId);
+
+        model.TemplateId = id;
+        model.ResumeId = resumeId;
+        model.IsExport = false;
+
+        var htmlContent = await _templateRenderer.RenderTemplateAsync(
+            $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",
+            model);
+
+        return Content(htmlContent, "text/html");
+    }
+
     [HttpGet]
     public async Task<IActionResult> ExportTemplate(int id, int? resumeId = null)
     {
@@ -432,6 +524,26 @@ public class CandidateDashController : Controller
         var fileName = $"Resume_{template?.Name ?? "Export"}_{DateTime.Now:yyyyMMdd}.pdf";
 
         return File(pdfBytes, "application/pdf", fileName);
+    }
+
+    // ── COLOR CUSTOMIZATION ───────────────────────────────────────────────────
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveColorSettings([FromBody] SaveColorSettingsRequest request)
+    {
+        if (request == null || request.Colors == null || request.ResumeId <= 0)
+            return BadRequest(new { error = "Invalid request." });
+
+        var ok = await _resumeBuilderService.SaveColorSettingsAsync(
+            GetUserId(),
+            request.ResumeId,
+            request.TemplateId,
+            request.Colors);
+
+        return ok
+            ? Ok(new { success = true })
+            : StatusCode(500, new { error = "Failed to save color settings." });
     }
 
     // ── RESUME BUILDER JSON API ──────────────────────────────────────────────

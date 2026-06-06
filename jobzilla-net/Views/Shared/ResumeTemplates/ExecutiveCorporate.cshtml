@@ -11,6 +11,10 @@
     <title>@(Model.Profile?.FullName ?? "Resume") - Executive Corporate</title>
     @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
     <style>
+        :root {
+            --ec-primary: #111111;
+            --ec-accent:  #444444;
+        }
         .resume-container {
             font-family: 'Times New Roman', Times, serif;
             color: #111;
@@ -21,12 +25,12 @@
         .header {
             text-align: center;
             padding: 50px 40px 30px;
-            border-bottom: 2px solid #111;
+            border-bottom: 2px solid var(--ec-primary);
             margin-bottom: 30px;
         }
-        .name { font-size: 2.5em; font-weight: bold; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 2px; }
-        .title { font-size: 1.2em; color: #444; margin-bottom: 20px; font-style: italic; }
-        .contact-info { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 0.9em; font-family: Arial, sans-serif; color: #444; }
+        .name { font-size: 2.5em; font-weight: bold; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--ec-primary); }
+        .title { font-size: 1.2em; color: var(--ec-accent); margin-bottom: 20px; font-style: italic; }
+        .contact-info { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 0.9em; font-family: Arial, sans-serif; color: var(--ec-accent); }
         
         .main-content {
             padding: 0 50px 50px;
@@ -37,7 +41,7 @@
             font-family: 'Times New Roman', Times, serif;
             font-size: 1.4em;
             text-transform: uppercase;
-            color: #111;
+            color: var(--ec-primary);
             border-bottom: 1px solid #999;
             padding-bottom: 5px;
             margin-bottom: 20px;
@@ -47,31 +51,32 @@
         
         .resume-item { margin-bottom: 20px; }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-        .resume-item-title { font-weight: bold; color: #111; font-size: 1.1em; }
-        .resume-item-date { font-size: 0.9em; color: #111; text-align: right; }
+        .resume-item-title { font-weight: bold; color: var(--ec-primary); font-size: 1.1em; }
+        .resume-item-date { font-size: 0.9em; color: var(--ec-primary); text-align: right; }
         .resume-item-subtitle { font-size: 1em; color: #333; margin-bottom: 8px; font-style: italic; }
         .resume-item-desc { font-size: 0.95em; color: #333; text-align: justify; }
         
         .resume-skills-list { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
-        .resume-skill-tag { font-size: 0.95em; font-weight: bold; color: #111; }
+        .resume-skill-tag { font-size: 0.95em; font-weight: bold; color: var(--ec-primary); }
         
         .resume-references-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .resume-reference-item { margin-bottom: 0; }
         
         .resume-custom-item { margin-bottom: 15px; }
         .resume-item-field { margin-bottom: 4px; font-size: 0.95em; }
-        .resume-field-label { font-weight: bold; color: #111; margin-right: 5px; }
+        .resume-field-label { font-weight: bold; color: var(--ec-primary); margin-right: 5px; }
         
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #fff; font-family: Arial, sans-serif; }
-        .btn { padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 0; margin: 0 5px; display: inline-block; cursor: pointer; border: none; }
+        .btn { padding: 10px 20px; background: var(--ec-primary); color: white; text-decoration: none; border-radius: 0; margin: 0 5px; display: inline-block; cursor: pointer; border: none; }
         .btn-secondary { background: #555; }
     </style>
+    @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
     @if (!Model.IsExport)
     {
         <div class="action-bar d-print-none">
-            <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
+            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
             @if (Model.TemplateId.HasValue)
             {
                 <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
@@ -116,5 +121,15 @@
             }
         </div>
     </div>
+<script>
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+    });
+</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 @model List<jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto>
 @{
     ViewData["Title"] = "Resume Templates";
-    ViewData["ActivePage"] = "Templates"; 
+    ViewData["ActivePage"] = "Templates";
 }
 
 <!-- CONTENT START -->
@@ -17,61 +17,146 @@
                         <h2 class="wt-title">Resume Templates</h2>
                     </div>
                 </div>
-                <!-- BREADCRUMB ROW -->                            
                 <div>
                     <ul class="wt-breadcrumb breadcrumb-style-2">
                         <li><a asp-controller="Home" asp-action="Index">Home</a></li>
                         <li>Resume Templates</li>
                     </ul>
                 </div>
-                <!-- BREADCRUMB ROW END -->                        
             </div>
         </div>
     </div>
-    <!-- INNER PAGE BANNER END -->
 
     <div class="section-full p-t120 p-b90 site-bg-white">
         <div class="container">
             <div class="row">
-                
+
                 <partial name="_CandidateSidebar" model="null" />
 
                 <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
                     <div class="twm-right-section-panel site-bg-gray">
-                        
+
                         <div class="product-filter-wrap d-flex justify-content-between align-items-center mb-4">
                             <span class="woocommerce-result-count-left">Available Templates</span>
-                            <div>
+                            @* <div>
                                 <a asp-action="Builder" asp-route-resumeId="@ViewBag.ResumeId" class="site-button outline primary">Back to Builder</a>
-                            </div>
+                            </div> *@
                         </div>
 
-                        <div class="row">
+                        <style>
+                            /* ── Template card ─────────────────────────────── */
+                            .tpl-card {
+                                border-radius: 12px;
+                                overflow: hidden;
+                                border: 2px solid transparent;
+                                background: #fff;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+                                cursor: pointer;
+                                transition: border-color .25s, transform .2s, box-shadow .25s;
+                                display: flex;
+                                flex-direction: column;
+                            }
+                            .tpl-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.14); border-color: #2563eb; }
+                            .tpl-card.is-selected { border-color: #16a34a; }
+
+                            /* ── Preview viewport ──────────────────────────── */
+                            .tpl-preview-wrap { position: relative; height: 230px; overflow: hidden; background: #f1f5f9; flex-shrink: 0; }
+                            .tpl-frame {
+                                position: absolute; top: 0; left: 50%;
+                                width: 900px; height: 1200px;
+                                border: none;
+                                transform: translateX(-50%) scale(0.255);
+                                transform-origin: top center;
+                                pointer-events: none;
+                            }
+
+                            /* ── Selected badge ────────────────────────────── */
+                            .tpl-selected-badge {
+                                position: absolute; top: 10px; right: 10px; z-index: 2;
+                                background: #16a34a; color: #fff; font-size: .72rem; font-weight: 700;
+                                padding: 3px 10px; border-radius: 20px; pointer-events: none;
+                            }
+
+                            /* ── Spinner ───────────────────────────────────── */
+                            .tpl-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; z-index: 1; transition: opacity .3s; }
+                            .tpl-loading.hidden { opacity: 0; pointer-events: none; }
+                            .tpl-spinner { width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: tpl-spin .7s linear infinite; }
+                            @@keyframes tpl-spin { to { transform: rotate(360deg); } }
+
+                            /* ── Palette strip ─────────────────────────────── */
+                            .tpl-palette-strip { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #fafafa; flex-wrap: wrap; }
+                            .tpl-palette-label { font-size: .72rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .5px; margin-right: 4px; white-space: nowrap; }
+                            .tpl-swatch {
+                                width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+                                border: 2.5px solid transparent; outline: 2px solid transparent; outline-offset: 2px;
+                                transition: transform .15s, outline-color .15s; flex-shrink: 0;
+                            }
+                            .tpl-swatch:hover { transform: scale(1.2); }
+                            .tpl-swatch.active { outline-color: #2563eb; border-color: #fff; transform: scale(1.15); }
+                            .tpl-swatch-name { font-size: .72rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+
+                            /* ── Card footer ───────────────────────────────── */
+                            .tpl-card-footer { padding: 14px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+                            .tpl-card-footer h5 { font-size: .97rem; font-weight: 700; margin: 0 0 4px; color: #1a202c; }
+                            .tpl-card-footer p { font-size: .82rem; color: #6b7280; margin: 0 0 14px; line-height: 1.4; flex: 1; }
+                        </style>
+
+                        <div class="row g-4">
                             @foreach (var template in Model)
                             {
-                                <div class="col-lg-6 col-md-6 mb-4">
-                                    <div class="card h-100 shadow-sm border-0">
-                                        <div class="card-body text-center d-flex flex-column">
-                                            @if (ViewBag.ActiveTemplateId != null && ViewBag.ActiveTemplateId == template.Id)
+                                var isSelected = ViewBag.ActiveTemplateId != null && (int)ViewBag.ActiveTemplateId == template.Id;
+                                var slug = System.IO.Path.GetFileNameWithoutExtension(template.TemplateFilePath ?? "").ToLower();
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="tpl-card @(isSelected ? "is-selected" : "")"
+                                         data-template-id="@template.Id"
+                                         data-resume-id="@ViewBag.ResumeId"
+                                         data-slug="@slug">
+
+                                        <!-- ── Live preview ── -->
+                                        <div class="tpl-preview-wrap">
+                                            @if (isSelected)
                                             {
-                                                <div class="position-absolute top-0 end-0 p-2">
-                                                    <span class="badge bg-success">Selected</span>
-                                                </div>
+                                                <span class="tpl-selected-badge">&#x2713; Selected</span>
                                             }
-                                            <i class="fa fa-file-alt fa-5x text-primary mb-3 mt-3"></i>
-                                            <h4 class="card-title">@template.Name</h4>
-                                            <p class="card-text text-muted mb-4">@template.Description</p>
-                                            
-                                            <div class="mt-auto">
-                                                <a asp-action="PreviewTemplate" asp-route-id="@template.Id" asp-route-resumeId="@ViewBag.ResumeId" class="site-button w-100 @(ViewBag.ActiveTemplateId == template.Id ? "outline" : "")">
-                                                    @(ViewBag.ActiveTemplateId == template.Id ? "Preview & Export" : "Select Template")
-                                                </a>
+                                            <div class="tpl-loading" id="loading-@template.Id">
+                                                <div class="tpl-spinner"></div>
                                             </div>
+                                            <iframe class="tpl-frame"
+                                                    id="frame-@template.Id"
+                                                    src="/CandidateDash/SkeletonPreview?id=@template.Id&resumeId=@ViewBag.ResumeId"
+                                                    scrolling="no"
+                                                    loading="lazy"
+                                                    tabindex="-1"
+                                                    aria-hidden="true"
+                                                    title="Preview of @template.Name"
+                                                    onload="document.getElementById('loading-@template.Id').classList.add('hidden')">
+                                            </iframe>
                                         </div>
+
+                                        <!-- ── Palette strip (rendered by JS after DOMContentLoaded) ── -->
+                                        <div class="tpl-palette-strip" id="palette-strip-@template.Id">
+                                            <span class="tpl-palette-label">Colors</span>
+                                            <span class="tpl-swatch-name" id="palette-name-@template.Id"></span>
+                                        </div>
+
+                                        <!-- ── Card footer ── -->
+                                        <div class="tpl-card-footer">
+                                            <h5>@template.Name</h5>
+                                            <p>@template.Description</p>
+                                            <button type="button"
+                                                    id="btn-template-@template.Id"
+                                                    class="site-button w-100 @(isSelected ? "outline" : "")"
+                                                    style="text-align:center;cursor:pointer;border:none;"
+                                                    onclick="selectTemplate(@template.Id, @ViewBag.ResumeId)">
+                                                @(isSelected ? "Preview & Export" : "Use This Template")
+                                            </button>
+                                        </div>
+
                                     </div>
                                 </div>
                             }
-                            
+
                             @if (!Model.Any())
                             {
                                 <div class="col-12 text-center p-4">
@@ -85,7 +170,100 @@
 
             </div>
         </div>
-    </div>   
+    </div>
 
 </div>
 <!-- CONTENT END -->
+
+@* Hidden CSRF token for AJAX *@
+<form id="csrf-form" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<script>
+    // ── All palette data comes from the controller, pre-serialized ────────────
+    var ALL_PALETTES = @Html.Raw(ViewBag.PalettesJson);
+
+    // ── Per-card state: templateId → selected palette index ──────────────────
+    var selectedPaletteIndex = {};
+
+    // ── Build swatch buttons for each card ───────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.tpl-card').forEach(function (card) {
+            var templateId = parseInt(card.dataset.templateId, 10);
+            var slug       = card.dataset.slug;
+            var palettes   = ALL_PALETTES[slug] || [];
+
+            if (!palettes.length) return;
+
+            selectedPaletteIndex[templateId] = 0;
+
+            var strip = document.getElementById('palette-strip-' + templateId);
+            var label = document.getElementById('palette-name-' + templateId);
+
+            if (label) label.textContent = palettes[0].name;
+
+            palettes.forEach(function (palette, i) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'tpl-swatch' + (i === 0 ? ' active' : '');
+                btn.style.background = palette.swatch;
+                btn.title = palette.name;
+                btn.setAttribute('aria-label', palette.name + ' palette');
+
+                btn.addEventListener('click', function () {
+                    applyPalette(btn, templateId, i, palettes);
+                });
+
+                // Insert before the name label
+                strip.insertBefore(btn, label);
+            });
+        });
+    });
+
+    // ── Apply a palette: update swatch highlight + postMessage to iframe ──────
+    function applyPalette(btn, templateId, paletteIndex, palettes) {
+        if (!palettes || paletteIndex >= palettes.length) return;
+
+        selectedPaletteIndex[templateId] = paletteIndex;
+        var palette = palettes[paletteIndex];
+
+        // Update active swatch
+        var strip = document.getElementById('palette-strip-' + templateId);
+        if (strip) {
+            strip.querySelectorAll('.tpl-swatch').forEach(function (s) { s.classList.remove('active'); });
+            btn.classList.add('active');
+        }
+
+        // Update name label
+        var label = document.getElementById('palette-name-' + templateId);
+        if (label) label.textContent = palette.name;
+
+        // Send colors to iframe
+        var frame = document.getElementById('frame-' + templateId);
+        if (frame && frame.contentWindow) {
+            frame.contentWindow.postMessage({ type: 'applyColors', colors: palette.colors }, '*');
+        }
+    }
+
+    // ── Select template: save colors via AJAX, then navigate ─────────────────
+    function selectTemplate(templateId, resumeId) {
+        var slug     = document.querySelector('[data-template-id="' + templateId + '"].tpl-card').dataset.slug;
+        var palettes = ALL_PALETTES[slug] || [];
+        var idx      = (selectedPaletteIndex[templateId] !== undefined) ? selectedPaletteIndex[templateId] : 0;
+        var colors   = palettes.length > 0 ? palettes[idx].colors : {};
+
+        var token = document.querySelector('input[name="__RequestVerificationToken"]');
+        var tokenValue = token ? token.value : '';
+
+        var navUrl = '/CandidateDash/PreviewTemplate?id=' + templateId + '&resumeId=' + resumeId;
+
+        fetch('/CandidateDash/SaveColorSettings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': tokenValue },
+            body: JSON.stringify({ resumeId: resumeId, templateId: templateId, colors: colors })
+        })
+        .then(function () { window.location.href = navUrl; })
+        .catch(function () { window.location.href = navUrl; });
+    }
+</script>

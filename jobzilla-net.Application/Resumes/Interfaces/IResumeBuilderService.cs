@@ -22,5 +22,11 @@ public interface IResumeBuilderService
     Task<List<jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto>> GetActiveTemplatesAsync(CancellationToken cancellationToken = default);
     Task<jobzilla_net.Application.Resumes.Dtos.ResumeTemplateDto?> GetTemplateByIdAsync(int templateId, CancellationToken cancellationToken = default);
     Task<bool> SetTemplateForResumeAsync(string userId, int resumeId, int templateId, CancellationToken cancellationToken = default);
+
+    // ── Color customization ───────────────────────────────────────────────────
+    /// <summary>Persists a palette color selection into <c>CandidateResume.SettingsJson</c>.</summary>
+    Task<bool> SaveColorSettingsAsync(string userId, int resumeId, int templateId, Dictionary<string, string> colors, CancellationToken cancellationToken = default);
+    /// <summary>Returns the saved color dictionary for a resume, or null when none has been saved.</summary>
+    Task<Dictionary<string, string>?> GetColorSettingsAsync(string userId, int resumeId, CancellationToken cancellationToken = default);
 }
 

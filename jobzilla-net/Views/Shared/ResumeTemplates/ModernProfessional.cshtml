@@ -2,9 +2,9 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
 @{
     Layout = null;
-    var sections = Model.GetUnifiedSections();
-    var skillsSections = sections.Where(s => s.IsVisible && s.SectionType.ToString() == "Skills").ToList();
-    var mainSections = sections.Where(s => s.IsVisible && s.SectionType.ToString() != "Skills").ToList();
+    var sections = Model.GetUnifiedSections().ToList();
+    var sidebarSections = sections.Where(s => s.IsVisible && (s.ColumnPlacement == "Sidebar" || (string.IsNullOrEmpty(s.ColumnPlacement) && s.SectionType.ToString() == "Skills"))).ToList();
+    var mainSections = sections.Where(s => s.IsVisible && !sidebarSections.Contains(s)).ToList();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -143,6 +143,24 @@
                 color: #444;
             }
 
+            /* Sidebar Overrides for general sections */
+            .sidebar .resume-item-title {
+                color: #fff;
+            }
+            .sidebar .resume-item-date,
+            .sidebar .resume-item-subtitle,
+            .sidebar .resume-item-desc,
+            .sidebar .resume-item-field,
+            .sidebar .resume-field-label {
+                color: #d0dbe5;
+            }
+            .sidebar .resume-item-header {
+                display: block; /* Stack title and date in sidebar */
+            }
+            .sidebar .resume-item-date {
+                text-align: left;
+            }
+
             .resume-skills-list {
                 display: flex;
                 flex-wrap: wrap;
@@ -236,32 +254,24 @@
             <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
             <div class="title">@(Model.Profile?.ProfessionalTitle ?? "Professional Title")</div>
 
-            <div class="resume-section-title" style="margin-top: 30px;">Contact</div>
-            @if (!string.IsNullOrWhiteSpace(Model.Profile?.Email))
-            {
-                <div class="contact-item">@Model.Profile.Email</div>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.Profile?.PhoneNumber))
-            {
-                <div class="contact-item">@Model.Profile.PhoneNumber</div>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.Profile?.Location))
-            {
-                <div class="contact-item">@Model.Profile.Location</div>
-            }
-
-            @if (Model.SocialLinks != null && Model.SocialLinks.Any())
-            {
-                <div class="resume-section-title" style="margin-top: 30px;">Social Links</div>
-                @foreach (var link in Model.SocialLinks)
+            <div class="contact-info">
+                @if (!string.IsNullOrWhiteSpace(Model.Profile?.Email))
                 {
-                    <div class="contact-item"><strong>@link.PlatformName</strong><br />@link.Url</div>
+                    <div class="contact-item">@Model.Profile.Email</div>
                 }
-            }
-            @* Skills rendered in the sidebar *@
-            @foreach (var sec in skillsSections)
+                @if (!string.IsNullOrWhiteSpace(Model.Profile?.PhoneNumber))
+                {
+                    <div class="contact-item">@Model.Profile.PhoneNumber</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Profile?.Location))
+                {
+                    <div class="contact-item">@Model.Profile.Location</div>
+                }
+            </div>
+
+            @foreach (var sec in sidebarSections)
             {
-                <div class="resume-section-title" style="margin-top: 30px;">@sec.Title</div>
+                <div class="resume-section-title">@sec.Title</div>
                 @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
             }
         </div>

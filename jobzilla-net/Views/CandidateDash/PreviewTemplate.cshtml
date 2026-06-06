@@ -6,7 +6,7 @@
 
 <!-- CONTENT START -->
 <div class="page-content">
-    <div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
+  @*   <div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
         <div class="overlay-main site-bg-white opacity-01"></div>
         <div class="container">
             <div class="wt-bnr-inr-entry">
@@ -24,7 +24,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> *@
 
     <div class="section-full p-t120 p-b90 site-bg-white">
         <div class="container-fluid" style="max-width: 1600px;">
@@ -58,14 +58,57 @@
                         <!-- SECTION SORTING -->
                         <div class="mb-4">
                             <h5 style="font-size: 1rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
-                                Reorder Sections
+                                Layout & Ordering
                             </h5>
-                            <p class="text-muted small mb-3">Drag to reorder sections.</p>
+                            <p class="text-muted small mb-3">Drag to reorder or move sections between columns.</p>
                             
-                            <div id="sections-list" class="list-group">
-                                @if (Model.Document != null && Model.Document.Sections.Any())
-                                {
-                                    foreach (var sec in Model.Document.Sections.OrderBy(s => s.DisplayOrder))
+                            @{
+                                bool isMultiColumn = ViewBag.TemplateSlug == "modernprofessional";
+                                var allSections = Model.Document?.Sections ?? new List<jobzilla_net.Application.Resumes.Dtos.ResumeSection>();
+                                var sidebarSections = allSections.Where(s => s.ColumnPlacement == "Sidebar" || (string.IsNullOrEmpty(s.ColumnPlacement) && s.SectionType.ToString() == "Skills")).OrderBy(s => s.DisplayOrder).ToList();
+                                var mainSections = allSections.Where(s => !sidebarSections.Contains(s)).OrderBy(s => s.DisplayOrder).ToList();
+                            }
+
+                            @if (isMultiColumn)
+                            {
+                                <div class="mb-3">
+                                    <h6 class="small fw-bold text-muted text-uppercase mb-2">Main Column</h6>
+                                    <div id="main-sections-list" class="list-group sortable-group" style="min-height: 50px; background: rgba(0,0,0,0.02); border-radius: 6px; padding: 4px;">
+                                        @foreach (var sec in mainSections)
+                                        {
+                                            <div class="list-group-item d-flex justify-content-between align-items-center" 
+                                                 data-id="@sec.Id" data-column="Main"
+                                                 style="cursor: grab; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e2e8f0;">
+                                                <div>
+                                                    <i class="fa fa-grip-vertical me-3 text-muted"></i>
+                                                    <span style="font-weight: 600;">@sec.Title</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h6 class="small fw-bold text-muted text-uppercase mb-2">Sidebar Column</h6>
+                                    <div id="sidebar-sections-list" class="list-group sortable-group" style="min-height: 50px; background: rgba(0,0,0,0.02); border-radius: 6px; padding: 4px;">
+                                        @foreach (var sec in sidebarSections)
+                                        {
+                                            <div class="list-group-item d-flex justify-content-between align-items-center" 
+                                                 data-id="@sec.Id" data-column="Sidebar"
+                                                 style="cursor: grab; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e2e8f0;">
+                                                <div>
+                                                    <i class="fa fa-grip-vertical me-3 text-muted"></i>
+                                                    <span style="font-weight: 600;">@sec.Title</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div id="sections-list" class="list-group sortable-group">
+                                    @foreach (var sec in allSections.OrderBy(s => s.DisplayOrder))
                                     {
                                         <div class="list-group-item d-flex justify-content-between align-items-center" 
                                              data-id="@sec.Id" 
@@ -76,8 +119,8 @@
                                             </div>
                                         </div>
                                     }
-                                }
-                            </div>
+                                </div>
+                            }
                         </div>
 
                     </div>
@@ -179,20 +222,48 @@
 
     // ── Section Sorting Logic ──
     function initSortable() {
-        const list = document.getElementById('sections-list');
-        if (!list || !currentDocument) return;
+        if (!currentDocument) return;
 
-        Sortable.create(list, {
+        const sortableOptions = {
+            group: 'shared',
             animation: 150,
             ghostClass: 'bg-light',
             onEnd: async function () {
-                // Reorder currentDocument.Sections based on DOM order
-                const newOrderIds = Array.from(list.children).map(el => el.dataset.id);
+                // Determine layout
+                const isMultiColumn = document.getElementById('main-sections-list') !== null;
                 
-                newOrderIds.forEach((id, index) => {
-                    const sec = currentDocument.Sections.find(s => s.Id == id);
-                    if (sec) sec.DisplayOrder = index;
-                });
+                if (isMultiColumn) {
+                    const mainList = document.getElementById('main-sections-list');
+                    const sidebarList = document.getElementById('sidebar-sections-list');
+                    
+                    // Process Main
+                    Array.from(mainList.children).forEach((el, index) => {
+                        const sec = currentDocument.Sections.find(s => s.Id == el.dataset.id);
+                        if (sec) {
+                            sec.DisplayOrder = index;
+                            sec.ColumnPlacement = "Main";
+                        }
+                    });
+                    
+                    // Process Sidebar
+                    Array.from(sidebarList.children).forEach((el, index) => {
+                        const sec = currentDocument.Sections.find(s => s.Id == el.dataset.id);
+                        if (sec) {
+                            sec.DisplayOrder = index;
+                            sec.ColumnPlacement = "Sidebar";
+                        }
+                    });
+                } else {
+                    const list = document.getElementById('sections-list');
+                    if (list) {
+                        Array.from(list.children).forEach((el, index) => {
+                            const sec = currentDocument.Sections.find(s => s.Id == el.dataset.id);
+                            if (sec) {
+                                sec.DisplayOrder = index;
+                            }
+                        });
+                    }
+                }
                 
                 // Save to DB via Builder API
                 await saveDocument(currentDocument);
@@ -201,7 +272,10 @@
                 const iframe = document.getElementById('resume-preview-frame');
                 if (iframe) iframe.contentWindow.location.reload();
             }
-        });
+        };
+
+        const lists = document.querySelectorAll('.sortable-group');
+        lists.forEach(list => Sortable.create(list, sortableOptions));
     }
 
     async function saveDocument(doc) {

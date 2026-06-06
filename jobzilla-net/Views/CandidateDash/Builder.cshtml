@@ -678,6 +678,10 @@
                           data-section-id="${sec.id}">${escHtml(sec.title)}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
+                    <select class="form-select form-select-sm cvb-column-placement" style="width:auto;font-size:0.8rem;padding:0.25rem 1.5rem 0.25rem 0.5rem" title="Column Placement">
+                        <option value="Main" ${sec.columnPlacement !== 'Sidebar' ? 'selected' : ''}>Main Column</option>
+                        <option value="Sidebar" ${sec.columnPlacement === 'Sidebar' ? 'selected' : ''}>Sidebar</option>
+                    </select>
                     <button class="cvb-action-btn cvb-visibility-toggle" title="Toggle visibility"
                             data-section-id="${sec.id}">
                         <i class="fa ${sec.isVisible ? 'fa-eye' : 'fa-eye-slash'}"></i>
@@ -724,6 +728,17 @@
                 scheduleAutosave();
             }
         });
+        // Wire column placement
+        const columnSelect = card.querySelector('.cvb-column-placement');
+        if (columnSelect) {
+            columnSelect.addEventListener('change', function () {
+                const s = _document.sections.find(s => s.id === sec.id);
+                if (s) {
+                    s.columnPlacement = this.value;
+                    scheduleAutosave();
+                }
+            });
+        }
         // Wire delete
         card.querySelector('.cvb-delete-section').addEventListener('click', () => {
             if (confirm(`Delete "${sec.title}"? This will remove all items in this section.`)) {

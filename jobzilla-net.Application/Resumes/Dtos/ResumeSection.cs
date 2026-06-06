@@ -16,6 +16,7 @@ public class ResumeSection
 
     public int DisplayOrder { get; set; }
     public bool IsVisible { get; set; } = true;
+    public string? ColumnPlacement { get; set; }
 
     public List<ResumeSectionItem> Items { get; set; } = new();
 }

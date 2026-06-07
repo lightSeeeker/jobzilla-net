@@ -6,27 +6,7 @@
 
 <!-- CONTENT START -->
 <div class="page-content">
-  @*   <div class="wt-bnr-inr overlay-wraper bg-center" style="background-image:url(/images/banner/1.jpg);">
-        <div class="overlay-main site-bg-white opacity-01"></div>
-        <div class="container">
-            <div class="wt-bnr-inr-entry">
-                <div class="banner-title-outer">
-                    <div class="banner-title-name">
-                        <h2 class="wt-title">Customize Template</h2>
-                    </div>
-                </div>
-                <div>
-                    <ul class="wt-breadcrumb breadcrumb-style-2">
-                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li><a asp-action="Templates" asp-route-resumeId="@Model.ResumeId">Templates</a></li>
-                        <li>Customize</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div> *@
-
-    <div class="section-full p-t120 p-b90 site-bg-white">
+     <div class="section-full p-t120 p-b90 site-bg-white">
         <div class="container-fluid" style="max-width: 1600px;">
             <div class="row g-4">
                 
@@ -52,6 +32,44 @@
                             </h5>
                             <div id="palette-container" class="d-flex flex-wrap gap-2">
                                 <!-- Rendered by JS -->
+                            </div>
+                        </div>
+
+                        <!-- SPACING & TYPOGRAPHY -->
+                        <div class="mb-5">
+                            <h5 style="font-size: 1rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+                                Typography & Spacing
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-1">Font Style</label>
+                                <select id="cvb-font-select" class="form-select form-select-sm" style="border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-color: #e2e8f0;">
+                                    <optgroup label="Modern Sans">
+                                        <option value="'Inter', sans-serif">Inter</option>
+                                        <option value="'Roboto', sans-serif">Roboto</option>
+                                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                                        <option value="'Lato', sans-serif">Lato</option>
+                                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                                    </optgroup>
+                                    <optgroup label="Classic Serif">
+                                        <option value="'Merriweather', serif">Merriweather</option>
+                                        <option value="'Lora', serif">Lora</option>
+                                        <option value="'Playfair Display', serif">Playfair Display</option>
+                                    </optgroup>
+                                    <optgroup label="Technical Monospace">
+                                        <option value="'Roboto Mono', monospace">Roboto Mono</option>
+                                        <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-1">Spacing (Page Fitter)</label>
+                                <select id="cvb-spacing-select" class="form-select form-select-sm" style="border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-color: #e2e8f0;">
+                                    <option value="normal">Normal (Default)</option>
+                                    <option value="compact">Compact (Fit more content)</option>
+                                    <option value="spacious">Spacious (Breathe more)</option>
+                                </select>
                             </div>
                         </div>
 
@@ -154,10 +172,63 @@
     const resumeId = @Model.ResumeId;
     const currentDocument = @Html.Raw(Model.Document != null ? System.Text.Json.JsonSerializer.Serialize(Model.Document) : "null");
 
+    const activeColorSettings = @Html.Raw(Model.ColorSettings != null ? System.Text.Json.JsonSerializer.Serialize(Model.ColorSettings) : "{}");
+    let currentDesignSettings = { ...activeColorSettings };
+
     document.addEventListener('DOMContentLoaded', () => {
         initPalettes();
+        initDesignControls();
         initSortable();
     });
+
+    // ── Typography & Spacing Logic ──
+    function initDesignControls() {
+        const fontSelect = document.getElementById('cvb-font-select');
+        const spacingSelect = document.getElementById('cvb-spacing-select');
+        
+        if (currentDesignSettings['--cvb-base-font']) {
+            fontSelect.value = currentDesignSettings['--cvb-base-font'];
+        }
+        
+        const currentLineHeight = currentDesignSettings['--cvb-line-height'];
+        if (currentLineHeight === '1.3') spacingSelect.value = 'compact';
+        else if (currentLineHeight === '1.8') spacingSelect.value = 'spacious';
+        else spacingSelect.value = 'normal';
+
+        fontSelect.addEventListener('change', (e) => {
+            currentDesignSettings['--cvb-base-font'] = e.target.value;
+            applyAndSaveDesign();
+        });
+
+        spacingSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (val === 'compact') {
+                currentDesignSettings['--cvb-line-height'] = '1.3';
+                currentDesignSettings['--cvb-section-margin'] = '15px';
+                currentDesignSettings['--cvb-item-margin'] = '10px';
+            } else if (val === 'spacious') {
+                currentDesignSettings['--cvb-line-height'] = '1.8';
+                currentDesignSettings['--cvb-section-margin'] = '40px';
+                currentDesignSettings['--cvb-item-margin'] = '20px';
+            } else {
+                currentDesignSettings['--cvb-line-height'] = '1.6';
+                currentDesignSettings['--cvb-section-margin'] = '30px';
+                currentDesignSettings['--cvb-item-margin'] = '15px';
+            }
+            applyAndSaveDesign();
+        });
+    }
+
+    function applyAndSaveDesign() {
+        const iframe = document.getElementById('resume-preview-frame');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+                type: 'applyColors',
+                colors: currentDesignSettings
+            }, '*');
+        }
+        saveColors(currentDesignSettings);
+    }
 
     // ── Color Palette Logic ──
     function initPalettes() {
@@ -183,17 +254,8 @@
             btn.onmouseout = () => btn.style.transform = 'scale(1)';
 
             btn.onclick = () => {
-                // Instantly update the iframe CSS variables
-                const iframe = document.getElementById('resume-preview-frame');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({
-                        type: 'applyColors',
-                        colors: palette.colors
-                    }, '*');
-                }
-                
-                // Save to DB
-                saveColors(palette.colors);
+                currentDesignSettings = { ...currentDesignSettings, ...palette.colors };
+                applyAndSaveDesign();
             };
 
             container.appendChild(btn);

@@ -16,9 +16,10 @@
             --ec-accent:  #444444;
         }
         .resume-container {
-            font-family: 'Times New Roman', Times, serif;
-            color: #111;
-            line-height: 1.5;
+            font-family: var(--cvb-base-font);
+            color: #222;
+            line-height: var(--cvb-line-height);
+            background-color: #fff;
             flex-direction: column;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
@@ -38,18 +39,17 @@
         }
         
         .resume-section-title {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.4em;
-            text-transform: uppercase;
-            color: var(--ec-primary);
-            border-bottom: 1px solid #999;
-            padding-bottom: 5px;
-            margin-bottom: 20px;
-            margin-top: 30px;
+            font-size: 14pt;
             font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--ec-primary);
+            color: var(--ec-primary);
+            margin-bottom: var(--cvb-item-margin);
+            margin-top: var(--cvb-section-margin);
+            padding-bottom: 2px;
         }
         
-        .resume-item { margin-bottom: 20px; }
+        .resume-item { margin-bottom: var(--cvb-item-margin); }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
         .resume-item-title { font-weight: bold; color: var(--ec-primary); font-size: 1.1em; }
         .resume-item-date { font-size: 0.9em; color: var(--ec-primary); text-align: right; }
@@ -73,16 +73,7 @@
     @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
-    @if (!Model.IsExport)
-    {
-        <div class="action-bar d-print-none">
-            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
-            @if (Model.TemplateId.HasValue)
-            {
-                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
-            }
-        </div>
-    }
+
 
     <div class="resume-container">
         <div class="header">

@@ -19,9 +19,9 @@
             --td-section: #c586c0;
         }
         .resume-container {
-            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-family: var(--cvb-base-font);
             color: #ccc;
-            line-height: 1.6;
+            line-height: var(--cvb-line-height);
             background-color: var(--td-bg);
             padding: 40px;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-radius: 4px; max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
@@ -40,14 +40,14 @@
         .resume-section-title {
             font-size: 1.2em;
             color: var(--td-section);
-            margin-bottom: 15px;
-            margin-top: 30px;
+            margin-bottom: var(--cvb-item-margin);
+            margin-top: var(--cvb-section-margin);
             font-weight: bold;
         }
         .resume-section-title::before { content: "class "; color: var(--td-keyword); }
         .resume-section-title::after { content: " {"; color: #d4d4d4; }
         
-        .resume-item { margin-bottom: 20px; padding-left: 20px; border-left: 1px dashed #444; }
+        .resume-item { margin-bottom: var(--cvb-item-margin); padding-left: 20px; border-left: 1px dashed #444; }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
         .resume-item-title { font-weight: bold; color: var(--td-fn); font-size: 1.05em; }
         .resume-item-date { font-size: 0.85em; color: #608b4e; }
@@ -73,16 +73,7 @@
     @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
-    @if (!Model.IsExport)
-    {
-        <div class="action-bar d-print-none">
-            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
-            @if (Model.TemplateId.HasValue)
-            {
-                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
-            }
-        </div>
-    }
+
 
     <div class="resume-container">
         <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start;">

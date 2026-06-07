@@ -19,9 +19,9 @@
             }
 
             .resume-container {
-                font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: var(--cvb-base-font);
                 color: #333;
-                line-height: 1.6;
+                line-height: var(--cvb-line-height);
                 box-sizing: border-box;
                 @if (Model.IsExport)
                 {
@@ -94,8 +94,8 @@
                 color: var(--mp-sidebar-bg);
                 border-bottom: 2px solid var(--mp-accent);
                 padding-bottom: 5px;
-                margin-bottom: 20px;
-                margin-top: 30px;
+                margin-bottom: var(--cvb-item-margin);
+                margin-top: var(--cvb-section-margin);
                 font-weight: 700;
             }
 
@@ -103,11 +103,11 @@
                 color: #fff;
                 border-bottom: 2px solid var(--mp-accent);
                 margin-top: 0;
-                margin-bottom: 15px;
+                margin-bottom: var(--cvb-item-margin);
             }
 
             .resume-item {
-                margin-bottom: 20px;
+                margin-bottom: var(--cvb-item-margin);
             }
 
             .resume-item-header {
@@ -229,16 +229,7 @@
     @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
-    @if (!Model.IsExport)
-    {
-        <div class="action-bar d-print-none">
-            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
-            @if (Model.TemplateId.HasValue)
-            {
-                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
-            }
-        </div>
-    }
+
     <div class="resume-container">
         <!-- SIDEBAR -->
         <div class="sidebar">

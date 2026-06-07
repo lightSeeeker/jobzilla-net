@@ -14,9 +14,9 @@
             --ats-primary: #000000;
         }
         .resume-container {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: var(--cvb-base-font);
             color: #111;
-            line-height: 1.5;
+            line-height: var(--cvb-line-height);
             background-color: #fff;
             padding: 40px;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
@@ -37,11 +37,11 @@
             border-bottom: 1px solid var(--ats-primary);
             color: var(--ats-primary);
             padding-bottom: 3px;
-            margin-bottom: 15px;
-            margin-top: 20px;
+            margin-bottom: var(--cvb-item-margin);
+            margin-top: var(--cvb-section-margin);
         }
         
-        .resume-item { margin-bottom: 15px; }
+        .resume-item { margin-bottom: var(--cvb-item-margin); }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; }
         .resume-item-title { font-weight: bold; font-size: 15px; }
         .resume-item-date { font-size: 14px; text-align: right; }
@@ -67,16 +67,7 @@
     @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
-    @if (!Model.IsExport)
-    {
-        <div class="action-bar d-print-none">
-            @* <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a> *@
-            @if (Model.TemplateId.HasValue)
-            {
-                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
-            }
-        </div>
-    }
+
 
     <div class="resume-container">
         <div class="header">

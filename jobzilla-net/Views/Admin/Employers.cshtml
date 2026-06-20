@@ -1,0 +1,165 @@
+@model AdminEmployersViewModel
+@{
+    ViewData["Title"] = "Employers Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Employers Management</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Employers</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Search & Filter -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20 m-b30">
+        <form asp-action="Employers" method="get" class="row align-items-end g-3">
+            <div class="col-xl-12 col-lg-12">
+                <div class="form-group">
+                    <label>Search</label>
+                    <div class="ls-inputicon-box">
+                        <input type="text" name="keyword" class="form-control" placeholder="Company name..." value="@Model.Keyword" />
+                        <i class="fs-input-icon fa fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+                <button type="submit" class="site-button">Search</button>
+                <a asp-action="Employers" class="site-button btn-secondary" style="margin-left: 10px;">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Employers Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-building"></i> Employers List</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Company Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Registered</th>
+                        <th>Jobs Posted</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employer in Model.Employers.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="twm-bookmark-list">
+                                    <div class="twm-mid-content">
+                                        <a asp-controller="Admin" asp-action="EmployerDetail" asp-route-id="@employer.Id" class="twm-job-title">
+                                            <h4>@employer.CompanyName</h4>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@employer.Email</td>
+                            <td>@employer.Phone</td>
+                            <td>@employer.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                            <td><a href="#" class="site-text-primary">@employer.JobsPostedCount</a></td>
+                            <td>
+                                <span class="@(employer.IsActive ? "text-clr-green2" : "text-clr-red")">
+                                    @(employer.IsActive ? "Active" : "Inactive")
+                                </span>
+                                @if (employer.IsVerified)
+                                {
+                                    <span class="badge bg-success ms-2">Verified</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="twm-table-controls">
+                                    <ul class="twm-DT-controls-icon list-unstyled d-flex align-items-center">
+                                        <li>
+                                            <a asp-controller="Admin" asp-action="EmployerDetail" asp-route-id="@employer.Id" title="View Details">
+                                                <span class="fa fa-eye"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="SetUserStatus" method="post" style="display:inline;">
+                                                <input type="hidden" name="userId" value="@employer.Id" />
+                                                <input type="hidden" name="isActive" value="@(!employer.IsActive)" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="@(employer.IsActive ? "Deactivate" : "Activate")">
+                                                    <span class="fa @(employer.IsActive ? "fa-lock" : "fa-unlock")"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="DeleteEmployer" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                                <input type="hidden" name="id" value="@employer.Id" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="Delete">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Employers.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Employers.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="Employers" asp-route-page="@(Model.Employers.Page - 1)" asp-route-keyword="@Model.Keyword">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Employers.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Employers.Page ? "active" : "")">
+                                <a asp-action="Employers" asp-route-page="@i" asp-route-keyword="@Model.Keyword">@i</a>
+                            </li>
+                        }
+                        @if (Model.Employers.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="Employers" asp-route-page="@(Model.Employers.Page + 1)" asp-route-keyword="@Model.Keyword">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>

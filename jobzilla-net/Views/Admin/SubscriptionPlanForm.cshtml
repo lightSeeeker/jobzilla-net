@@ -1,0 +1,142 @@
+@model jobzilla_net.Models.AdminDash.AdminSubscriptionPlanFormViewModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? "Edit Subscription Plan" : "Add Subscription Plan";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>@ViewData["Title"]</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="SubscriptionPlans">Subscription Plans</a>
+        <span>@ViewData["Title"]</span>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Form Section -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20">
+        <form asp-action="SubscriptionPlanForm" method="post">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Plan Name -->
+                    <div class="form-group mb-3">
+                        <label>Plan Name *</label>
+                        <input asp-for="Plan.Name" class="form-control" placeholder="e.g., Starter Plan" required />
+                        <span asp-validation-for="Plan.Name" class="text-danger"></span>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label>Price ($) *</label>
+                                <input asp-for="Plan.Price" type="number" class="form-control" placeholder="29.99" step="0.01" required />
+                                <span asp-validation-for="Plan.Price" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label>Duration (Days) *</label>
+                                <input asp-for="Plan.DurationDays" type="number" class="form-control" placeholder="30" required />
+                                <span asp-validation-for="Plan.DurationDays" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Post Limit -->
+                    <div class="form-group mb-3">
+                        <label>Job Post Limit *</label>
+                        <input asp-for="Plan.JobPostLimit" type="number" class="form-control" placeholder="10" required />
+                        <small class="text-muted">Maximum number of job posts allowed under this plan</small>
+                        <span asp-validation-for="Plan.JobPostLimit" class="text-danger"></span>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="form-group mb-3">
+                        <h5 class="mb-3">Features</h5>
+                        <div class="form-check">
+                            <input asp-for="Plan.CanFeatureJobs" type="checkbox" class="form-check-input" id="canFeatureJobs" />
+                            <label class="form-check-label" for="canFeatureJobs">
+                                Allow Featured Jobs
+                            </label>
+                            <small class="d-block text-muted mt-2">Employers can feature their job postings to get more visibility</small>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Fields -->
+                    @if (Model.IsEditMode)
+                    {
+                        <input type="hidden" asp-for="PlanId" />
+                        <input type="hidden" asp-for="IsEditMode" />
+                    }
+                </div>
+
+                <!-- Right Column - Preview -->
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading wt-panel-heading p-a20">
+                            <h5 class="m-a0">Plan Preview</h5>
+                        </div>
+                        <div class="panel-body wt-panel-body p-a20">
+                            <div class="plan-preview">
+                                <h4 class="mb-2">@(string.IsNullOrEmpty(Model.Plan.Name) ? "Plan Name" : Model.Plan.Name)</h4>
+                                <div class="mb-3">
+                                    <span class="h3">
+                                        @if (Model.Plan.Price > 0)
+                                        {
+                                            <span>$@Model.Plan.Price.ToString("0.00")</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Free</span>
+                                        }
+                                    </span>
+                                    @if (Model.Plan.DurationDays > 0)
+                                    {
+                                        <span class="text-muted"> / @Model.Plan.DurationDays days</span>
+                                    }
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fa fa-check text-success"></i>
+                                        <span>@(Model.Plan.JobPostLimit > 0 ? Model.Plan.JobPostLimit : "Unlimited") Job Posts</span>
+                                    </li>
+                                    @if (Model.Plan.CanFeatureJobs)
+                                    {
+                                        <li class="mb-2">
+                                            <i class="fa fa-check text-success"></i>
+                                            <span>Featured Jobs Allowed</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-4">
+                <button type="submit" class="site-button">
+                    <i class="fa fa-save"></i> @(Model.IsEditMode ? "Update Plan" : "Create Plan")
+                </button>
+                <a asp-action="SubscriptionPlans" class="site-button btn-secondary ms-2">
+                    <i class="fa fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

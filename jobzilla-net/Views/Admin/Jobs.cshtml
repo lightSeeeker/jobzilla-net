@@ -1,0 +1,166 @@
+﻿@model AdminJobsViewModel
+@{
+    ViewData["Title"] = "Jobs Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Jobs Management</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Jobs</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Search & Filter -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20 m-b30">
+        <form asp-action="Jobs" method="get" class="row align-items-end g-3">
+            <div class="col-xl-6 col-lg-12">
+                <div class="form-group">
+                    <label>Search</label>
+                    <div class="ls-inputicon-box">
+                        <input type="text" name="keyword" class="form-control" placeholder="Job title..." value="@Model.Keyword" />
+                        <i class="fs-input-icon fa fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="ls-inputicon-box">
+                        <select name="status" class="wt-select-box selectpicker" data-live-search="true">
+                            <option value="">All Status</option>
+                            <option value="Published" selected="@(Model.Status == "Published")">Published</option>
+                            <option value="PendingApproval" selected="@(Model.Status == "PendingApproval")">Pending</option>
+                            <option value="Closed" selected="@(Model.Status == "Closed")">Closed</option>
+                        </select>
+                        <i class="fs-input-icon fa fa-filter"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-12">
+                <button type="submit" class="site-button">Filter</button>
+                <a asp-action="Jobs" class="site-button btn-secondary" style="margin-left: 10px;">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Jobs Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-suitcase"></i> Jobs List</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Employer</th>
+                        <th>Category</th>
+                        <th>Posted</th>
+                        <th>Applications</th>
+                        <th>Status</th>
+                        <th>Featured</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var job in Model.Jobs.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="twm-bookmark-list">
+                                    <div class="twm-mid-content">
+                                        <h4>@job.Title</h4>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@job.CompanyName</td>
+                            <td><span class="badge bg-info">@job.CategoryName</span></td>
+                            <td>@job.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                            <td><span class="badge bg-warning">@job.ApplicationsCount</span></td>
+                            <td>
+                                <span class="@(job.Status == "Published" ? "text-clr-green2" : "text-clr-red")">
+                                    @job.Status
+                                </span>
+                            </td>
+                            <td>
+                                <span class="@(job.IsFeatured ? "text-danger" : "text-muted")">
+                                    <i class="fa @(job.IsFeatured ? "fa-star" : "fa-star-o")"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="twm-table-controls">
+                                    <ul class="twm-DT-controls-icon list-unstyled d-flex align-items-center">
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="ToggleJobFeatured" method="post" style="display:inline;">
+                                                <input type="hidden" name="jobId" value="@job.Id" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="@(job.IsFeatured ? "Remove Featured" : "Mark Featured")">
+                                                    <span class="fa fa-star"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="DeleteJob" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                                <input type="hidden" name="jobId" value="@job.Id" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="Delete">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Jobs.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Jobs.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="Jobs" asp-route-page="@(Model.Jobs.Page - 1)" asp-route-keyword="@Model.Keyword" asp-route-status="@Model.Status">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Jobs.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Jobs.Page ? "active" : "")">
+                                <a asp-action="Jobs" asp-route-page="@i" asp-route-keyword="@Model.Keyword" asp-route-status="@Model.Status">@i</a>
+                            </li>
+                        }
+                        @if (Model.Jobs.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="Jobs" asp-route-page="@(Model.Jobs.Page + 1)" asp-route-keyword="@Model.Keyword" asp-route-status="@Model.Status">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

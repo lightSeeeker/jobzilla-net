@@ -16,5 +16,6 @@ public enum ResumeSectionType
     Volunteer,
     Publications,
     SocialLinks,
+    References,
     Unknown
 }

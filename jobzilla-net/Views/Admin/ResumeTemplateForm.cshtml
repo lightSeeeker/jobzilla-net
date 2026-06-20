@@ -1,0 +1,213 @@
+@model jobzilla_net.Models.AdminDash.AdminResumeTemplateFormViewModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? "Edit Resume Template" : "Add Resume Template";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>@ViewData["Title"]</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="ResumeTemplates">Resume Templates</a>
+        <span>@ViewData["Title"]</span>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Form Section -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20">
+        <form asp-action="ResumeTemplateForm" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-xl-8 col-lg-12">
+                    <!-- Template Name -->
+                    <div class="form-group mb-3">
+                        <label>Template Name *</label>
+                        <input asp-for="Template.Name" class="form-control" placeholder="e.g., Modern Resume" required />
+                        <span asp-validation-for="Template.Name" class="text-danger"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mb-3">
+                        <label>Description</label>
+                        <textarea asp-for="Template.Description" class="form-control" rows="4" placeholder="Describe this template..."></textarea>
+                        <span asp-validation-for="Template.Description" class="text-danger"></span>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-group mb-3">
+                        <label>Category</label>
+                        <select asp-for="Template.Category" class="form-control">
+                            <option value="">-- Select Category --</option>
+                            <option value="Professional">Professional</option>
+                            <option value="Modern">Modern</option>
+                            <option value="Creative">Creative</option>
+                            <option value="ATS Friendly">ATS Friendly</option>
+                            <option value="Executive">Executive</option>
+                            <option value="Technical">Technical</option>
+                        </select>
+                        <span asp-validation-for="Template.Category" class="text-danger"></span>
+                    </div>
+
+                    <!-- Template Type -->
+                    <div class="form-group mb-3">
+                        <label>Template Type</label>
+                        <input asp-for="Template.TemplateType" class="form-control" placeholder="e.g., Single Column" />
+                        <span asp-validation-for="Template.TemplateType" class="text-danger"></span>
+                    </div>
+
+                    <!-- Template File Upload -->
+                    <div class="form-group mb-3">
+                        <label>Template File *</label>
+                        <input type="file" name="templateFile" class="form-control" accept=".pdf,.docx,.html" />
+                        <small class="text-muted">Accepted formats: PDF, DOCX, HTML</small>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Pricing Section -->
+                    <h5 class="mb-3">Pricing Information</h5>
+
+                    <!-- Is Premium -->
+                    <div class="form-group mb-3">
+                        <div class="form-check">
+                            <input asp-for="Template.IsPremium" type="checkbox" class="form-check-input" id="isPremium" onchange="togglePricingSection()" />
+                            <label class="form-check-label" for="isPremium">
+                                This is a Premium Template
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price (shows only if premium) -->
+                    <div id="pricingSection" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>Price ($) *</label>
+                                    <input asp-for="Template.Price" type="number" class="form-control" placeholder="19.99" step="0.01" />
+                                    <span asp-validation-for="Template.Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>Discount Price ($)</label>
+                                    <input asp-for="Template.DiscountPrice" type="number" class="form-control" placeholder="14.99" step="0.01" />
+                                    <span asp-validation-for="Template.DiscountPrice" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Status -->
+                    <div class="form-group mb-3">
+                        <div class="form-check">
+                            <input asp-for="Template.IsActive" type="checkbox" class="form-check-input" id="isActive" checked />
+                            <label class="form-check-label" for="isActive">
+                                Active / Enabled
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Fields -->
+                    @if (Model.IsEditMode)
+                    {
+                        <input type="hidden" asp-for="TemplateId" />
+                        <input type="hidden" asp-for="IsEditMode" />
+                    }
+                </div>
+
+                <!-- Right Column - Preview -->
+                <div class="col-xl-4 col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading wt-panel-heading p-a20">
+                            <h5 class="m-a0">Preview</h5>
+                        </div>
+                        <div class="panel-body wt-panel-body p-a20">
+                            <div class="preview-box bg-light p-4 rounded text-center" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                                <div>
+                                    <i class="fa fa-file-pdf-o" style="font-size: 60px; color: #ccc;"></i>
+                                    <p class="mt-3 text-muted">Template Preview</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template Details -->
+                    <div class="panel panel-default mt-3">
+                        <div class="panel-heading wt-panel-heading p-a20">
+                            <h5 class="m-a0">Details</h5>
+                        </div>
+                        <div class="panel-body wt-panel-body p-a20">
+                            <div class="mb-3">
+                                <label class="text-muted small">Status</label>
+                                <p>
+                                    @if (Model.Template.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted small">Pricing</label>
+                                <p>
+                                    @if (Model.Template.IsPremium)
+                                    {
+                                        <span class="badge bg-warning">Premium</span>
+                                        @if (Model.Template.Price > 0)
+                                        {
+                                            <span class="ms-2">${Model.Template.Price.ToString("0.00")}</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Free</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-4">
+                <button type="submit" class="site-button">
+                    <i class="fa fa-save"></i> @(Model.IsEditMode ? "Update Template" : "Create Template")
+                </button>
+                <a asp-action="ResumeTemplates" class="site-button btn-secondary ms-2">
+                    <i class="fa fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePricingSection() {
+            var isPremium = document.getElementById('isPremium').checked;
+            var pricingSection = document.getElementById('pricingSection');
+            pricingSection.style.display = isPremium ? 'block' : 'none';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            togglePricingSection();
+        });
+    </script>
+}

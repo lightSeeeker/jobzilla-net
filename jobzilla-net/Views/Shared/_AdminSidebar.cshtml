@@ -1,0 +1,73 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+<nav id="sidebar-admin-wraper">
+    <div class="page-logo">
+        <a asp-controller="Home" asp-action="Index"><img src="~/images/logo-dark.png" alt=""></a>
+    </div>
+
+    <div class="admin-nav scrollbar-macosx">
+        <ul>
+            <li class="@(currentAction == "Index" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Index"><i class="fa fa-home"></i><span class="admin-nav-text">Dashboard</span></a>
+            </li>
+
+            <li class="@(currentAction == "Employers" || currentAction == "EmployerDetail" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Employers"><i class="fa fa-building"></i><span class="admin-nav-text">Employers</span></a>
+            </li>
+
+            <li class="@(currentAction == "Candidates" || currentAction == "CandidateDetail" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Candidates"><i class="fa fa-users"></i><span class="admin-nav-text">Candidates</span></a>
+            </li>
+
+            <li class="@(currentAction == "ResumeTemplates" || currentAction == "ResumeTemplateForm" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="ResumeTemplates"><i class="fa fa-file-pdf-o"></i><span class="admin-nav-text">Resume Templates</span></a>
+            </li>
+
+            <li class="@(currentAction == "SubscriptionPlans" || currentAction == "SubscriptionPlanForm" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="SubscriptionPlans"><i class="fa fa-credit-card"></i><span class="admin-nav-text">Subscription Plans</span></a>
+            </li>
+
+            <li class="@(currentAction == "Payments" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Payments"><i class="fa fa-money"></i><span class="admin-nav-text">Payments</span></a>
+            </li>
+
+            <li class="@(currentAction == "Jobs" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Jobs"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
+            </li>
+
+            <li class="@(currentAction == "Applications" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Applications"><i class="fa fa-inbox"></i><span class="admin-nav-text">Applications</span></a>
+            </li>
+
+            <li class="@(currentAction == "ContentPages" || currentAction == "EditContentPage" || currentAction == "Blogs" || currentAction == "HomePageContent" || currentAction == "EditHomePageContent" ? "active" : "")">
+                <a href="javascript:void(0)"><i class="fa fa-newspaper"></i><span class="admin-nav-text">Content & Blogs</span></a>
+                <ul class="sub-menu">
+                    <li class="@(currentAction == "HomePageContent" || currentAction == "EditHomePageContent" ? "active" : "")">
+                        <a asp-controller="Admin" asp-action="HomePageContent"><span class="admin-nav-text">Home Page Content</span></a>
+                    </li>
+                    <li class="@(currentAction == "ContentPages" || currentAction == "EditContentPage" ? "active" : "")">
+                        <a asp-controller="Admin" asp-action="ContentPages"><span class="admin-nav-text">CMS Pages</span></a>
+                    </li>
+                    <li class="@(currentAction == "Blogs" ? "active" : "")">
+                        <a asp-controller="Admin" asp-action="Blogs"><span class="admin-nav-text">Blog Posts</span></a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="@(currentAction == "Reports" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="Reports"><i class="fa fa-bar-chart"></i><span class="admin-nav-text">Reports</span></a>
+            </li>
+
+            <li class="@(currentAction == "AuditLog" ? "active" : "")">
+                <a asp-controller="Admin" asp-action="AuditLog"><i class="fa fa-history"></i><span class="admin-nav-text">Audit Log</span></a>
+            </li>
+
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormSidebar" style="display: none;"></form>
+                <a href="javascript:document.getElementById('logoutFormSidebar').submit()"><i class="fa fa-share-square"></i><span class="admin-nav-text">Logout</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>

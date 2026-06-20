@@ -102,6 +102,9 @@ public class ResumeBuilderService : IResumeBuilderService
                             });
                     }
                 }
+                // Load persisted color settings and attach to model
+                customVm.ColorSettings = await GetColorSettingsAsync(userId, resumeId.Value, cancellationToken);
+
                 return customVm;
             }
         }
@@ -370,6 +373,68 @@ public class ResumeBuilderService : IResumeBuilderService
         resume.TemplateId = templateId;
         await _context.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    // ── Color Customization ───────────────────────────────────────────────────
+
+    /// <inheritdoc />
+    public async Task<bool> SaveColorSettingsAsync(
+        string userId,
+        int resumeId,
+        int templateId,
+        Dictionary<string, string> colors,
+        CancellationToken cancellationToken = default)
+    {
+        var profileId = await GetProfileIdAsync(userId, cancellationToken);
+        if (profileId == null) return false;
+
+        var resume = await _context.CandidateResumes
+            .FirstOrDefaultAsync(r => r.Id == resumeId && r.CandidateProfileId == profileId.Value, cancellationToken);
+
+        if (resume == null) return false;
+
+        // Merge into existing SettingsJson so we don't overwrite other settings
+        var settings = new ResumeColorSettingsWrapper
+        {
+            TemplateId = templateId,
+            Colors     = colors
+        };
+
+        resume.SettingsJson = System.Text.Json.JsonSerializer.Serialize(
+            settings,
+            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+
+        await _context.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Saved color settings for resume {ResumeId}, template {TemplateId}", resumeId, templateId);
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<Dictionary<string, string>?> GetColorSettingsAsync(
+        string userId,
+        int resumeId,
+        CancellationToken cancellationToken = default)
+    {
+        var settingsJson = await _context.CandidateResumes
+            .Where(r => r.Id == resumeId && r.CandidateProfile!.UserId == userId)
+            .Select(r => r.SettingsJson)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(settingsJson)) return null;
+
+        try
+        {
+            var wrapper = System.Text.Json.JsonSerializer.Deserialize<ResumeColorSettingsWrapper>(
+                settingsJson,
+                new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+
+            return wrapper?.Colors;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to deserialize SettingsJson for resume {ResumeId}", resumeId);
+            return null;
+        }
     }
 
     // ── Dynamic Document API ──────────────────────────────────────────────────
@@ -703,5 +768,15 @@ public class ResumeBuilderService : IResumeBuilderService
             .Select(p => (int?)p.Id)
             .FirstOrDefaultAsync(cancellationToken);
         return id;
+    }
+
+    /// <summary>
+    /// Internal JSON envelope stored in <c>CandidateResume.SettingsJson</c>.
+    /// Keeps the color palette selection alongside the templateId that generated it.
+    /// </summary>
+    private sealed class ResumeColorSettingsWrapper
+    {
+        public int TemplateId { get; set; }
+        public Dictionary<string, string> Colors { get; set; } = new();
     }
 }

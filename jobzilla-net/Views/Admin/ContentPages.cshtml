@@ -1,0 +1,106 @@
+@model jobzilla_net.Models.AdminDash.AdminContentPagesViewModel
+@{
+    ViewData["Title"] = "CMS Pages";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>CMS Pages</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>CMS Pages</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- CMS Pages Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-newspaper"></i> Content Pages</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        @if (Model.Pages.Any())
+        {
+            <div class="twm-D_table p-a20 table-responsive">
+                <table class="table table-bordered twm-bookmark-list-wrap">
+                    <thead>
+                        <tr>
+                            <th>Page Title</th>
+                            <th>Key / Slug</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var contentPage in Model.Pages)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="twm-bookmark-list">
+                                        <div class="twm-mid-content">
+                                            <h5>@contentPage.Title</h5>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code class="bg-light p-2 rounded">@contentPage.Key</code>
+                                </td>
+                                <td>
+                                    @if (contentPage.IsPublished)
+                                    {
+                                        <span class="badge bg-success">Published</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Draft</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="twm-table-controls">
+                                        <ul class="twm-DT-controls-icon list-unstyled d-flex align-items-center">
+                                            <li>
+                                                <a asp-action="EditContentPage" asp-route-key="@contentPage.Key" title="Edit Page">
+                                                    <span class="fa fa-edit"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("EditContentPage", "Admin", new { key = contentPage.Key })" target="_blank" title="View Page">
+                                                    <span class="fa fa-eye"></span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i> No content pages available
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Default Pages Info -->
+<div class="panel panel-default mt-4">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-info-circle"></i> About CMS Pages</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <p>Manage your website's static content pages through this CMS interface. Edit page titles, descriptions, and HTML content directly.</p>
+        <p class="mb-0"><strong>Standard Pages:</strong> About Us, Privacy Policy, Terms of Service, FAQ, Contact Us</p>
+    </div>
+</div>

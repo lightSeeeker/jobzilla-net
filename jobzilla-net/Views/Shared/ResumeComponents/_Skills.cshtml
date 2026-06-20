@@ -6,6 +6,7 @@
         var n = item.GetValue("Name");
         if (!string.IsNullOrWhiteSpace(n))
         {
+            n = n.Replace("×", "").Trim();
             <span class="resume-skill-tag">@n</span>
         }
     }

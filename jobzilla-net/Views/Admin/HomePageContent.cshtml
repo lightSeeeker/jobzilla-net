@@ -1,0 +1,71 @@
+@model List<HomePageContentDto>
+@{
+    ViewData["Title"] = "Home Page Content";
+}
+
+<div class="wt-admin-right-page-header">
+    <div class="wt-admin-right-page-header-title">
+        <h2>Home Page Content</h2>
+        <p>Manage home page section content</p>
+    </div>
+    <div>
+        <a href="@Url.Action("EditHomePageContent")" class="site-button">Add Content</a>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="wt-panel-heading">
+        <h4>Content Items</h4>
+    </div>
+    <div class="wt-panel-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped twm-D_table">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Key</th>
+                            <th>Value Preview</th>
+                            <th>Display Order</th>
+                            <th>Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderBy(x => x.Section).ThenBy(x => x.DisplayOrder))
+                        {
+                            <tr>
+                                <td><span class="badge bg-primary">@item.Section</span></td>
+                                <td>@item.Key</td>
+                                <td>@(item.Value.Length > 50 ? item.Value.Substring(0, 50) + "..." : item.Value)</td>
+                                <td>@item.DisplayOrder</td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("EditHomePageContent", new { id = item.Id })" class="btn btn-sm btn-primary">Edit</a>
+                                    <form method="POST" action="@Url.Action("DeleteHomePageContent", new { id = item.Id })" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">No content items found.</div>
+        }
+    </div>
+</div>

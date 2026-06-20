@@ -10,10 +10,14 @@
     <title>@(Model.Profile?.FullName ?? "Resume") - ATS Optimized</title>
     @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
     <style>
+        :root {
+            --ats-primary: #000000;
+        }
         .resume-container {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #000;
-            line-height: 1.4;
+            font-family: var(--cvb-base-font);
+            color: #111;
+            line-height: var(--cvb-line-height);
+            background-color: #fff;
             padding: 40px;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
@@ -22,7 +26,7 @@
             text-align: center;
             margin-bottom: 25px;
         }
-        .name { font-size: 24px; font-weight: bold; margin: 0 0 5px; text-transform: uppercase; }
+        .name { font-size: 24px; font-weight: bold; margin: 0 0 5px; text-transform: uppercase; color: var(--ats-primary); }
         .contact-info { font-size: 14px; margin-bottom: 15px; }
         .contact-info span { margin: 0 5px; }
         
@@ -30,13 +34,14 @@
             font-size: 16px;
             text-transform: uppercase;
             font-weight: bold;
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid var(--ats-primary);
+            color: var(--ats-primary);
             padding-bottom: 3px;
-            margin-bottom: 15px;
-            margin-top: 20px;
+            margin-bottom: var(--cvb-item-margin);
+            margin-top: var(--cvb-section-margin);
         }
         
-        .resume-item { margin-bottom: 15px; }
+        .resume-item { margin-bottom: var(--cvb-item-margin); }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; }
         .resume-item-title { font-weight: bold; font-size: 15px; }
         .resume-item-date { font-size: 14px; text-align: right; }
@@ -56,21 +61,13 @@
         .resume-field-label { font-weight: bold; margin-right: 5px; }
         
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #f0f0f0; }
-        .btn { padding: 10px 20px; background: #000; color: white; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: sans-serif; }
+        .btn { padding: 10px 20px; background: var(--ats-primary); color: white; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: sans-serif; }
         .btn-secondary { background: #555; }
     </style>
+    @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
-    @if (!Model.IsExport)
-    {
-        <div class="action-bar d-print-none">
-            <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
-            @if (Model.TemplateId.HasValue)
-            {
-                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
-            }
-        </div>
-    }
+
 
     <div class="resume-container">
         <div class="header">
@@ -103,9 +100,21 @@
         
         @foreach (var sec in sections.Where(s => s.IsVisible))
         {
-            <div class="resume-section-title">@sec.Title</div>
-            @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
+            <div class="cvb-section-wrapper" data-section-id="@sec.Id">
+                <div class="resume-section-title">@sec.Title</div>
+                @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
+            </div>
         }
     </div>
+<script>
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+    });
+</script>
 </body>
 </html>

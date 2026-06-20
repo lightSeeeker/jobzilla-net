@@ -1,6 +1,15 @@
 @model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
 
 <style>
+@@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500&family=Lora:wght@400;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap');
+
+    :root {
+        --cvb-base-font: 'Inter', sans-serif;
+        --cvb-line-height: 1.6;
+        --cvb-section-margin: 30px;
+        --cvb-item-margin: 15px;
+    }
+
     /* Base reset & typography defaults */
     body {
         margin: 0;
@@ -11,7 +20,22 @@
     }
     
     /* PDF page-break handling to prevent awkward cuts across A4 pages */
-    .resume-item, .resume-section-title, .resume-item-header {
+    .resume-item {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        display: block; /* Required for page-break-inside to work reliably */
+    }
+    .resume-section-title {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+    }
+    .resume-item-header {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+    }
+    .resume-skills-list, .resume-references-grid {
         page-break-inside: avoid;
         break-inside: avoid;
     }
@@ -44,3 +68,35 @@
         </text>
     }
 </style>
+
+<script>
+    // Universal listener for real-time color updates in the Preview Editor
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+        if (e.data && e.data.type === 'reorderSections') {
+            const mainContainer = document.querySelector('.main-content') || document.querySelector('.resume-container');
+            const sidebarContainer = document.querySelector('.sidebar');
+            
+            if (e.data.isMultiColumn && sidebarContainer && mainContainer) {
+                e.data.sidebar.forEach(id => {
+                    const el = document.querySelector(`[data-section-id="${id}"]`);
+                    if (el) sidebarContainer.appendChild(el);
+                });
+                e.data.main.forEach(id => {
+                    const el = document.querySelector(`[data-section-id="${id}"]`);
+                    if (el) mainContainer.appendChild(el);
+                });
+            } else if (mainContainer) {
+                e.data.main.forEach(id => {
+                    const el = document.querySelector(`[data-section-id="${id}"]`);
+                    if (el) mainContainer.appendChild(el);
+                });
+            }
+        }
+    });
+</script>

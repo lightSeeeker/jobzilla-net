@@ -1,0 +1,150 @@
+﻿@model AdminResumeTemplatesViewModel
+@{
+    ViewData["Title"] = "Resume Templates Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <div class="d-flex justify-content-between align-items-center" style="width: 100%;">
+        <h2>Resume Templates</h2>
+        <a asp-action="ResumeTemplateForm" class="site-button"><i class="fa fa-plus"></i> Add Template</a>
+    </div>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Templates</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Templates Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-file-pdf-o"></i> Templates List</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var template in Model.Templates.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="twm-bookmark-list">
+                                    <div class="twm-mid-content">
+                                        <h4>@template.Name</h4>
+                                        <p class="text-muted">@template.Description</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">@template.Category</span>
+                            </td>
+                            <td>@template.TemplateType</td>
+                            <td>
+                                @if (template.IsPremium)
+                                {
+                                    <span class="text-danger">${@template.Price.ToString("0.00")}</span>
+                                    @if (template.DiscountPrice.HasValue)
+                                    {
+                                        <br />
+                                        <small class="text-success">Discount: $@template.DiscountPrice.Value.ToString("0.00")</small>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-success">Free</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="@(template.IsActive ? "twm-bg-green" : "twm-bg-red")">
+                                    @(template.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>@template.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <div class="twm-table-controls">
+                                    <ul class="twm-DT-controls-icon list-unstyled d-flex align-items-center">
+                                        <li>
+                                            <a asp-action="ResumeTemplateForm" asp-route-id="@template.Id" title="Edit">
+                                                <span class="far fa-edit"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="ToggleTemplateStatus" method="post" style="display:inline;">
+                                                <input type="hidden" name="id" value="@template.Id" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="@(template.IsActive ? "Disable" : "Enable")">
+                                                    <span class="fa @(template.IsActive ? "fa-eye-slash" : "fa-eye")"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="DeleteResumeTemplate" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                                <input type="hidden" name="id" value="@template.Id" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="Delete">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Templates.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Templates.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="ResumeTemplates" asp-route-page="@(Model.Templates.Page - 1)">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Templates.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Templates.Page ? "active" : "")">
+                                <a asp-action="ResumeTemplates" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        @if (Model.Templates.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="ResumeTemplates" asp-route-page="@(Model.Templates.Page + 1)">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

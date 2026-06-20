@@ -9,4 +9,9 @@ public class ResumeTemplate : AuditableEntity
     public string TemplateFilePath { get; set; } = string.Empty;
     public string? PreviewImagePath { get; set; }
     public bool IsActive { get; set; } = true;
+    public string? Category { get; set; }
+    public bool IsPremium { get; set; }
+    public decimal Price { get; set; }
+    public decimal? DiscountPrice { get; set; }
+    public string? TemplateType { get; set; }
 }

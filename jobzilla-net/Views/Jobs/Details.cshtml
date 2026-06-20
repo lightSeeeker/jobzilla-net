@@ -109,7 +109,7 @@
                                                     var resumes = ViewBag.CandidateResumes as List<jobzilla_net.Application.Candidates.Dtos.CandidateResumeDto>;
                                                     if (resumes == null || !resumes.Any())
                                                     {
-                                                        <a class="site-button" href="/CandidateDash/Resumes">
+                                                        <a class="site-button" href="/Candidate/Resumes">
                                                             Create Resume to Apply
                                                         </a>
                                                     }
@@ -407,7 +407,7 @@
                     msgArea.innerHTML = '';
                     
                     try {
-                        const response = await fetch('/CandidateDash/ApplyJob', {
+                        const response = await fetch('/Candidate/ApplyJob', {
                             method: 'POST',
                             body: formData
                         });

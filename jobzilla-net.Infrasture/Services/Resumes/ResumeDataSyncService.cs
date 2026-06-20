@@ -40,45 +40,62 @@ public class ResumeDataSyncService : IResumeDataSyncService
         }
 
         // ── Personal Information ──────────────────────────────────────────────
-        // Parsed data is PRIMARY. Profile fields are fallback when parser extracted nothing.
-        if (!string.IsNullOrWhiteSpace(parsedData.FullName))
-            profile.FullName = parsedData.FullName;
+        var pInfo = parsedData.PersonalInfo;
+        
+        if (!string.IsNullOrWhiteSpace(pInfo.FullName))
+            profile.FullName = pInfo.FullName;
+        else if (!string.IsNullOrWhiteSpace(pInfo.FirstName) || !string.IsNullOrWhiteSpace(pInfo.LastName))
+            profile.FullName = $"{pInfo.FirstName} {pInfo.LastName}".Trim();
 
-        if (!string.IsNullOrWhiteSpace(parsedData.PhoneNumber))
-            profile.PhoneNumber = parsedData.PhoneNumber;
+        if (!string.IsNullOrWhiteSpace(pInfo.Phone))
+            profile.PhoneNumber = pInfo.Phone;
 
         if (!string.IsNullOrWhiteSpace(parsedData.Summary))
             profile.Summary = parsedData.Summary;
 
-        // ── Experience ────────────────────────────────────────────────────────
-        foreach (var exp in parsedData.Experiences)
+        // Add specific links to SocialLinks if not present
+        void AddSocialLink(string platform, string url)
         {
-            if (!profile.Experiences.Any(e => e.CompanyName == exp.CompanyName && e.JobTitle == exp.JobTitle))
+            if (string.IsNullOrWhiteSpace(url)) return;
+            if (!profile.SocialLinks.Any(l => l.Url == url))
+            {
+                profile.SocialLinks.Add(new CandidateSocialLink { PlatformName = platform, Url = url, CandidateProfileId = profile.Id });
+            }
+        }
+        AddSocialLink("LinkedIn", pInfo.Linkedin);
+        AddSocialLink("GitHub", pInfo.Github);
+        AddSocialLink("Portfolio", pInfo.Portfolio);
+
+        // ── Experience ────────────────────────────────────────────────────────
+        foreach (var exp in parsedData.Experience)
+        {
+            if (!profile.Experiences.Any(e => e.CompanyName == exp.Company && e.JobTitle == exp.Title))
             {
                 profile.Experiences.Add(new CandidateExperience
                 {
-                    CompanyName        = exp.CompanyName ?? string.Empty,
-                    JobTitle           = exp.JobTitle    ?? string.Empty,
-                    StartDate          = exp.StartDate   ?? DateTime.UtcNow,
-                    EndDate            = exp.EndDate,
-                    Description        = exp.Description,
+                    CompanyName        = exp.Company ?? string.Empty,
+                    JobTitle           = exp.Title   ?? string.Empty,
+                    Location           = exp.Location ?? string.Empty,
+                    StartDate          = ParseDateString(exp.StartDate) ?? DateTime.UtcNow,
+                    EndDate            = exp.IsCurrent ? null : ParseDateString(exp.EndDate),
+                    Description        = exp.Bullets.Count > 0 ? string.Join(Environment.NewLine, exp.Bullets.Select(b => "• " + b)) : string.Empty,
                     CandidateProfileId = profile.Id
                 });
             }
         }
 
         // ── Education ─────────────────────────────────────────────────────────
-        foreach (var edu in parsedData.Educations)
+        foreach (var edu in parsedData.Education)
         {
-            if (!profile.Educations.Any(e => e.InstitutionName == edu.InstitutionName && e.Degree == edu.Degree))
+            if (!profile.Educations.Any(e => e.InstitutionName == edu.Institution && e.Degree == edu.Degree))
             {
                 profile.Educations.Add(new CandidateEducation
                 {
-                    InstitutionName    = edu.InstitutionName ?? string.Empty,
-                    Degree             = edu.Degree          ?? string.Empty,
-                    FieldOfStudy       = edu.FieldOfStudy    ?? string.Empty,
-                    StartDate          = edu.StartDate       ?? DateTime.UtcNow,
-                    EndDate            = edu.EndDate,
+                    InstitutionName    = edu.Institution ?? string.Empty,
+                    Degree             = edu.Degree      ?? string.Empty,
+                    FieldOfStudy       = edu.Field         ?? string.Empty,
+                    StartDate          = edu.StartYear.HasValue ? new DateTime(edu.StartYear.Value, 1, 1) : DateTime.UtcNow,
+                    EndDate            = edu.EndYear.HasValue ? new DateTime(edu.EndYear.Value, 1, 1) : null,
                     CandidateProfileId = profile.Id
                 });
             }
@@ -93,22 +110,8 @@ public class ResumeDataSyncService : IResumeDataSyncService
                 {
                     Name                = cert.Name                ?? string.Empty,
                     IssuingOrganization = cert.IssuingOrganization ?? string.Empty,
-                    IssueDate           = cert.IssueDate           ?? DateTime.UtcNow,
+                    IssueDate           = ParseDateString(cert.IssueDate) ?? DateTime.UtcNow,
                     CandidateProfileId  = profile.Id
-                });
-            }
-        }
-
-        // ── Social Links ──────────────────────────────────────────────────────
-        foreach (var link in parsedData.SocialLinks)
-        {
-            if (!profile.SocialLinks.Any(l => l.Url == link.Url))
-            {
-                profile.SocialLinks.Add(new CandidateSocialLink
-                {
-                    PlatformName       = link.PlatformName ?? string.Empty,
-                    Url                = link.Url          ?? string.Empty,
-                    CandidateProfileId = profile.Id
                 });
             }
         }
@@ -121,29 +124,28 @@ public class ResumeDataSyncService : IResumeDataSyncService
                 profile.Projects.Add(new CandidateProject
                 {
                     Name                = proj.Name ?? string.Empty,
-                    StartDate           = proj.StartDate ?? DateTime.UtcNow,
-                    EndDate             = proj.EndDate,
-                    ProjectUrl          = proj.ProjectUrl,
-                    Description         = proj.Description,
+                    StartDate           = DateTime.UtcNow, // Custom rules didn't explicitly demand project dates, but we could add if needed
+                    Description         = proj.Highlights.Count > 0 ? string.Join(Environment.NewLine, proj.Highlights.Select(b => "• " + b)) : string.Empty,
                     CandidateProfileId  = profile.Id
                 });
             }
         }
 
         // ── Skills ────────────────────────────────────────────────────────────
-        // Skills use a normalised lookup table (Skill) + join table (CandidateSkill).
-        // For each parsed skill name, upsert the Skill row then link it to the profile.
         var existingSkillNames = profile.Skills
             .Where(cs => cs.Skill != null)
             .Select(cs => cs.Skill!.Name.ToLowerInvariant())
             .ToHashSet();
 
-        foreach (var skillName in parsedData.Skills.Distinct(StringComparer.OrdinalIgnoreCase))
+        // Flatten the categorized skills
+        var allSkills = parsedData.Skills.SelectMany(kv => kv.Value).Distinct(StringComparer.OrdinalIgnoreCase);
+
+        int skillsAdded = 0;
+        foreach (var skillName in allSkills)
         {
             if (existingSkillNames.Contains(skillName.ToLowerInvariant()))
                 continue;
 
-            // Find or create the global Skill record
             var skill = await _context.Skills
                 .FirstOrDefaultAsync(s => s.Name.ToLower() == skillName.ToLower(), cancellationToken)
                 ?? new Skill { Name = skillName };
@@ -158,9 +160,10 @@ public class ResumeDataSyncService : IResumeDataSyncService
             });
 
             existingSkillNames.Add(skillName.ToLowerInvariant());
+            skillsAdded++;
         }
 
-        _logger.LogInformation("Synced {Count} skills for user {UserId}", parsedData.Skills.Count, userId);
+        _logger.LogInformation("Synced {Count} skills for user {UserId}", skillsAdded, userId);
 
         try
         {
@@ -173,4 +176,20 @@ public class ResumeDataSyncService : IResumeDataSyncService
             return false;
         }
     }
+
+    private static DateTime? ParseDateString(string? dateStr)
+    {
+        if (string.IsNullOrWhiteSpace(dateStr)) return null;
+        var parts = dateStr.Split('-');
+        if (parts.Length == 2 && int.TryParse(parts[0], out int year) && int.TryParse(parts[1], out int month))
+        {
+            return new DateTime(year, month, 1);
+        }
+        if (parts.Length == 1 && int.TryParse(parts[0], out int y))
+        {
+            return new DateTime(y, 1, 1);
+        }
+        return null;
+    }
 }
+

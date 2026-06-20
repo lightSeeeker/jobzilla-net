@@ -22,10 +22,10 @@ public class SelectPdfGenerator : IPdfGenerator
         // Setup PDF options
         converter.Options.PdfPageSize = PdfPageSize.A4;
         converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
-        converter.Options.MarginLeft = 0;
-        converter.Options.MarginRight = 0;
-        converter.Options.MarginTop = 0;
-        converter.Options.MarginBottom = 0;
+        converter.Options.MarginLeft = 30;
+        converter.Options.MarginRight = 30;
+        converter.Options.MarginTop = 30;
+        converter.Options.MarginBottom = 30;
 
         // Optionally disable JavaScript execution during rendering if not needed, for security/speed
         converter.Options.JavaScriptEnabled = false;

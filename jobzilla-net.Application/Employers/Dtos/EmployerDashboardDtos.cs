@@ -1,6 +1,6 @@
 namespace jobzilla_net.Application.Employers.Dtos;
 
-public class EmployerDashboardOverviewDto
+public class EmployerboardOverviewDto
 {
     public int PostedJobsCount { get; set; }
     public int TotalApplicationsCount { get; set; }

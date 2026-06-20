@@ -1,0 +1,201 @@
+﻿@model AdminDashOverviewViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Hello, @User.Identity?.Name</h2>
+    <div class="breadcrumbs"><a asp-controller="Home" asp-action="Index">Home</a><span>Dashboard</span></div>
+</div>
+
+<!-- Dashboard Stats Cards -->
+<div class="twm-dash-b-blocks mb-5">
+    <div class="row">
+        <!-- Total Employers -->
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-1 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-building"></i></div>
+                        <div class="wt-card-right wt-total-active-listing counter" data-stat="totalEmployers">@Model.Stats.TotalEmployers</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">Total Employers</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Candidates -->
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-2 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-users"></i></div>
+                        <div class="wt-card-right wt-total-active-listing counter" data-stat="totalCandidates">@Model.Stats.TotalCandidates</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">Total Candidates</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Jobs Posted -->
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-3 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-suitcase"></i></div>
+                        <div class="wt-card-right wt-total-active-listing counter" data-stat="totalJobsPosted">@Model.Stats.TotalJobsPosted</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">Total Jobs Posted</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Revenue -->
+        <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-4 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-money"></i></div>
+                        <div class="wt-card-right wt-total-active-listing counter" data-stat="totalRevenue">$@Model.Stats.TotalRevenue.ToString("0")</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">Total Revenue</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Sections -->
+<div class="twm-pro-view-chart-wrap">
+    <div class="row">
+        <!-- Active Jobs Section -->
+        <div class="col-xl-6 col-lg-12 col-md-12 mb-4">
+            <div class="panel panel-default site-bg-white">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h4 class="panel-tittle m-a0"><i class="fa fa-briefcase"></i> Job Statistics</h4>
+                </div>
+                <div class="panel-body wt-panel-body bg-white p-a20">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-2">Active Jobs</p>
+                            <h3 class="counter" data-stat="activeJobs">@Model.Stats.ActiveJobs</h3>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-2">Total Resumes</p>
+                            <h3 class="counter" data-stat="totalResumes">@Model.Stats.TotalResumes</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Statistics Section -->
+        <div class="col-xl-6 col-lg-12 col-md-12 mb-4">
+            <div class="panel panel-default">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h4 class="panel-tittle m-a0"><i class="fa fa-users"></i> User Statistics</h4>
+                </div>
+                <div class="panel-body wt-panel-body bg-white p-a20">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-2">Active Users</p>
+                            <h3 class="counter" data-stat="activeUsers">@Model.Stats.ActiveUsers</h3>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-2">New Users Today</p>
+                            <h3 class="counter" data-stat="newUsersToday">@Model.Stats.NewUsersToday</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="col-lg-12 col-md-12 mb-4">
+            <div class="panel panel-default">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h4 class="panel-tittle m-a0"><i class="fa fa-history"></i> Recent Activities</h4>
+                </div>
+                <div class="panel-body wt-panel-body bg-white">
+                    <div class="twm-D_table p-a20 table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Entity</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.RecentActivities.Any())
+                                {
+                                    @foreach (var activity in Model.RecentActivities)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-primary">@activity.Type</span>
+                                            </td>
+                                            <td>@activity.Description</td>
+                                            <td>@activity.EntityName</td>
+                                            <td>@activity.OccurredAt.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-muted text-center">No recent activities</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        jQuery(document).ready(function() {
+            // Fetch and update dashboard stats dynamically
+            var statsUrl = '@Url.Action("GetDashboardStats", "Admin")';
+
+            jQuery.ajax({
+                url: statsUrl,
+                type: 'GET',
+                dataType: 'json',
+                timeout: 5000,
+                success: function(data) {
+                    // Update each stat with smooth fade effect
+                    updateStatWithAnimation('[data-stat="totalEmployers"]', data.totalEmployers);
+                    updateStatWithAnimation('[data-stat="totalCandidates"]', data.totalCandidates);
+                    updateStatWithAnimation('[data-stat="totalJobsPosted"]', data.totalJobsPosted);
+                    updateStatWithAnimation('[data-stat="totalRevenue"]', '$' + data.totalRevenue);
+                    updateStatWithAnimation('[data-stat="activeJobs"]', data.activeJobs);
+                    updateStatWithAnimation('[data-stat="totalResumes"]', data.totalResumes);
+                    updateStatWithAnimation('[data-stat="activeUsers"]', data.activeUsers);
+                    updateStatWithAnimation('[data-stat="newUsersToday"]', data.newUsersToday);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Stats fetch failed:', status);
+                    // Stats already displayed from server-side render, so no error shown to user
+                }
+            });
+
+            // Simple fade animation for stats update
+            function updateStatWithAnimation(selector, newValue) {
+                var element = jQuery(selector);
+                if (element.length > 0) {
+                    element.fadeOut(200, function() {
+                        jQuery(this).text(newValue).fadeIn(200);
+                    });
+                }
+            }
+        });
+    </script>
+}
+

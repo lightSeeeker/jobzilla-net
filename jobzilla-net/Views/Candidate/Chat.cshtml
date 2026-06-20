@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Candidate Chat";
+    ViewData["ActivePage"] = "Chat";
+}
+
+<div class="page-content">
+
+
+    <div class="section-full p-t120  p-b90 site-bg-white">
+        <div class="container-fluid" style="max-width: 1600px; padding: 0 40px;">
+            <div class="row">
+                
+                <partial name="_CandidateSidebar" model="null" />
+
+                <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
+                    <partial name="_ChatPanel" model="ViewBag.ConversationId" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -31,6 +31,8 @@ public interface IApplicationDbContext
     DbSet<BlogPost> BlogPosts { get; }
     DbSet<BlogCategory> BlogCategories { get; }
     DbSet<ContentPage> ContentPages { get; }
+    DbSet<AdminAuditLog> AdminAuditLogs { get; }
+    DbSet<HomePageContent> HomePageContents { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

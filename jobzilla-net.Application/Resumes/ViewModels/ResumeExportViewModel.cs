@@ -62,6 +62,27 @@ public class ResumeExportViewModel
     public int? ResumeId { get; set; }
     public bool IsExport { get; set; }
 
+    // ── Color Customization ────────────────────────────────────────────────
+    // Persisted palette selection. Keys are CSS custom property names (e.g. "--mp-accent"),
+    // values are hex color strings (e.g. "#48a9a6"). Null means use the template defaults.
+    public Dictionary<string, string>? ColorSettings { get; set; }
+
+    /// <summary>
+    /// Serializes <see cref="ColorSettings"/> into a CSS &lt;style&gt; block that overrides
+    /// the template's default CSS variable values. Returns an empty string when no
+    /// custom colors are set so templates can call this unconditionally.
+    /// </summary>
+    public string RenderColorVarsCss()
+    {
+        if (ColorSettings == null || ColorSettings.Count == 0)
+            return string.Empty;
+
+        var vars = string.Join("\n",
+            ColorSettings.Select(kv => $"  {kv.Key}: {kv.Value};"));
+
+        return $"<style>:root {{\n{vars}\n}}</style>";
+    }
+
     // ── Unified Rendering Helper ───────────────────────────────────────────
     // Provides a single collection of ResumeSections regardless of whether the
     // resume was built with the dynamic builder or from legacy typed data.

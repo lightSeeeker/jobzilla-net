@@ -1,0 +1,106 @@
+@model AdminHomePageContentFormViewModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? "Edit Content" : "Add Content";
+}
+
+<div class="wt-admin-right-page-header">
+    <div class="wt-admin-right-page-header-title">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="wt-panel-heading">
+        <h4>@(Model.IsEditMode ? "Edit" : "Create") Home Page Content</h4>
+    </div>
+    <div class="wt-panel-body">
+        <form method="POST" action="@Url.Action("EditHomePageContent")">
+            @if (Model.IsEditMode && Model.Item != null)
+            {
+                <input type="hidden" name="id" value="@Model.Item.Id" />
+            }
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="Section">Section *</label>
+                        <select id="Section" name="Section" class="form-control" required>
+                            <option value="">-- Select Section --</option>
+                            @{
+                                var currentSection = Model.Item?.Section ?? "";
+                                var sections = new[] {
+                                    ("HeroBanner", "Hero Banner"),
+                                    ("HowItWorks", "How It Works"),
+                                    ("Testimonials", "Testimonials"),
+                                    ("Features", "Features"),
+                                    ("CallToAction", "Call To Action"),
+                                    ("Other", "Other")
+                                };
+                            }
+                            @foreach(var (value, label) in sections)
+                            {
+                                if (value == currentSection)
+                                {
+                                    <option value="@value" selected>@label</option>
+                                }
+                                else
+                                {
+                                    <option value="@value">@label</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="Key">Key *</label>
+                        <input type="text" id="Key" name="Key" class="form-control" value="@Model.Item?.Key" required placeholder="e.g., title, description, subtitle" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="Value">Value *</label>
+                        <textarea id="Value" name="Value" class="form-control" rows="5" required placeholder="Enter content value">@Model.Item?.Value</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="ImageUrl">Image URL</label>
+                        <input type="url" id="ImageUrl" name="ImageUrl" class="form-control" value="@Model.Item?.ImageUrl" placeholder="https://example.com/image.jpg" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="DisplayOrder">Display Order *</label>
+                        <input type="number" id="DisplayOrder" name="DisplayOrder" class="form-control" value="@(Model.Item?.DisplayOrder ?? 0)" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" value="true" @(Model.Item?.IsActive != false ? "checked" : "") />
+                        <label class="form-check-label" for="IsActive">
+                            Active
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="site-button">@(Model.IsEditMode ? "Update" : "Create")</button>
+                    <a href="@Url.Action("HomePageContent")" class="site-button btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

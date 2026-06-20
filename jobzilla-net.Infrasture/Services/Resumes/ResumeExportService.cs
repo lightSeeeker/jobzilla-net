@@ -46,6 +46,11 @@ public class ResumeExportService : IResumeExportService
                 $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml", 
                 model);
 
+            // Polyfill CSS Variables for the PDF Generator
+            // SelectPdf/wkhtmltopdf engines do not support var(--variable-name) in CSS.
+            // We parse the :root blocks and inline the colors directly into the CSS rules.
+            html = PolyfillCssVariablesForPdf(html);
+
             // Generate PDF from HTML
             var pdfBytes = await _pdfGenerator.GeneratePdfFromHtmlAsync(html, cancellationToken);
             
@@ -56,5 +61,37 @@ public class ResumeExportService : IResumeExportService
             _logger.LogError(ex, "Failed to export resume to PDF for user {UserId}", userId);
             return null;
         }
+    }
+
+    /// <summary>
+    /// Replaces CSS var(--name) usages with their actual hex values for PDF engines
+    /// that lack modern CSS custom property support.
+    /// </summary>
+    private string PolyfillCssVariablesForPdf(string html)
+    {
+        var variables = new Dictionary<string, string>();
+        var rootBlockRegex = new System.Text.RegularExpressions.Regex(@":root\s*{([^}]+)}");
+        var varDefRegex = new System.Text.RegularExpressions.Regex(@"(--[\w-]+)\s*:\s*([^;]+);");
+
+        var rootMatches = rootBlockRegex.Matches(html);
+        foreach (System.Text.RegularExpressions.Match rootMatch in rootMatches)
+        {
+            var block = rootMatch.Groups[1].Value;
+            var varMatches = varDefRegex.Matches(block);
+            foreach (System.Text.RegularExpressions.Match varMatch in varMatches)
+            {
+                var varName = varMatch.Groups[1].Value.Trim();
+                var varValue = varMatch.Groups[2].Value.Trim();
+                // Later blocks overwrite earlier ones (custom settings overwrite defaults)
+                variables[varName] = varValue;
+            }
+        }
+
+        var varUsageRegex = new System.Text.RegularExpressions.Regex(@"var\s*\(\s*(--[\w-]+)\s*\)");
+        return varUsageRegex.Replace(html, match => 
+        {
+            var varName = match.Groups[1].Value.Trim();
+            return variables.TryGetValue(varName, out var val) ? val : match.Value;
+        });
     }
 }

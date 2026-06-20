@@ -83,95 +83,6 @@
                                 </div>
                             </div>
 
-                            <div class="twm-sidebar-ele-filter">
-                                <h4 class="section-head-small mb-4">Job Type</h4>
-                                <ul>
-                                    <li>
-                                        <div class=" form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                            <label class="form-check-label" for="exampleCheck1">Freelance</label>
-                                        </div>
-                                        <span class="twm-job-type-count">09</span>
-                                    </li>
-                                    <li>
-                                        <div class=" form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck2">
-                                            <label class="form-check-label" for="exampleCheck2">Full Time</label>
-                                        </div>
-                                        <span class="twm-job-type-count">07</span>
-                                    </li>
-                                    <li>
-                                        <div class=" form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck3">
-                                            <label class="form-check-label" for="exampleCheck3">Internship</label>
-                                        </div>
-                                        <span class="twm-job-type-count">15</span>
-                                    </li>
-                                    <li>
-                                        <div class=" form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck4">
-                                            <label class="form-check-label" for="exampleCheck4">Part Time</label>
-                                        </div>
-                                        <span class="twm-job-type-count">20</span>
-                                    </li>
-                                    <li>
-                                        <div class=" form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck5">
-                                            <label class="form-check-label" for="exampleCheck5">Temporary</label>
-                                        </div>
-                                        <span class="twm-job-type-count">22</span>
-                                    </li>
-                                    <li>
-                                        <div class=" form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck6">
-                                            <label class="form-check-label" for="exampleCheck6">Volunteer</label>
-                                        </div>
-                                        <span class="twm-job-type-count">25</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="twm-sidebar-ele-filter">
-                                <h4 class="section-head-small mb-4">Date Posts</h4>
-                                <ul>
-                                    <li>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" id="exampleradio1">
-                                            <label class="form-check-label" for="exampleradio1">Last hour</label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" id="exampleradio2">
-                                            <label class="form-check-label" for="exampleradio2">Last 24 hours</label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" id="exampleradio3">
-                                            <label class="form-check-label" for="exampleradio3">Last 7 days</label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" id="exampleradio4">
-                                            <label class="form-check-label" for="exampleradio4">Last 14 days</label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" id="exampleradio5">
-                                            <label class="form-check-label" for="exampleradio5">Last 30 days</label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" id="exampleradio6">
-                                            <label class="form-check-label" for="exampleradio6">All</label>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
 
                             <div class="twm-sidebar-ele-filter">
                                 <h4 class="section-head-small mb-4">Type of employment</h4>
@@ -276,22 +187,22 @@
                     <span class="woocommerce-result-count-left">Showing @Model.Result.TotalCount jobs</span>
 
                     <form class="woocommerce-ordering twm-filter-select" method="get">
-                        <span class="woocommerce-result-count">Short By</span>
-                        <select class="wt-select-bar-2 selectpicker" data-live-search="true" data-bv-field="size">
-                            <option>Most Recent</option>
-                            <option>Freelance</option>
-                            <option>Full Time</option>
-                            <option>Internship</option>
-                            <option>Part Time</option>
-                            <option>Temporary</option>
-                        </select>
-                        <select class="wt-select-bar-2 selectpicker" data-live-search="true" data-bv-field="size">
-                            <option>Show 10</option>
-                            <option>Show 20</option>
-                            <option>Show 30</option>
-                            <option>Show 40</option>
-                            <option>Show 50</option>
-                            <option>Show 60</option>
+                        <!-- Preserve current filters -->
+                        <input type="hidden" name="keyword" value="@Model.Keyword" />
+                        <input type="hidden" name="location" value="@Model.Location" />
+                        <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                        <input type="hidden" name="employmentType" value="@Model.EmploymentType" />
+                        <input type="hidden" name="minSalary" value="@Model.MinSalary" />
+                        <input type="hidden" name="maxSalary" value="@Model.MaxSalary" />
+                        <input type="hidden" name="page" value="1" />
+
+                        <span class="woocommerce-result-count">Items per page</span>
+                        <select class="wt-select-bar-2 selectpicker form-control" name="pageSize" onchange="this.form.submit()">
+                            <option value="10" selected="@(Model.PageSize == 10 ? "selected" : "")">Show 10</option>
+                            <option value="20" selected="@(Model.PageSize == 20 ? "selected" : "")">Show 20</option>
+                            <option value="30" selected="@(Model.PageSize == 30 ? "selected" : "")">Show 30</option>
+                            <option value="40" selected="@(Model.PageSize == 40 ? "selected" : "")">Show 40</option>
+                            <option value="50" selected="@(Model.PageSize == 50 ? "selected" : "")">Show 50</option>
                         </select>
                     </form>
 

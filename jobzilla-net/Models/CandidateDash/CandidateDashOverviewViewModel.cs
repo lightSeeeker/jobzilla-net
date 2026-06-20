@@ -1,8 +1,8 @@
 using jobzilla_net.Application.Candidates.Dtos;
 
-namespace jobzilla_net.Models.CandidateDash;
+namespace jobzilla_net.Models.Candidate;
 
-public class CandidateDashOverviewViewModel
+public class CandidateOverviewViewModel
 {
-    public CandidateDashboardOverviewDto Overview { get; set; } = new();
+    public CandidateboardOverviewDto Overview { get; set; } = new();
 }

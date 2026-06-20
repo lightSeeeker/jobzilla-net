@@ -1,3 +1,4 @@
+using jobzilla_net.Application.Admin;
 using jobzilla_net.Application.Blogs;
 using jobzilla_net.Application.Candidates;
 using jobzilla_net.Application.Common.Interfaces;
@@ -67,9 +68,11 @@ public static class DependencyInjection
         services.AddScoped<ICandidateService, CandidateService>();
         services.AddScoped<IEmployerService, EmployerService>();
         services.AddScoped<IBlogService, BlogService>();
-        services.AddScoped<ICandidateDashboardService, CandidateDashboardService>();
-        services.AddScoped<IEmployerDashboardService, EmployerDashboardService>();
+        services.AddScoped<ICandidateboardService, CandidateboardService>();
+        services.AddScoped<IEmployerboardService, EmployerboardService>();
         services.AddScoped<jobzilla_net.Application.Chat.IChatService, jobzilla_net.Infrasture.Services.Chat.ChatService>();
+        services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<IHomePageContentService, HomePageContentService>();
 
         // ── Resume Parsing Pipeline ──────────────────────────────────────────
         services.AddScoped<IResumeDataSyncService, ResumeDataSyncService>();

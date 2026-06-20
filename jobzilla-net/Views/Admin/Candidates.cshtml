@@ -1,0 +1,144 @@
+@model AdminCandidatesViewModel
+@{
+    ViewData["Title"] = "Candidates Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Candidates Management</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Candidates</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Search & Filter -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20 m-b30">
+        <form asp-action="Candidates" method="get" class="row align-items-end g-3">
+            <div class="col-xl-12 col-lg-12">
+                <div class="form-group">
+                    <label>Search</label>
+                    <div class="ls-inputicon-box">
+                        <input type="text" name="keyword" class="form-control" placeholder="Candidate name..." value="@Model.Keyword" />
+                        <i class="fs-input-icon fa fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+                <button type="submit" class="site-button">Search</button>
+                <a asp-action="Candidates" class="site-button btn-secondary" style="margin-left: 10px;">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Candidates Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-users"></i> Candidates List</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Registered</th>
+                        <th>Resumes</th>
+                        <th>Profile</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var candidate in Model.Candidates.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="twm-bookmark-list">
+                                    <div class="twm-mid-content">
+                                        <a asp-controller="Admin" asp-action="CandidateDetail" asp-route-id="@candidate.Id" class="twm-job-title">
+                                            <h4>@candidate.FullName</h4>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@candidate.Email</td>
+                            <td>@candidate.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                            <td><span class="badge bg-info">@candidate.ResumeCount</span></td>
+                            <td>@candidate.ProfileCompletionPercent%</td>
+                            <td>
+                                <span class="@(candidate.IsActive ? "text-clr-green2" : "text-clr-red")">
+                                    @(candidate.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="twm-table-controls">
+                                    <ul class="twm-DT-controls-icon list-unstyled d-flex align-items-center">
+                                        <li>
+                                            <a asp-controller="Admin" asp-action="CandidateDetail" asp-route-id="@candidate.Id" title="View Profile">
+                                                <span class="fa fa-eye"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="DeleteCandidate" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                                <input type="hidden" name="id" value="@candidate.Id" />
+                                                <button type="submit" class="border-0 bg-transparent p-0" title="Delete">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Candidates.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Candidates.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="Candidates" asp-route-page="@(Model.Candidates.Page - 1)" asp-route-keyword="@Model.Keyword">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Candidates.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Candidates.Page ? "active" : "")">
+                                <a asp-action="Candidates" asp-route-page="@i" asp-route-keyword="@Model.Keyword">@i</a>
+                            </li>
+                        }
+                        @if (Model.Candidates.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="Candidates" asp-route-page="@(Model.Candidates.Page + 1)" asp-route-keyword="@Model.Keyword">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>

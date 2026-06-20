@@ -11,15 +11,20 @@
     <title>@(Model.Profile?.FullName ?? "Resume") - Creative Designer</title>
     @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
     <style>
+        :root {
+            --cd-header-from: #ff7e5f;
+            --cd-header-to:   #feb47b;
+            --cd-accent:      #ff7e5f;
+        }
         .resume-container {
-            font-family: 'Poppins', sans-serif;
-            color: #222;
-            line-height: 1.6;
-            background-color: #fafafa;
+            font-family: var(--cvb-base-font);
+            color: #333;
+            line-height: var(--cvb-line-height);
+            background-color: #fcfcfc;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
         .header {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            background: linear-gradient(135deg, var(--cd-header-from), var(--cd-header-to));
             color: #fff;
             padding: 50px 40px;
             text-align: left;
@@ -33,21 +38,21 @@
         }
         
         .resume-section-title {
-            font-size: 1.6em;
-            text-transform: lowercase;
-            color: #ff7e5f;
-            border-bottom: 3px solid #ff7e5f;
+            font-size: 20px;
+            color: var(--cd-accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            border-bottom: 2px solid #ddd;
             padding-bottom: 5px;
-            margin-bottom: 25px;
-            margin-top: 35px;
-            font-weight: 800;
-            display: inline-block;
+            margin-bottom: var(--cvb-item-margin);
+            margin-top: var(--cvb-section-margin);
         }
         
-        .resume-item { margin-bottom: 25px; position: relative; padding-left: 20px; border-left: 2px solid #ddd; }
+        .resume-item { margin-bottom: var(--cvb-item-margin); position: relative; padding-left: 20px; border-left: 2px solid #ddd; }
         .resume-item::before {
             content: ''; position: absolute; left: -6px; top: 5px;
-            width: 10px; height: 10px; border-radius: 50%; background: #ff7e5f;
+            width: 10px; height: 10px; border-radius: 50%; background: var(--cd-accent);
         }
         .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
         .resume-item-title { font-weight: 700; color: #222; font-size: 1.1em; }
@@ -56,7 +61,7 @@
         .resume-item-desc { font-size: 0.95em; color: #444; }
         
         .resume-skills-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .resume-skill-tag { background: #fff; border: 1px solid #ff7e5f; color: #ff7e5f; padding: 5px 12px; border-radius: 20px; font-size: 0.9em; font-weight: 600; }
+        .resume-skill-tag { background: #fff; border: 1px solid var(--cd-accent); color: var(--cd-accent); padding: 5px 12px; border-radius: 20px; font-size: 0.9em; font-weight: 600; }
         
         .resume-references-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .resume-reference-item { border: none; padding-left: 0; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -66,21 +71,13 @@
         .resume-custom-item::before { display: none; }
         
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #fff; }
-        .btn { padding: 10px 20px; background: #ff7e5f; color: white; text-decoration: none; border-radius: 25px; margin: 0 5px; font-weight: 600; display: inline-block; font-family: sans-serif; border: none; cursor: pointer; }
+        .btn { padding: 10px 20px; background: var(--cd-accent); color: white; text-decoration: none; border-radius: 25px; margin: 0 5px; font-weight: 600; display: inline-block; font-family: sans-serif; border: none; cursor: pointer; }
         .btn-secondary { background: #555; }
     </style>
+    @Html.Raw(Model.RenderColorVarsCss())
 </head>
 <body>
-    @if (!Model.IsExport)
-    {
-        <div class="action-bar d-print-none">
-            <a href="/CandidateDash/Templates" class="btn btn-secondary">Back to Templates</a>
-            @if (Model.TemplateId.HasValue)
-            {
-                <a href="/CandidateDash/ExportTemplate?id=@Model.TemplateId&resumeId=@Model.ResumeId" class="btn">Download as PDF</a>
-            }
-        </div>
-    }
+
 
     <div class="resume-container">
         <div class="header" style="display: flex; align-items: center; justify-content: space-between;">
@@ -126,10 +123,22 @@
             
             @foreach (var sec in sections.Where(s => s.IsVisible))
             {
-                <div class="resume-section-title">@sec.Title</div>
-                @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
+                <div class="cvb-section-wrapper" data-section-id="@sec.Id">
+                    <div class="resume-section-title">@sec.Title</div>
+                    @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/_{sec.SectionType}.cshtml", sec)
+                </div>
             }
         </div>
     </div>
+<script>
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'applyColors') {
+            var root = document.documentElement;
+            Object.entries(e.data.colors).forEach(function (entry) {
+                root.style.setProperty(entry[0], entry[1]);
+            });
+        }
+    });
+</script>
 </body>
 </html>

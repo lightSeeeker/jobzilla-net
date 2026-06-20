@@ -3,9 +3,9 @@ using jobzilla_net.Application.Common;
 
 namespace jobzilla_net.Application.Candidates;
 
-public interface ICandidateDashboardService
+public interface ICandidateboardService
 {
-    Task<CandidateDashboardOverviewDto> GetDashboardOverviewAsync(string userId);
+    Task<CandidateboardOverviewDto> GetDashboardOverviewAsync(string userId);
     
     Task<PagedResult<AppliedJobDto>> GetAppliedJobsAsync(string userId, int page = 1, int pageSize = 10);
     

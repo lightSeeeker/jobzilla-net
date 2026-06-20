@@ -1,0 +1,179 @@
+@model jobzilla_net.Application.Admin.Dtos.AdminCandidateDetailDto
+@{
+    ViewData["Title"] = "Candidate Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>@Model.FullName</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Candidates">Candidates</a>
+        <span>@Model.FullName</span>
+    </div>
+</div>
+
+<!-- Candidate Profile Section -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="row">
+            <!-- Profile Info -->
+            <div class="col-xl-4 col-lg-6 col-md-12 mb-4">
+                <div class="text-center">
+                    <div class="bg-light p-5 mb-3 rounded">
+                        <i class="fa fa-user-circle" style="font-size: 80px; color: #ccc;"></i>
+                    </div>
+                    <h3>@Model.FullName</h3>
+                    <p class="text-muted">@(Model.ProfessionalTitle ?? "No title")</p>
+                    <div class="mt-3">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="col-xl-8 col-lg-6 col-md-12">
+                <h4 class="mb-3">Profile Information</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Email</label>
+                        <p>@(Model.Email ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Phone</label>
+                        <p>@(Model.PhoneNumber ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Location</label>
+                        <p>@(Model.Location ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Professional Title</label>
+                        <p>@(Model.ProfessionalTitle ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="text-muted small">Summary</label>
+                        <p>@(Model.Summary ?? "N/A")</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="text-muted small">Member Since</label>
+                    <p>@Model.CreatedAtUtc.ToString("MMMM dd, yyyy")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Section -->
+<div class="twm-pro-view-chart-wrap">
+    <div class="nav-tabs-style-2 mb-4">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#resumes-tab" type="button">
+                    <i class="fa fa-file-pdf-o"></i> Resumes (@Model.Resumes.Count)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#applications-tab" type="button">
+                    <i class="fa fa-inbox"></i> Applications (@Model.Applications.Count)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4">
+            <!-- Resumes Tab -->
+            <div class="tab-pane fade show active" id="resumes-tab">
+                @if (Model.Resumes.Any())
+                {
+                    <div class="twm-D_table table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Resume Title</th>
+                                    <th>Created</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var resume in Model.Resumes)
+                                {
+                                    <tr>
+                                        <td>@resume.Title</td>
+                                        <td>@resume.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            @if (resume.IsDefault)
+                                            {
+                                                <span class="badge bg-success">Default</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Secondary</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">No resumes uploaded</div>
+                }
+            </div>
+
+            <!-- Applications Tab -->
+            <div class="tab-pane fade" id="applications-tab">
+                @if (Model.Applications.Any())
+                {
+                    <div class="twm-D_table table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Applied</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in Model.Applications)
+                                {
+                                    <tr>
+                                        <td>@app.JobTitle</td>
+                                        <td>@app.CompanyName</td>
+                                        <td>@app.AppliedAtUtc.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <span class="badge @(app.Status == "Applied" ? "bg-info" : app.Status == "Shortlisted" ? "bg-primary" : app.Status == "Rejected" ? "bg-danger" : "bg-success")">
+                                                @app.Status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">No job applications</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="mt-4">
+    <a href="@Url.Action("Candidates", "Admin")" class="site-button btn-secondary">
+        <i class="fa fa-arrow-left"></i> Back to List
+    </a>
+</div>

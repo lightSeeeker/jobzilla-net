@@ -1,7 +1,7 @@
-namespace jobzilla_net.Models.CandidateDash;
+namespace jobzilla_net.Models.Candidate;
 
 /// <summary>
-/// Request body for POST /CandidateDash/SaveColorSettings.
+/// Request body for POST /Candidate/SaveColorSettings.
 /// Carries the selected palette color variables so they can be persisted
 /// into <c>CandidateResume.SettingsJson</c> without a page reload.
 /// </summary>

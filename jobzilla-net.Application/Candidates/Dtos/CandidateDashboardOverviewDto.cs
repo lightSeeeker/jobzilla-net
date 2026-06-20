@@ -1,6 +1,6 @@
 namespace jobzilla_net.Application.Candidates.Dtos;
 
-public class CandidateDashboardOverviewDto
+public class CandidateboardOverviewDto
 {
     public int AppliedJobsCount { get; set; }
     public int SavedJobsCount { get; set; }

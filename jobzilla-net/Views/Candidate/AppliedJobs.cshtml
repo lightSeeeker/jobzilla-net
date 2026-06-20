@@ -1,0 +1,95 @@
+@model jobzilla_net.Models.Candidate.CandidateAppliedJobsViewModel
+@{
+    ViewData["Title"] = "Applied Jobs";
+    ViewData["ActivePage"] = "AppliedJobs";
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+
+
+
+    <div class="section-full p-t120  p-b90 site-bg-white">
+        <div class="container-fluid">
+            <div class="row">
+                
+                <partial name="_CandidateSidebar" model="null" />
+
+                <div class="col-xl-9 col-lg-8 col-md-12 m-b30">
+                    <div class="twm-right-section-panel site-bg-gray">
+                        <div class="wt-admin-right-page-header">
+                            <h2>Applied Jobs</h2>
+                            <p>Manage and track all your applications here.</p>
+                        </div>
+                        
+                        <div class="twm-dashboard-candidates-wrap">
+                            <div class="row">
+                                
+                                @if (Model.AppliedJobs.Items.Any())
+                                {
+                                    foreach (var app in Model.AppliedJobs.Items)
+                                    {
+                                        <div class="col-xl-12 col-lg-12 col-md-12">
+                                            <div class="twm-dash-candidates-list">
+                                                <div class="twm-media">
+                                                    <div class="twm-media-pic">
+                                                        <img src="@(string.IsNullOrEmpty(app.CompanyLogoPath) ? "/images/jobs-company/pic1.jpg" : app.CompanyLogoPath)" alt="#">
+                                                    </div>
+                                                </div>
+                                                <div class="twm-mid-content">
+                                                    <a asp-controller="Jobs" asp-action="Details" asp-route-id="@app.JobPostId" class="twm-job-title">
+                                                        <h4>@app.JobTitle </h4>
+                                                    </a>
+                                                    <p>@app.CompanyName</p>
+                                                    
+                                                    <div class="twm-fot-content">
+                                                        <div class="twm-left-info">
+                                                            <p class="twm-candidate-address"><i class="feather-map-pin"></i>@app.Location</p>
+                                                            <div class="twm-jobs-vacancies">@app.Status</div>
+                                                        </div>
+                                                        <div class="twm-right-btn">
+                                                            <ul class="twm-controls-icon list-unstyled">
+                                                                <li>
+                                                                    <a asp-controller="Jobs" asp-action="Details" asp-route-id="@app.JobPostId" title="View Job" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                        <span class="fa fa-eye"></span>
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <form asp-action="StartChat" method="post" class="m-0 p-0">
+                                                                        <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                                                                        <button type="submit" class="btn btn-sm btn-outline-info p-1 ml-2" title="Message Employer" data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                            <span class="fa fa-comments"></span>
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12 p-3 text-center">
+                                        <p>You haven't applied to any jobs yet.</p>
+                                        <a asp-controller="Jobs" asp-action="Index" class="site-button">Browse Jobs</a>
+                                    </div>
+                                }
+                                
+                            </div>
+                        </div>
+
+                        <!-- Pagination can be added here based on Model.AppliedJobs.TotalPages -->
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>   
+
+</div>
+<!-- CONTENT END -->
+

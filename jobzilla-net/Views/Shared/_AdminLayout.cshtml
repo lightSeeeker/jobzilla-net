@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+@inject jobzilla_net.Application.Common.Interfaces.IApplicationDbContext DbContext
+@using System.Security.Claims
+@{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var profileImage = "/images/user-avtar/pic4.jpg";
+}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard - Jobzilla</title>
+
+    <link rel="icon" href="~/images/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" type="image/x-icon" href="~/images/favicon.png" />
+
+    <link rel="stylesheet" type="text/css" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/feather.css">
+    <link rel="stylesheet" type="text/css" href="~/css/owl.carousel.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/magnific-popup.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/lc_lightbox.css">
+    <link rel="stylesheet" type="text/css" href="~/css/bootstrap-select.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/select.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/dropzone.css">
+    <link rel="stylesheet" type="text/css" href="~/css/scrollbar.css">
+    <link rel="stylesheet" type="text/css" href="~/css/datepicker.css">
+    <link rel="stylesheet" type="text/css" href="~/css/flaticon.css">
+    <link rel="stylesheet" type="text/css" href="~/css/swiper-bundle.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/style.css">
+    <link rel="stylesheet" class="skin" type="text/css" href="~/css/skins-type/skin-6.css">
+    <link rel="stylesheet" type="text/css" href="~/css/switcher.css">
+</head>
+
+<body>
+    <!-- LOADING AREA START ===== -->
+    <div class="loading-area">
+        <div class="loading-box"></div>
+        <div class="loading-pic">
+            <div class="wrapper">
+                <div class="cssload-loader"></div>
+            </div>
+        </div>
+    </div>
+    <!-- LOADING AREA  END ====== -->
+
+	<div class="page-wraper">
+        <header id="header-admin-wrap" class="header-admin-fixed">
+            <!-- Header Start -->
+            <div id="header-admin">
+                <div class="container">
+                    <!-- Left Side Content -->
+                    <div class="header-left">
+                        <div class="nav-btn-wrap">
+                            <a class="nav-btn-admin" id="sidebarCollapse">
+                                <span class="fa fa-angle-left"></span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Content -->
+                    <div class="header-right">
+                        <ul class="header-widget-wrap">
+                            <li class="header-widget">
+								<div class="dashboard-user-section">
+                                	<div class="listing-user">
+                                        <div class="dropdown">
+                                            <a href="javascript:;" class="dropdown-toggle" id="ID-ACCOUNT_dropdown" data-bs-toggle="dropdown">
+                                                <div class="user-name text-black">
+                                                    <span>
+                                                        <img src="@profileImage" alt="">
+                                                    </span>@User.Identity?.Name
+                                                </div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="ID-ACCOUNT_dropdown">
+                                                <ul>
+                                                    <li><a asp-controller="Admin" asp-action="Index"><i class="fa fa-home"></i>Dashboard</a></li>
+                                                    <li>
+                                                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormLayout">
+                                                            <a href="javascript:document.getElementById('logoutFormLayout').submit()"><i class="fa fa-share-square"></i> Logout</a>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                               </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <partial name="_AdminSidebar" />
+
+        <!-- Page Content Holder -->
+        <div id="content">
+            <div class="content-admin-main">
+                @RenderBody()
+            </div>
+    	</div>
+
+	</div>
+
+<!-- JAVASCRIPT  FILES ========================================= -->
+<script src="~/js/jquery-3.6.0.min.js"></script>
+<script src="~/js/popper.min.js"></script>
+<script src="~/js/bootstrap.min.js"></script>
+<script src="~/js/magnific-popup.min.js"></script>
+<script src="~/js/waypoints.min.js"></script>
+<script src="~/js/counterup.min.js"></script>
+<script src="~/js/waypoints-sticky.min.js"></script>
+<script src="~/js/isotope.pkgd.min.js"></script>
+<script src="~/js/imagesloaded.pkgd.min.js"></script>
+<script src="~/js/owl.carousel.min.js"></script>
+<script src="~/js/theia-sticky-sidebar.js"></script>
+<script src="~/js/lc_lightbox.lite.js" ></script>
+<script src="~/js/bootstrap-select.min.js"></script>
+<script src="~/js/dropzone.js"></script>
+<script src="~/js/jquery.scrollbar.js"></script>
+<script src="~/js/bootstrap-datepicker.js"></script>
+<script src="~/js/jquery.dataTables.min.js"></script>
+<script src="~/js/dataTables.bootstrap5.min.js"></script>
+<script src="~/js/chart.js"></script>
+<script src="~/js/bootstrap-slider.min.js"></script>
+<script src="~/js/swiper-bundle.min.js"></script>
+<script src="~/js/custom.js"></script>
+<script src="~/js/switcher.js"></script>
+
+@RenderSection("Scripts", required: false)
+
+</body>
+</html>

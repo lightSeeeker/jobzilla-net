@@ -57,7 +57,7 @@ public sealed class JobsController : Controller
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                var candidateService = HttpContext.RequestServices.GetRequiredService<jobzilla_net.Application.Candidates.ICandidateDashboardService>();
+                var candidateService = HttpContext.RequestServices.GetRequiredService<jobzilla_net.Application.Candidates.ICandidateboardService>();
                 ViewBag.HasApplied = await candidateService.HasAppliedForJobAsync(userId, job.Id);
                 ViewBag.CandidateResumes = await candidateService.GetResumesAsync(userId);
             }

@@ -1,0 +1,98 @@
+@model jobzilla_net.Models.Account.LoginViewModel
+@{
+    ViewData["Title"] = "Admin Log In";
+    Layout = "_Layout";
+}
+
+<!-- CONTENT START -->
+<div class="page-content">
+
+    <!-- Login Section Start -->
+    <div class="section-full site-bg-white">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-8 col-lg-6 col-md-5 twm-log-reg-media-wrap">
+                    <div class="twm-log-reg-media">
+                        <div class="twm-l-media">
+                            <img src="~/images/login-bg.png" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-7">
+                    <div class="twm-log-reg-form-wrap">
+                        <div class="twm-log-reg-logo-head">
+                            <a asp-controller="Home" asp-action="Index">
+                                <img src="~/images/logo-dark.png" alt="" class="logo">
+                            </a>
+                        </div>
+
+                        <div class="twm-log-reg-inner">
+                            <div class="twm-log-reg-head">
+                                <div class="twm-log-reg-logo">
+                                    <span class="log-reg-form-title">Admin Log In</span>
+                                    <p style="font-size: 12px; color: #999; margin-top: 5px;">Administrator Access Only</p>
+                                </div>
+                            </div>
+
+                            <form asp-controller="Admin" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                                <input type="hidden" asp-for="UserType" id="UserType" value="Admin" />
+
+                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 font-weight-bold"></div>
+
+                                <div class="row">
+
+                                    <div class="col-lg-12">
+                                        <div class="form-group mb-3">
+                                            <input asp-for="Email" class="form-control" placeholder="Admin Email*">
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12">
+                                        <div class="form-group mb-3">
+                                            <input asp-for="Password" class="form-control" placeholder="Password*">
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12">
+                                        <div class="twm-forgot-wrap">
+                                            <div class="form-group mb-3">
+                                                <div class="form-check">
+                                                    <input asp-for="RememberMe" class="form-check-input" id="RememberMe">
+                                                    <label class="form-check-label rem-forgot" for="RememberMe">Remember me</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <button type="submit" class="site-button">Log in as Admin</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12" style="text-align: center; margin-top: 20px;">
+                                        <p style="font-size: 12px; color: #666;">
+                                            Not an admin? <a asp-controller="Account" asp-action="Login" class="site-text-primary">Go to user login</a>
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Login Section End -->
+
+</div>
+<!-- CONTENT END -->
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

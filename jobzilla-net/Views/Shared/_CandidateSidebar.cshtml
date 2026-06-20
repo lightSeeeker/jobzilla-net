@@ -1,4 +1,4 @@
-@model jobzilla_net.Models.CandidateDash.CandidateDashOverviewViewModel
+@model jobzilla_net.Models.Candidate.CandidateOverviewViewModel
 @inject jobzilla_net.Application.Common.Interfaces.IApplicationDbContext DbContext
 @using System.Security.Claims
 @{
@@ -40,18 +40,18 @@
        
         <div class="twm-nav-list-1">
             <ul>
-                <li class="@(activePage == "Dashboard" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-tachometer-alt"></i> Dashboard</a></li>
-                <li class="@(activePage == "Profile" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-user"></i> My Profile</a></li>
-                <li class="@(activePage == "AppliedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="AppliedJobs"><i class="fa fa-suitcase"></i> Applied Jobs</a></li>
-                <li class="@(activePage == "Resumes" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-receipt"></i> My Resume</a></li>
-                <li><a asp-controller="CandidateDash" asp-action="Resumes"><i class="fa fa-cloud-upload-alt"></i> Upload Resume</a></li>
-                <li class="@(activePage == "Builder" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Builder"><i class="fa fa-pencil-ruler"></i> Resume Builder</a></li>
-                <li class="@(activePage == "Templates" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Templates"><i class="fa fa-file-alt"></i> Templates</a></li>
-                <li><a asp-controller="CandidateDash" asp-action="Templates"><i class="fa fa-download"></i> Download Resume</a></li>
-                <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
-                <li><a asp-controller="CandidateDash" asp-action="Index"><i class="fa fa-bell"></i> Job Alerts</a></li>
-                <li><a asp-controller="CandidateDash" asp-action="Profile"><i class="fa fa-fingerprint"></i> Change Password</a></li>
-                <li class="@(activePage == "Chat" ? "active" : "")"><a asp-controller="CandidateDash" asp-action="Chat"><i class="fa fa-comments"></i> Chat</a></li>
+                <li class="@(activePage == "Dashboard" ? "active" : "")"><a asp-controller="Candidate" asp-action="Index"><i class="fa fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="@(activePage == "Profile" ? "active" : "")"><a asp-controller="Candidate" asp-action="Profile"><i class="fa fa-user"></i> My Profile</a></li>
+                <li class="@(activePage == "AppliedJobs" ? "active" : "")"><a asp-controller="Candidate" asp-action="AppliedJobs"><i class="fa fa-suitcase"></i> Applied Jobs</a></li>
+                <li class="@(activePage == "Resumes" ? "active" : "")"><a asp-controller="Candidate" asp-action="Resumes"><i class="fa fa-receipt"></i> My Resume</a></li>
+                <li><a asp-controller="Candidate" asp-action="Resumes"><i class="fa fa-cloud-upload-alt"></i> Upload Resume</a></li>
+                <li class="@(activePage == "Builder" ? "active" : "")"><a asp-controller="Candidate" asp-action="Builder"><i class="fa fa-pencil-ruler"></i> Resume Builder</a></li>
+                <li class="@(activePage == "Templates" ? "active" : "")"><a asp-controller="Candidate" asp-action="Templates"><i class="fa fa-file-alt"></i> Templates</a></li>
+                <li><a asp-controller="Candidate" asp-action="Templates"><i class="fa fa-download"></i> Download Resume</a></li>
+                <li class="@(activePage == "SavedJobs" ? "active" : "")"><a asp-controller="Candidate" asp-action="SavedJobs"><i class="fa fa-file-download"></i> Saved Jobs</a></li>
+                <li><a asp-controller="Candidate" asp-action="Index"><i class="fa fa-bell"></i> Job Alerts</a></li>
+                <li><a asp-controller="Candidate" asp-action="Profile"><i class="fa fa-fingerprint"></i> Change Password</a></li>
+                <li class="@(activePage == "Chat" ? "active" : "")"><a asp-controller="Candidate" asp-action="Chat"><i class="fa fa-comments"></i> Chat</a></li>
                 <li><a asp-controller="Blogs" asp-action="Manage"><i class="fa fa-newspaper"></i> My Blogs</a></li>
                 <li>
                     <form asp-controller="Account" asp-action="Logout" method="post" id="candidateLogoutForm" style="display: none;"></form>

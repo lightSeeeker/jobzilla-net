@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace jobzilla_net.Infrasture.Services;
 
-public class EmployerDashboardService : IEmployerDashboardService
+public class EmployerboardService : IEmployerboardService
 {
     private readonly ApplicationDbContext _context;
 
-    public EmployerDashboardService(ApplicationDbContext context)
+    public EmployerboardService(ApplicationDbContext context)
     {
         _context = context;
     }
@@ -34,7 +34,7 @@ public class EmployerDashboardService : IEmployerDashboardService
         return profile;
     }
 
-    public async Task<EmployerDashboardOverviewDto> GetDashboardOverviewAsync(string userId)
+    public async Task<EmployerboardOverviewDto> GetDashboardOverviewAsync(string userId)
     {
         var profile = await GetOrCreateProfileAsync(userId);
 
@@ -68,7 +68,7 @@ public class EmployerDashboardService : IEmployerDashboardService
             .ToList();
 
         // Message count would require chat system, mock for now
-        return new EmployerDashboardOverviewDto
+        return new EmployerboardOverviewDto
         {
             PostedJobsCount = postedJobsCount,
             TotalApplicationsCount = totalApplications,

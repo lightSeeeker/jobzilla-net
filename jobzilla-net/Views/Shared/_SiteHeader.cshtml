@@ -6,8 +6,12 @@
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
     var isEmployer = isAuthenticated && User.IsInRole("Employer");
     var isCandidate = isAuthenticated && User.IsInRole("Candidate");
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var isAuthPage = (controller == "Account" && (action == "Login" || action == "Register")) ||
+                     (controller == "Admin" && (action == "Login" || action == "LoginWith2FA"));
 }
-@if (!isCandidate)
+@if (!isCandidate && !isAuthPage)
 {
     <!-- HEADER START -->
     <header class="site-header header-style-3 mobile-sider-drawer-menu">
@@ -48,11 +52,11 @@
                                 <li class="has-child">
                                     <a href="javascript:;">Employer Panel</a>
                                     <ul class="sub-menu">
-                                        <li><a asp-controller="EmployerDash" asp-action="Index">Dashboard</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="Profile">Profile</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="Applications">Applications</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="PostedJobs">Manage Jobs</a></li>
-                                        <li><a asp-controller="EmployerDash" asp-action="PostJob">Post A Job</a></li>
+                                        <li><a asp-controller="Employer" asp-action="Index">Dashboard</a></li>
+                                        <li><a asp-controller="Employer" asp-action="Profile">Profile</a></li>
+                                        <li><a asp-controller="Employer" asp-action="Applications">Applications</a></li>
+                                        <li><a asp-controller="Employer" asp-action="PostedJobs">Manage Jobs</a></li>
+                                        <li><a asp-controller="Employer" asp-action="PostJob">Post A Job</a></li>
                                         <li><a asp-controller="Candidates" asp-action="Index">Browse Candidates</a></li>
                                         <li><a asp-controller="Chat" asp-action="Index">Chat</a></li>
                                     </ul>
@@ -66,11 +70,11 @@
                                 <li class="has-child">
                                     <a href="javascript:;">Candidate Panel</a>
                                     <ul class="sub-menu">
-                                        <li><a asp-controller="CandidateDash" asp-action="Index">Dashboard</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Profile">My Profile</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="AppliedJobs">Applied Jobs</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="Resumes">My Resume</a></li>
-                                        <li><a asp-controller="CandidateDash" asp-action="SavedJobs">Saved Jobs</a></li>
+                                        <li><a asp-controller="Candidate" asp-action="Index">Dashboard</a></li>
+                                        <li><a asp-controller="Candidate" asp-action="Profile">My Profile</a></li>
+                                        <li><a asp-controller="Candidate" asp-action="AppliedJobs">Applied Jobs</a></li>
+                                        <li><a asp-controller="Candidate" asp-action="Resumes">My Resume</a></li>
+                                        <li><a asp-controller="Candidate" asp-action="SavedJobs">Saved Jobs</a></li>
                                         <li><a asp-controller="Chat" asp-action="Index">Chat</a></li>
                                     </ul>
                                 </li>
@@ -102,7 +106,7 @@
                                 else if (isEmployer)
                                 {
                                     <div class="twm-nav-btn-right">
-                                        <a asp-controller="EmployerDash" asp-action="PostedJobs" class="twm-nav-post-a-job">
+                                        <a asp-controller="Employer" asp-action="PostedJobs" class="twm-nav-post-a-job">
                                             <i class="feather-briefcase"></i> Post a job
                                         </a>
                                     </div>

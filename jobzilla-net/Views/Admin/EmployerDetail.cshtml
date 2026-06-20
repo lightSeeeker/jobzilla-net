@@ -1,0 +1,252 @@
+@model jobzilla_net.Application.Admin.Dtos.AdminEmployerDetailDto
+@{
+    ViewData["Title"] = "Employer Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>@Model.CompanyName</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Employers">Employers</a>
+        <span>@Model.CompanyName</span>
+    </div>
+</div>
+
+<!-- Employer Profile Section -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="row">
+            <!-- Logo & Basic Info -->
+            <div class="col-xl-4 col-lg-6 col-md-12 mb-4">
+                <div class="text-center">
+                    @if (!string.IsNullOrEmpty(Model.LogoPath))
+                    {
+                        <img src="@Model.LogoPath" alt="@Model.CompanyName" class="img-fluid mb-3" style="max-height: 150px; max-width: 100%;">
+                    }
+                    else
+                    {
+                        <div class="bg-light p-5 mb-3 rounded">
+                            <i class="fa fa-building" style="font-size: 60px; color: #ccc;"></i>
+                        </div>
+                    }
+                    <h3>@Model.CompanyName</h3>
+                    <div class="mt-3">
+                        @if (Model.IsVerified)
+                        {
+                            <span class="badge bg-success">Verified</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Not Verified</span>
+                        }
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-info">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="col-xl-8 col-lg-6 col-md-12">
+                <h4 class="mb-3">Contact Information</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Email</label>
+                        <p>@(Model.Email ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Phone</label>
+                        <p>@(Model.PhoneNumber ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Industry</label>
+                        <p>@(Model.Industry ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Location</label>
+                        <p>@(Model.Location ?? "N/A")</p>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="text-muted small">Website</label>
+                        <p>
+                            @if (!string.IsNullOrEmpty(Model.WebsiteUrl))
+                            {
+                                <a href="@Model.WebsiteUrl" target="_blank" class="site-text-primary">@Model.WebsiteUrl</a>
+                            }
+                            else
+                            {
+                                <span>N/A</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="text-muted small">Description</label>
+                        <p>@(Model.Description ?? "N/A")</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="text-muted small">Member Since</label>
+                    <p>@Model.CreatedAtUtc.ToString("MMMM dd, yyyy")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Section -->
+<div class="twm-pro-view-chart-wrap">
+    <div class="nav-tabs-style-2 mb-4">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#jobs-tab" type="button">
+                    <i class="fa fa-briefcase"></i> Recent Jobs (@Model.RecentJobs.Count)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#subscription-tab" type="button">
+                    <i class="fa fa-credit-card"></i> Subscription
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#payments-tab" type="button">
+                    <i class="fa fa-money"></i> Payment History (@Model.Payments.Count)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4">
+            <!-- Jobs Tab -->
+            <div class="tab-pane fade show active" id="jobs-tab">
+                @if (Model.RecentJobs.Any())
+                {
+                    <div class="twm-D_table table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Category</th>
+                                    <th>Posted</th>
+                                    <th>Applications</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var job in Model.RecentJobs)
+                                {
+                                    <tr>
+                                        <td>@job.Title</td>
+                                        <td>@job.CategoryName</td>
+                                        <td>@job.CreatedAtUtc.ToString("MMM dd, yyyy")</td>
+                                        <td><span class="badge bg-primary">@job.ApplicationsCount</span></td>
+                                        <td>
+                                            <span class="@(job.Status == "Active" ? "text-clr-green2" : "text-clr-red")">
+                                                @job.Status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">No jobs posted yet</div>
+                }
+            </div>
+
+            <!-- Subscription Tab -->
+            <div class="tab-pane fade" id="subscription-tab">
+                @if (Model.CurrentSubscription != null)
+                {
+                    <div class="panel panel-default">
+                        <div class="panel-body wt-panel-body p-a20">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Plan Name</h5>
+                                    <p>@Model.CurrentSubscription.Name</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Price</h5>
+                                    <p>$@Model.CurrentSubscription.Price.ToString("0.00")</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Job Post Limit</h5>
+                                    <p>@Model.CurrentSubscription.JobPostLimit</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Duration</h5>
+                                    <p>@Model.CurrentSubscription.DurationDays days</p>
+                                </div>
+                                <div class="col-md-12">
+                                    <h5>Features</h5>
+                                    <ul class="list-unstyled">
+                                        @if (Model.CurrentSubscription.CanFeatureJobs)
+                                        {
+                                            <li><i class="fa fa-check text-success"></i> Featured Jobs</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">No active subscription</div>
+                }
+            </div>
+
+            <!-- Payments Tab -->
+            <div class="tab-pane fade" id="payments-tab">
+                @if (Model.Payments.Any())
+                {
+                    <div class="twm-D_table table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Package</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var payment in Model.Payments)
+                                {
+                                    <tr>
+                                        <td>@payment.TransactionDateUtc.ToString("MMM dd, yyyy")</td>
+                                        <td>@payment.Package</td>
+                                        <td>$@payment.Amount.ToString("0.00")</td>
+                                        <td>
+                                            <span class="badge @(payment.Status == "Completed" ? "bg-success" : payment.Status == "Pending" ? "bg-warning" : "bg-danger")">
+                                                @payment.Status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">No payment history</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="mt-4">
+    <a href="@Url.Action("Employers", "Admin")" class="site-button btn-secondary">
+        <i class="fa fa-arrow-left"></i> Back to List
+    </a>
+</div>

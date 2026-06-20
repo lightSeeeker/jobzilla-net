@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace jobzilla_net.Infrasture.Services;
 
-public class CandidateDashboardService : ICandidateDashboardService
+public class CandidateboardService : ICandidateboardService
 {
     private readonly IApplicationDbContext _context;
 
-    public CandidateDashboardService(IApplicationDbContext context)
+    public CandidateboardService(IApplicationDbContext context)
     {
         _context = context;
     }
@@ -35,7 +35,7 @@ public class CandidateDashboardService : ICandidateDashboardService
         return profile;
     }
 
-    public async Task<CandidateDashboardOverviewDto> GetDashboardOverviewAsync(string userId)
+    public async Task<CandidateboardOverviewDto> GetDashboardOverviewAsync(string userId)
     {
         var profile = await GetOrCreateProfileAsync(userId);
 
@@ -67,7 +67,7 @@ public class CandidateDashboardService : ICandidateDashboardService
             })
             .ToListAsync();
 
-        return new CandidateDashboardOverviewDto
+        return new CandidateboardOverviewDto
         {
             AppliedJobsCount = appliedJobsCount,
             SavedJobsCount = savedJobsCount,

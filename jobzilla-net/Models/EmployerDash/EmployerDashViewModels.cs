@@ -1,25 +1,25 @@
 using jobzilla_net.Application.Employers.Dtos;
 using Microsoft.AspNetCore.Http;
 
-namespace jobzilla_net.Models.EmployerDash;
+namespace jobzilla_net.Models.Employer;
 
-public class EmployerDashOverviewViewModel
+public class EmployerOverviewViewModel
 {
-    public EmployerDashboardOverviewDto Overview { get; set; } = new();
+    public EmployerboardOverviewDto Overview { get; set; } = new();
 }
 
-public class EmployerDashProfileViewModel
+public class EmployerProfileViewModel
 {
     public EmployerProfileDto Profile { get; set; } = new();
     public IFormFile? LogoImage { get; set; }
 }
 
-public class EmployerDashJobsViewModel
+public class EmployerJobsViewModel
 {
     public Application.Common.PagedResult<EmployerJobPostDto> PostedJobs { get; set; } = new();
 }
 
-public class EmployerDashApplicationsViewModel
+public class EmployerApplicationsViewModel
 {
     public Application.Common.PagedResult<EmployerJobApplicationDto> Applications { get; set; } = new();
 }

@@ -94,9 +94,9 @@ public class AccountController : Controller
                 else if (user is not null)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    if (roles.Contains("Admin"))     returnUrl = Url.Action("Index", "Dashboard") ?? "/";
-                    else if (roles.Contains("Employer"))  returnUrl = Url.Action("Index", "EmployerDash") ?? "/";
-                    else if (roles.Contains("Candidate")) returnUrl = Url.Action("Index", "CandidateDash") ?? "/";
+                    if (roles.Contains("Admin"))     returnUrl = Url.Action("Index", "Admin") ?? "/";
+                    else if (roles.Contains("Employer"))  returnUrl = Url.Action("Index", "Employer") ?? "/";
+                    else if (roles.Contains("Candidate")) returnUrl = Url.Action("Index", "Candidate") ?? "/";
                 }
                 return Json(new { success = true, redirectUrl = returnUrl });
             }
@@ -180,9 +180,9 @@ public class AccountController : Controller
             if (isAjax)
             {
                 string returnUrl = Url.Action("Index", "Home") ?? "/";
-                if (model.UserType == "Admin")     returnUrl = Url.Action("Index", "Dashboard") ?? "/";
-                else if (model.UserType == "Employer")  returnUrl = Url.Action("Index", "EmployerDash") ?? "/";
-                else if (model.UserType == "Candidate") returnUrl = Url.Action("Index", "CandidateDash") ?? "/";
+                if (model.UserType == "Admin")     returnUrl = Url.Action("Index", "Admin") ?? "/";
+                else if (model.UserType == "Employer")  returnUrl = Url.Action("Index", "Employer") ?? "/";
+                else if (model.UserType == "Candidate") returnUrl = Url.Action("Index", "Candidate") ?? "/";
                 return Json(new { success = true, redirectUrl = returnUrl });
             }
 
@@ -231,9 +231,9 @@ public class AccountController : Controller
     /// </summary>
     private IActionResult RedirectToDashboard()
     {
-        if (User.IsInRole("Admin"))     return RedirectToAction("Index", "Dashboard");
-        if (User.IsInRole("Employer"))  return RedirectToAction("Index", "EmployerDash");
-        if (User.IsInRole("Candidate")) return RedirectToAction("Index", "CandidateDash");
+        if (User.IsInRole("Admin"))     return RedirectToAction("Index", "Admin");
+        if (User.IsInRole("Employer"))  return RedirectToAction("Index", "Employer");
+        if (User.IsInRole("Candidate")) return RedirectToAction("Index", "Candidate");
         return RedirectToAction("Index", "Home");
     }
 
@@ -247,9 +247,9 @@ public class AccountController : Controller
         if (user is not null)
         {
             var roles = await _userManager.GetRolesAsync(user);
-            if (roles.Contains("Admin"))     return RedirectToAction("Index", "Dashboard");
-            if (roles.Contains("Employer"))  return RedirectToAction("Index", "EmployerDash");
-            if (roles.Contains("Candidate")) return RedirectToAction("Index", "CandidateDash");
+            if (roles.Contains("Admin"))     return RedirectToAction("Index", "Admin");
+            if (roles.Contains("Employer"))  return RedirectToAction("Index", "Employer");
+            if (roles.Contains("Candidate")) return RedirectToAction("Index", "Candidate");
         }
         return RedirectToAction("Index", "Home");
     }

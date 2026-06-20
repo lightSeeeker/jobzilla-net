@@ -1,4 +1,6 @@
-﻿<!-- LOADING AREA START ===== -->
+﻿@model jobzilla_net.Models.Home.HomePageViewModel
+
+<!-- LOADING AREA START ===== -->
     <div class="loading-area">
         <div class="loading-box"></div>
         <div class="loading-pic">
@@ -53,44 +55,41 @@
                             <div class="twm-bnr-discription">Type your keyword, then click search to find your perfect job.</div>
 
                             <div class="twm-bnr-search-bar">
-                                <form>
-                                    <div class="row">
-                                        <!--Title-->
-                                        <div class="form-group col-xl-3 col-lg-6 col-md-6">
-                                            <label>What</label>
-                                            <select class="wt-search-bar-select selectpicker"  data-live-search="true" title="" id="j-Job_Title" data-bv-field="size">
-                                                <option disabled selected value="">Select Category</option>
-                                                <option selected>Job Title</option>
-                                                <option>Web Designer</option>
-                                                <option>Developer</option>
-                                                <option>Acountant</option>
-                                            </select>
+                                <form asp-controller="Jobs" asp-action="Index" method="get">
+                                    <div class="row align-items-end g-2 g-md-3">
+                                        <!--Keyword Search-->
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #b0b0b0; margin-bottom: 10px; text-transform: uppercase;">What</label>
+                                            <input type="text" name="keyword" class="form-control" placeholder="Job title, keywords..." style="border: 1px solid #ddd; padding: 13px 15px; font-size: 14px; border-radius: 4px; transition: all 0.3s; background-color: #f9f9f9;" onmouseover="this.style.backgroundColor='#fff'; this.style.borderColor='#1967d2';" onmouseout="this.style.backgroundColor='#f9f9f9'; this.style.borderColor='#ddd';">
                                         </div>
 
-                                        <!--All Category-->
-                                        <div class="form-group col-xl-3 col-lg-6 col-md-6">
-                                            <label>Type</label>
-                                            <select class="wt-search-bar-select selectpicker"  data-live-search="true" title="" id="j-All_Category" data-bv-field="size">
-                                                <option disabled selected value="">Select Category</option>
-                                                <option selected>All Category</option>
-                                                <option>Web Designer</option>
-                                                <option>Developer</option>
-                                                <option>Acountant</option>
+                                        <!--Category-->
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #b0b0b0; margin-bottom: 10px; text-transform: uppercase;">Category</label>
+                                            <select class="form-control selectpicker" name="categoryId" data-live-search="true" style="border: 1px solid #ddd; padding: 13px 15px; font-size: 14px; border-radius: 4px; background-color: #f9f9f9;">
+                                                <option value="">All Categories</option>
+                                                @if (Model?.JobCategories != null && Model.JobCategories.Any())
+                                                {
+                                                    @foreach (var cat in Model.JobCategories)
+                                                    {
+                                                        <option value="@cat.Id">@cat.Name</option>
+                                                    }
+                                                }
                                             </select>
                                         </div>
 
                                         <!--Location-->
-                                        <div class="form-group col-xl-3 col-lg-6 col-md-6">
-                                            <label>Location</label>
-                                            <div class="twm-inputicon-box">
-                                                <input name="username" type="text" required class="form-control" placeholder="Search...">
-                                                <i class="twm-input-icon fas fa-map-marker-alt"></i>
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #b0b0b0; margin-bottom: 10px; text-transform: uppercase;">Location</label>
+                                            <div class="input-group">
+                                                <input name="location" type="text" class="form-control" placeholder="City, region..." style="border: 1px solid #ddd; padding: 13px 15px; font-size: 14px; border-radius: 4px 0 0 4px; background-color: #f9f9f9;">
+                                                <span class="input-group-text" style="border: 1px solid #ddd; border-left: none; background-color: #f9f9f9; border-radius: 0 4px 4px 0;"><i class="fas fa-map-marker-alt" style="color: #999; font-size: 16px;"></i></span>
                                             </div>
                                         </div>
 
                                         <!--Find job btn-->
-                                        <div class="form-group col-xl-3 col-lg-6 col-md-6">
-                                            <button type="button" class="site-button">Find Job</button>
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <button type="submit" class="btn w-100" style="padding: 13px 20px; font-size: 15px; font-weight: 600; background-color: #1967d2; border: 2px solid #1967d2; color: white; border-radius: 4px; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.backgroundColor='#0d47a1'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(25,103,210,0.35)';" onmouseout="this.style.backgroundColor='#1967d2'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">Find Job</button>
                                         </div>
 
                                     </div>
@@ -141,9 +140,16 @@
                                         </div>
                                         <div class="twm-content">
                                             <div class="tw-count-number text-clr-sky">
-                                                <span class="counter">12</span>K+
+                                                @if (Model.TotalCompanies > 0)
+                                                {
+                                                    <span class="counter">@((Model.TotalCompanies / 1000).ToString("0"))</span><text>K+</text>
+                                                }
+                                                else
+                                                {
+                                                    <span class="counter">12</span><text>K+</text>
+                                                }
                                             </div>
-                                            <p class="icon-content-info">Companies Jobs</p>
+                                            <p class="icon-content-info">Companies</p>
                                         </div>
                                     </div>
 
@@ -154,9 +160,9 @@
                                         </div>
                                         <div class="twm-content">
                                             <div class="tw-count-number text-clr-pink">
-                                                <span class="counter">98</span> +
+                                                <span class="counter">@Model.TotalCountries</span>
                                             </div>
-                                            <p class="icon-content-info">Job For Countries </p>
+                                            <p class="icon-content-info">Countries With Jobs</p>
                                         </div>
                                     </div>
 
@@ -172,9 +178,16 @@
                                         </div>
                                         <div class="twm-content">
                                             <div class="tw-count-number text-clr-green">
-                                                <span class="counter">3</span>K+
+                                                @if (Model.TotalJobsDone > 0)
+                                                {
+                                                    <span class="counter">@((Model.TotalJobsDone / 1000).ToString("0"))</span><text>K+</text>
+                                                }
+                                                else
+                                                {
+                                                    <span class="counter">3</span><text>K+</text>
+                                                }
                                             </div>
-                                            <p class="icon-content-info">Jobs Done</p>
+                                            <p class="icon-content-info">Jobs Completed</p>
                                         </div>
                                     </div>
                                 </div>

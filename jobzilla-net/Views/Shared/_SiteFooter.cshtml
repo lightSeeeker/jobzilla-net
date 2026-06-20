@@ -1,6 +1,6 @@
 @{
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString();
-    bool isMinimalFooter = controllerName == "CandidateDash" || controllerName == "EmployerDash";
+    bool isMinimalFooter = controllerName == "Candidate" || controllerName == "Employer" || controllerName == "Account";
 }
         <footer class="footer-dark" style="background-image: url(/images/f-bg.jpg); @(isMinimalFooter ? "padding-top: 0;" : "")">
             <div class="container">
@@ -55,8 +55,8 @@
                                         <div class="widget widget_services ftr-list-center">
                                             <h3 class="widget-title">For Candidate</h3>
                                             <ul>
-                                                <li><a asp-controller="CandidateDash" asp-action="Index">User Dashboard</a></li>
-                                                <li><a asp-controller="CandidateDash" asp-action="Index">Alert resume</a></li>
+                                                <li><a asp-controller="Candidate" asp-action="Index">User Dashboard</a></li>
+                                                <li><a asp-controller="Candidate" asp-action="Index">Alert resume</a></li>
                                                 <li><a asp-controller="Candidates" asp-action="Index">Candidates</a></li>
                                                 <li><a asp-controller="Blogs" asp-action="Index">Blog List</a></li>
                                                 <li><a asp-controller="Blogs" asp-action="Details">Blog single</a></li>
@@ -68,7 +68,7 @@
                                         <div class="widget widget_services ftr-list-center">
                                             <h3 class="widget-title">For Employers</h3>
                                             <ul>
-                                                <li><a asp-controller="EmployerDash" asp-action="PostedJobs">Post Jobs</a></li>
+                                                <li><a asp-controller="Employer" asp-action="PostedJobs">Post Jobs</a></li>
                                                 <li><a asp-controller="Blogs" asp-action="Index">Blog Grid</a></li>
                                                 <li><a asp-controller="Home" asp-action="Index">Contact</a></li>
                                                 <li><a asp-controller="Jobs" asp-action="Index">Jobs Listing</a></li>
@@ -83,7 +83,7 @@
                                             <ul>
                                                 <li><a asp-controller="Home" asp-action="Index">FAQs</a></li>
                                                 <li><a asp-controller="Employers" asp-action="Details">Employer detail</a></li>
-                                                <li><a asp-controller="CandidateDash" asp-action="Profile">Profile</a></li>
+                                                <li><a asp-controller="Candidate" asp-action="Profile">Profile</a></li>
                                                 <li><a asp-controller="Home" asp-action="Index">404 Page</a></li>
                                                 <li><a asp-controller="Home" asp-action="Index">Pricing</a></li>
                                             </ul>
@@ -96,7 +96,7 @@
                                             <ul>
                                                 <li><a href="@Url.Action("Index", "Home")">Home</a></li>
                                                 <li><a asp-controller="Home" asp-action="Index">About us</a></li>
-                                                <li><a asp-controller="CandidateDash" asp-action="SavedJobs">Bookmark</a></li>
+                                                <li><a asp-controller="Candidate" asp-action="SavedJobs">Bookmark</a></li>
                                                 <li><a asp-controller="Jobs" asp-action="Index">Jobs</a></li>
                                                 <li><a asp-controller="Employers" asp-action="Index">Employer</a></li>
                                             </ul>

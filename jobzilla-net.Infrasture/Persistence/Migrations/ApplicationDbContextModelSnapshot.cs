@@ -155,6 +155,50 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("jobzilla_net.Core.Entities.AdminAuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdminName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdminUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PerformedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminAuditLogs");
+                });
+
             modelBuilder.Entity("jobzilla_net.Core.Entities.BlogCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -847,6 +891,49 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.ToTable("EmployerSubscriptions");
                 });
 
+            modelBuilder.Entity("jobzilla_net.Core.Entities.HomePageContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Section")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HomePageContents");
+                });
+
             modelBuilder.Entity("jobzilla_net.Core.Entities.JobAlert", b =>
                 {
                     b.Property<int>("Id")
@@ -1238,16 +1325,26 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("DiscountPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPremium")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -1257,8 +1354,15 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                     b.Property<string>("PreviewImagePath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("TemplateFilePath")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TemplateType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
@@ -1272,52 +1376,72 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         new
                         {
                             Id = 1,
+                            Category = "Professional",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "A clean, balanced layout with subtle colors suitable for modern professionals.",
                             IsActive = true,
                             IsDeleted = false,
+                            IsPremium = false,
                             Name = "Modern Professional",
-                            TemplateFilePath = "ModernProfessional"
+                            Price = 0m,
+                            TemplateFilePath = "ModernProfessional",
+                            TemplateType = "Modern"
                         },
                         new
                         {
                             Id = 2,
+                            Category = "Executive",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Traditional and sophisticated, perfect for senior corporate roles.",
                             IsActive = true,
                             IsDeleted = false,
+                            IsPremium = true,
                             Name = "Executive Corporate",
-                            TemplateFilePath = "ExecutiveCorporate"
+                            Price = 29.99m,
+                            TemplateFilePath = "ExecutiveCorporate",
+                            TemplateType = "Corporate"
                         },
                         new
                         {
                             Id = 3,
+                            Category = "ATS Friendly",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Strictly single column, text-focused format designed to pass cleanly through tracking systems.",
                             IsActive = true,
                             IsDeleted = false,
+                            IsPremium = true,
                             Name = "ATS Optimized",
-                            TemplateFilePath = "AtsOptimized"
+                            Price = 19.99m,
+                            TemplateFilePath = "AtsOptimized",
+                            TemplateType = "ATS"
                         },
                         new
                         {
                             Id = 4,
+                            Category = "Creative",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Bold typography and vibrant accents for creative and design-focused roles.",
                             IsActive = true,
                             IsDeleted = false,
+                            IsPremium = true,
                             Name = "Creative Designer",
-                            TemplateFilePath = "CreativeDesigner"
+                            Price = 39.99m,
+                            TemplateFilePath = "CreativeDesigner",
+                            TemplateType = "Creative"
                         },
                         new
                         {
                             Id = 5,
+                            Category = "Technical",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Clean and structured with tech-focused elements, resembling technical documentation.",
                             IsActive = true,
                             IsDeleted = false,
+                            IsPremium = true,
                             Name = "Technical Developer",
-                            TemplateFilePath = "TechnicalDeveloper"
+                            Price = 24.99m,
+                            TemplateFilePath = "TechnicalDeveloper",
+                            TemplateType = "Technical"
                         });
                 });
 

@@ -1,9 +1,9 @@
 using jobzilla_net.Application.Employers.Dtos;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace jobzilla_net.Models.EmployerDash;
+namespace jobzilla_net.Models.Employer;
 
-public class EmployerDashJobFormViewModel
+public class EmployerJobFormViewModel
 {
     public EmployerJobCreateUpdateDto Job { get; set; } = new();
     

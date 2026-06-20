@@ -1,0 +1,122 @@
+@model jobzilla_net.Models.AdminDash.AdminContentPageEditViewModel
+@{
+    ViewData["Title"] = "Edit Content Page";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Edit: @Model.Title</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="ContentPages">CMS Pages</a>
+        <span>@Model.Title</span>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Edit Form -->
+<div class="panel panel-default">
+    <div class="panel-body wt-panel-body p-a20">
+        <form asp-action="EditContentPage" method="post">
+            <!-- Page Key (Hidden) -->
+            <input type="hidden" asp-for="Key" />
+
+            <!-- Page Title -->
+            <div class="form-group mb-3">
+                <label>Page Title *</label>
+                <input asp-for="Title" class="form-control form-control-lg" placeholder="Page title" required />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <!-- Page Slug Info -->
+            <div class="alert alert-info mb-4">
+                <strong>Page Key:</strong> <code class="bg-white p-2">@Model.Key</code>
+                <p class="mb-0 mt-2 text-muted small">This page is identified by the key shown above. This cannot be changed.</p>
+            </div>
+
+            <!-- HTML Content Editor -->
+            <div class="form-group mb-3">
+                <label>Page Content (HTML) *</label>
+                <textarea asp-for="HtmlContent" class="form-control" rows="15" placeholder="Enter HTML content..." required></textarea>
+                <small class="text-muted d-block mt-2">
+                    You can enter HTML tags here. For safety, some tags may be filtered.
+                </small>
+                <span asp-validation-for="HtmlContent" class="text-danger"></span>
+            </div>
+
+            <!-- Editor Toolbar Help -->
+            <div class="panel panel-default mb-4 bg-light">
+                <div class="panel-heading wt-panel-heading p-a15">
+                    <h5 class="m-a0"><i class="fa fa-question-circle"></i> Allowed HTML Tags</h5>
+                </div>
+                <div class="panel-body wt-panel-body p-a15 text-muted small">
+                    <p class="mb-2">You can use the following HTML tags:</p>
+                    <ul class="list-unstyled">
+                        <li><code>&lt;h1&gt; ... &lt;h6&gt;</code> - Headings</li>
+                        <li><code>&lt;p&gt;</code> - Paragraphs</li>
+                        <li><code>&lt;strong&gt;, &lt;em&gt;, &lt;u&gt;</code> - Text formatting</li>
+                        <li><code>&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</code> - Lists</li>
+                        <li><code>&lt;a href=""&gt;</code> - Links</li>
+                        <li><code>&lt;img src=""&gt;</code> - Images</li>
+                        <li><code>&lt;br&gt;</code> - Line breaks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="panel panel-default mb-4">
+                <div class="panel-heading wt-panel-heading p-a20">
+                    <h5 class="m-a0"><i class="fa fa-eye"></i> Live Preview</h5>
+                </div>
+                <div class="panel-body wt-panel-body p-a20 bg-light">
+                    <div id="contentPreview" class="border rounded p-4" style="min-height: 200px; background: white;">
+                        <p class="text-muted text-center">Preview will appear here as you type...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-4">
+                <button type="submit" class="site-button">
+                    <i class="fa fa-save"></i> Save Changes
+                </button>
+                <a asp-action="ContentPages" class="site-button btn-secondary ms-2">
+                    <i class="fa fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Live preview
+        document.addEventListener('DOMContentLoaded', function() {
+            var htmlContentTextarea = document.querySelector('textarea[name="HtmlContent"]');
+            var preview = document.getElementById('contentPreview');
+
+            function updatePreview() {
+                var content = htmlContentTextarea.value;
+                if (content.trim().length === 0) {
+                    preview.innerHTML = '<p class="text-muted text-center">Preview will appear here as you type...</p>';
+                } else {
+                    preview.innerHTML = content;
+                }
+            }
+
+            // Update preview on input
+            htmlContentTextarea.addEventListener('input', updatePreview);
+
+            // Initial preview
+            updatePreview();
+        });
+    </script>
+}

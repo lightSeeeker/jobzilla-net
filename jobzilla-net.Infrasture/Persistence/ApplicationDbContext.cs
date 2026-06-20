@@ -43,6 +43,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
     public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();
     public DbSet<ContentPage> ContentPages => Set<ContentPage>();
+    public DbSet<AdminAuditLog> AdminAuditLogs => Set<AdminAuditLog>();
+    public DbSet<HomePageContent> HomePageContents => Set<HomePageContent>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -101,6 +103,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.Entity<JobPost>().Property(x => x.MaximumSalary).HasPrecision(18, 2);
         builder.Entity<PaymentTransaction>().Property(x => x.Amount).HasPrecision(18, 2);
         builder.Entity<SubscriptionPlan>().Property(x => x.Price).HasPrecision(18, 2);
+        builder.Entity<ResumeTemplate>().Property(x => x.Price).HasPrecision(18, 2);
+        builder.Entity<ResumeTemplate>().Property(x => x.DiscountPrice).HasPrecision(18, 2);
     }
 
     private static void SeedData(ModelBuilder builder)
@@ -215,6 +219,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 Description = "A clean, balanced layout with subtle colors suitable for modern professionals.",
                 TemplateFilePath = "ModernProfessional",
                 IsActive = true,
+                Category = "Professional",
+                IsPremium = false,
+                Price = 0m,
+                TemplateType = "Modern",
                 CreatedAtUtc = SeedDate
             },
             new ResumeTemplate
@@ -224,6 +232,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 Description = "Traditional and sophisticated, perfect for senior corporate roles.",
                 TemplateFilePath = "ExecutiveCorporate",
                 IsActive = true,
+                Category = "Executive",
+                IsPremium = true,
+                Price = 29.99m,
+                TemplateType = "Corporate",
                 CreatedAtUtc = SeedDate
             },
             new ResumeTemplate
@@ -233,6 +245,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 Description = "Strictly single column, text-focused format designed to pass cleanly through tracking systems.",
                 TemplateFilePath = "AtsOptimized",
                 IsActive = true,
+                Category = "ATS Friendly",
+                IsPremium = true,
+                Price = 19.99m,
+                TemplateType = "ATS",
                 CreatedAtUtc = SeedDate
             },
             new ResumeTemplate
@@ -242,6 +258,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 Description = "Bold typography and vibrant accents for creative and design-focused roles.",
                 TemplateFilePath = "CreativeDesigner",
                 IsActive = true,
+                Category = "Creative",
+                IsPremium = true,
+                Price = 39.99m,
+                TemplateType = "Creative",
                 CreatedAtUtc = SeedDate
             },
             new ResumeTemplate
@@ -251,6 +271,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 Description = "Clean and structured with tech-focused elements, resembling technical documentation.",
                 TemplateFilePath = "TechnicalDeveloper",
                 IsActive = true,
+                Category = "Technical",
+                IsPremium = true,
+                Price = 24.99m,
+                TemplateType = "Technical",
                 CreatedAtUtc = SeedDate
             });
     }

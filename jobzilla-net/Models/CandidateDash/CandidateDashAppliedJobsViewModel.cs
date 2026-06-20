@@ -1,9 +1,9 @@
 using jobzilla_net.Application.Candidates.Dtos;
 using jobzilla_net.Application.Common;
 
-namespace jobzilla_net.Models.CandidateDash;
+namespace jobzilla_net.Models.Candidate;
 
-public class CandidateDashAppliedJobsViewModel
+public class CandidateAppliedJobsViewModel
 {
     public PagedResult<AppliedJobDto> AppliedJobs { get; set; } = null!;
 }

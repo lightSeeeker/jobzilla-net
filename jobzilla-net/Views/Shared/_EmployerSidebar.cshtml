@@ -10,22 +10,22 @@
     <div class="admin-nav scrollbar-macosx">
         <ul>
             <li class="@(currentAction == "Index" ? "active" : "")">
-                <a asp-controller="EmployerDash" asp-action="Index"><i class="fa fa-home"></i><span class="admin-nav-text">Dashboard</span></a>
+                <a asp-controller="Employer" asp-action="Index"><i class="fa fa-home"></i><span class="admin-nav-text">Dashboard</span></a>
             </li>
 
             <li class="@(currentAction == "Profile" ? "active" : "")">
-                <a asp-controller="EmployerDash" asp-action="Profile"><i class="fa fa-user-tie"></i><span class="admin-nav-text">Company Profile</span></a>
+                <a asp-controller="Employer" asp-action="Profile"><i class="fa fa-user-tie"></i><span class="admin-nav-text">Company Profile</span></a>
             </li>
 
             <li>
-                <a asp-controller="EmployerDash" asp-action="PostedJobs"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
+                <a asp-controller="Employer" asp-action="PostedJobs"><i class="fa fa-suitcase"></i><span class="admin-nav-text">Jobs</span></a>
                 <ul class="sub-menu">
-                    <li class="@(currentAction == "PostJob" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostJob"><span class="admin-nav-text">Post a New Jobs</span></a></li>
-                    <li class="@(currentAction == "PostedJobs" ? "active" : "")"> <a asp-controller="EmployerDash" asp-action="PostedJobs"><span class="admin-nav-text">Manage Jobs</span></a></li>
+                    <li class="@(currentAction == "PostJob" ? "active" : "")"> <a asp-controller="Employer" asp-action="PostJob"><span class="admin-nav-text">Post a New Jobs</span></a></li>
+                    <li class="@(currentAction == "PostedJobs" ? "active" : "")"> <a asp-controller="Employer" asp-action="PostedJobs"><span class="admin-nav-text">Manage Jobs</span></a></li>
                 </ul>
             </li>
             <li class="@(currentAction == "Applications" ? "active" : "")">
-                <a asp-controller="EmployerDash" asp-action="Applications"><i class="fa fa-user-friends"></i><span class="admin-nav-text">Candidates</span></a>
+                <a asp-controller="Employer" asp-action="Applications"><i class="fa fa-user-friends"></i><span class="admin-nav-text">Candidates</span></a>
             </li>
             
             <li>
@@ -33,7 +33,7 @@
             </li>
             
             <li class="@(currentAction == "Chat" ? "active" : "")">
-                <a asp-controller="EmployerDash" asp-action="Chat"><i class="fa fa-comments"></i><span class="admin-nav-text">Chat</span></a>
+                <a asp-controller="Employer" asp-action="Chat"><i class="fa fa-comments"></i><span class="admin-nav-text">Chat</span></a>
             </li>
             
             <li>

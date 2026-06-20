@@ -1,8 +1,8 @@
 using jobzilla_net.Application.Candidates.Dtos;
 
-namespace jobzilla_net.Models.CandidateDash;
+namespace jobzilla_net.Models.Candidate;
 
-public class CandidateDashResumesViewModel
+public class CandidateResumesViewModel
 {
     public List<CandidateResumeDto> Resumes { get; set; } = new();
 }

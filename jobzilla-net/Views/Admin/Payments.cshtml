@@ -1,0 +1,123 @@
+﻿@model AdminPaymentsViewModel
+@{
+    ViewData["Title"] = "Payments Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Payments & Revenue</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Payments</span>
+    </div>
+</div>
+
+<!-- Revenue Stats -->
+<div class="twm-dash-b-blocks mb-5">
+    <div class="row">
+        <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-1 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-dollar"></i></div>
+                        <div class="wt-card-right wt-total-active-listing">$@Model.Stats.TotalRevenue.ToString("0")</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">Total Revenue</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-2 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-calendar"></i></div>
+                        <div class="wt-card-right wt-total-active-listing">$@Model.Stats.MonthlyRevenue.ToString("0")</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">This Month</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body gradi-3 dashboard-card">
+                    <div class="wt-card-wrap">
+                        <div class="wt-card-icon"><i class="fa fa-line-chart"></i></div>
+                        <div class="wt-card-right wt-total-active-listing">$@Model.Stats.YearlyRevenue.ToString("0")</div>
+                        <div class="wt-card-bottom"><h4 class="m-b0">This Year</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payments Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-credit-card"></i> Payment History</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var payment in Model.Payments.Items)
+                    {
+                        <tr>
+                            <td>@payment.Reference</td>
+                            <td><strong>${@payment.Amount.ToString("0.00")}</strong></td>
+                            <td>@payment.TransactionDateUtc.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <span class="twm-bg-@(payment.Status.ToLower())">@payment.Status</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Payments.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Payments.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="Payments" asp-route-page="@(Model.Payments.Page - 1)">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Payments.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Payments.Page ? "active" : "")">
+                                <a asp-action="Payments" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        @if (Model.Payments.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="Payments" asp-route-page="@(Model.Payments.Page + 1)">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

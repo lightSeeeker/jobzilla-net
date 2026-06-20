@@ -1,0 +1,69 @@
+﻿@model AdminSubscriptionPlansViewModel
+@{
+    ViewData["Title"] = "Subscription Plans Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <div class="d-flex justify-content-between align-items-center" style="width: 100%;">
+        <h2>Subscription Plans</h2>
+        <a asp-action="SubscriptionPlanForm" class="site-button"><i class="fa fa-plus"></i> Add Plan</a>
+    </div>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Plans</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Plans Cards -->
+<div class="row">
+    @foreach (var plan in Model.Plans)
+    {
+        <div class="col-xl-4 col-lg-6 col-md-12 mb-4">
+            <div class="panel panel-default">
+                <div class="panel-body wt-panel-body p-a30">
+                    <h3 class="mb-3">@plan.Name</h3>
+                    <div class="mb-4">
+                        <span class="h2 text-primary">${@plan.Price.ToString("0.00")}</span>
+                        <span class="text-muted">/month</span>
+                    </div>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="fa fa-check text-success"></i>
+                            <strong>@plan.JobPostLimit</strong> job posts
+                        </li>
+                        <li class="mb-2">
+                            <i class="fa @(plan.CanFeatureJobs ? "fa-check text-success" : "fa-times text-danger")"></i>
+                            @(plan.CanFeatureJobs ? "Feature jobs" : "No featured jobs")
+                        </li>
+                        <li class="mb-2">
+                            <i class="fa fa-calendar text-info"></i>
+                            @plan.DurationDays days duration
+                        </li>
+                    </ul>
+                    <div class="d-flex gap-2">
+                        <a asp-action="SubscriptionPlanForm" asp-route-id="@plan.Id" class="btn btn-sm btn-primary">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                        <form asp-controller="Admin" asp-action="DeleteSubscriptionPlan" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                            <input type="hidden" name="id" value="@plan.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+

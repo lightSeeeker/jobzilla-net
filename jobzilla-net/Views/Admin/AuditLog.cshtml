@@ -1,0 +1,86 @@
+﻿@model AdminAuditLogViewModel
+@{
+    ViewData["Title"] = "Audit Log";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Audit Log</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Audit Log</span>
+    </div>
+</div>
+
+<!-- Audit Log Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-history"></i> Admin Activities</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Admin</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>Details</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.Logs.Items)
+                    {
+                        <tr>
+                            <td>@log.AdminName</td>
+                            <td>
+                                <span class="badge bg-info">@log.Action</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@log.Module</span>
+                            </td>
+                            <td>@log.Details</td>
+                            <td>@log.PerformedAtUtc.ToString("MMM dd, yyyy HH:mm:ss")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Logs.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Logs.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="AuditLog" asp-route-page="@(Model.Logs.Page - 1)">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Logs.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Logs.Page ? "active" : "")">
+                                <a asp-action="AuditLog" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        @if (Model.Logs.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="AuditLog" asp-route-page="@(Model.Logs.Page + 1)">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

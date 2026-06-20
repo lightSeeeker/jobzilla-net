@@ -3,9 +3,9 @@ using jobzilla_net.Application.Employers.Dtos;
 
 namespace jobzilla_net.Application.Employers;
 
-public interface IEmployerDashboardService
+public interface IEmployerboardService
 {
-    Task<EmployerDashboardOverviewDto> GetDashboardOverviewAsync(string userId);
+    Task<EmployerboardOverviewDto> GetDashboardOverviewAsync(string userId);
     Task<EmployerProfileDto> GetProfileAsync(string userId);
     Task<bool> UpdateProfileAsync(string userId, EmployerProfileDto profileDto);
     Task<PagedResult<EmployerJobPostDto>> GetPostedJobsAsync(string userId, int page, int pageSize);

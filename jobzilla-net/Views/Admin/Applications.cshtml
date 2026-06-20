@@ -1,0 +1,90 @@
+﻿@model AdminApplicationsViewModel
+@{
+    ViewData["Title"] = "Applications Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="wt-admin-right-page-header clearfix">
+    <h2>Job Applications</h2>
+    <div class="breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <span>Applications</span>
+    </div>
+</div>
+
+<!-- Applications Table -->
+<div class="panel panel-default">
+    <div class="panel-heading wt-panel-heading p-a20">
+        <h4 class="panel-tittle m-a0"><i class="fa fa-inbox"></i> All Applications</h4>
+    </div>
+    <div class="panel-body wt-panel-body p-a20">
+        <div class="twm-D_table p-a20 table-responsive">
+            <table class="table table-bordered twm-bookmark-list-wrap">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Job Title</th>
+                        <th>Company</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model.Applications.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="twm-bookmark-list">
+                                    <div class="twm-mid-content">
+                                        <h4>@app.CandidateName</h4>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@app.JobTitle</td>
+                            <td>@app.CompanyName</td>
+                            <td>@app.AppliedAtUtc.ToString("MMM dd, yyyy hh:mm tt")</td>
+                            <td>
+                                <span class="twm-bg-@(app.Status.ToLower())">@app.Status</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Applications.TotalPages > 1)
+        {
+            <div class="pagination-outer text-right mt-4">
+                <div class="pagination-style1">
+                    <ul class="clearfix">
+                        @if (Model.Applications.HasPreviousPage)
+                        {
+                            <li class="prev">
+                                <a asp-action="Applications" asp-route-page="@(Model.Applications.Page - 1)">
+                                    <span><i class="fa fa-angle-left"></i></span>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.Applications.TotalPages; i++)
+                        {
+                            <li class="@(i == Model.Applications.Page ? "active" : "")">
+                                <a asp-action="Applications" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        @if (Model.Applications.HasNextPage)
+                        {
+                            <li class="next">
+                                <a asp-action="Applications" asp-route-page="@(Model.Applications.Page + 1)">
+                                    <span><i class="fa fa-angle-right"></i></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

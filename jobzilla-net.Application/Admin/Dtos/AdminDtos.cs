@@ -36,6 +36,7 @@ public sealed class AdminEmployerListDto
     public string? ContactPerson { get; init; }
     public string? Email { get; init; }
     public string? Phone { get; init; }
+    public string? LogoPath { get; init; }
     public DateTime CreatedAtUtc { get; init; }
     public string? SubscriptionPlanName { get; init; }
     public bool IsActive { get; init; }

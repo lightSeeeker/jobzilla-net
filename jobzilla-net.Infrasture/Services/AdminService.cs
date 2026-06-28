@@ -146,6 +146,7 @@ public class AdminService : IAdminService
                 CompanyName = e.CompanyName,
                 Email = e.Email,
                 Phone = e.PhoneNumber,
+                LogoPath = e.LogoPath,
                 CreatedAtUtc = e.CreatedAtUtc,
                 IsVerified = e.IsVerified,
                 JobsPostedCount = e.JobPosts.Count

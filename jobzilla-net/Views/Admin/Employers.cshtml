@@ -60,6 +60,7 @@
             <table class="table table-bordered twm-bookmark-list-wrap">
                 <thead>
                     <tr>
+                        <th>Logo</th>
                         <th>Company Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -73,6 +74,18 @@
                     @foreach (var employer in Model.Employers.Items)
                     {
                         <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(employer.LogoPath))
+                                {
+                                    <img src="@employer.LogoPath" alt="@employer.CompanyName" style="max-height: 40px; max-width: 60px; object-fit: contain;" />
+                                }
+                                else
+                                {
+                                    <div style="width: 60px; height: 40px; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; border-radius: 4px;">
+                                        <i class="fa fa-building" style="color: #999;"></i>
+                                    </div>
+                                }
+                            </td>
                             <td>
                                 <div class="twm-bookmark-list">
                                     <div class="twm-mid-content">

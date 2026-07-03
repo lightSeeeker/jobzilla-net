@@ -1,3 +1,50 @@
+:root {
+  /* === Brand Colors === */
+  --color-primary:        #2563EB;   /* Sapphire Blue — trust, professionalism */
+  --color-primary-light:  #3B82F6;   /* Lighter sapphire for hover states */
+  --color-primary-pale:   #EFF6FF;   /* Very light sapphire tint for backgrounds */
+  --color-success:        #10B981;   /* Emerald Green — growth, opportunity */
+  --color-success-pale:   #ECFDF5;   /* Light emerald tint */
+  --color-accent:         #F59E0B;   /* Warm Amber — CTAs, highlights */
+  --color-accent-pale:    #FFFBEB;   /* Light amber tint */
+  --color-danger:         #EF4444;
+  --color-danger-pale:    #FEF2F2;
+
+  /* === Backgrounds === */
+  --bg-page:       #F0F4FF;   /* Overall page background — light blue-white */
+  --bg-surface:    #FFFFFF;   /* Cards, panels, inputs */
+  --bg-footer:     #EEF2FF;   /* Footer background */
+  --bg-hero:       linear-gradient(135deg, #EEF2FF 0%, #F0F9FF 50%, #ECFDF5 100%);
+
+  /* === Text === */
+  --text-primary:  #0F172A;   /* Deep navy — headings, important text */
+  --text-secondary:#334155;   /* Slate — body text */
+  --text-muted:    #64748B;   /* Slate gray — labels, secondary */
+  --text-subtle:   #94A3B8;   /* Light gray — placeholders, captions */
+
+  /* === Borders === */
+  --border-color:  #E2E8F0;
+  --border-focus:  rgba(37, 99, 235, 0.4);   /* Sapphire glow on focus */
+
+  /* === Shadows === */
+  --shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md:     0 4px 16px rgba(37, 99, 235, 0.08), 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-lg:     0 10px 40px rgba(37, 99, 235, 0.12), 0 4px 16px rgba(15, 23, 42, 0.08);
+  --shadow-hover:  0 16px 48px rgba(37, 99, 235, 0.16), 0 6px 20px rgba(15, 23, 42, 0.1);
+
+  /* === Spacing & Shape === */
+  --radius-sm:     6px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --radius-xl:     24px;
+  --radius-pill:   9999px;
+
+  /* === Transitions === */
+  --transition-fast:   all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 html {
   font-size: 14px;
 }
@@ -29,3 +76,1696 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* =====================================
+   Modernized Header — Design System
+====================================== */
+
+/* 1. Scroll progress bar */
+#jz-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* 2. Header styling */
+.site-header .sticky-header,
+.site-header .main-bar {
+  background: var(--bg-surface);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+.site-header .main-bar {
+  box-shadow: var(--shadow-sm);
+}
+.site-header.scrolled .main-bar {
+  box-shadow: var(--shadow-md);
+}
+
+/* 3. Nav links */
+.site-header .nav.navbar-nav > li > a {
+  color: var(--text-primary);
+  font-weight: 500;
+  position: relative;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+.site-header .nav.navbar-nav > li > a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 0;
+  background: var(--color-primary);
+  transition: width 0.25s ease;
+}
+.site-header .nav.navbar-nav > li > a:hover {
+  color: var(--color-primary);
+}
+.site-header .nav.navbar-nav > li > a:hover::after,
+.site-header .nav.navbar-nav > li.active > a::after {
+  width: 100%;
+}
+.site-header .nav.navbar-nav > li.active > a {
+  color: var(--color-primary);
+}
+
+/* 4. Sign Up button */
+.twm-nav-sign-up {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 10px 24px;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+.twm-nav-sign-up:hover,
+.twm-nav-sign-up:focus {
+  background: var(--color-primary-light);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 5. Post a job button */
+.twm-nav-post-a-job {
+  background: var(--color-success);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 10px 24px;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+.twm-nav-post-a-job:hover,
+.twm-nav-post-a-job:focus {
+  background: #34D399;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 6. Logout button — outlined */
+.twm-nav-logout {
+  background: transparent;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+.twm-nav-logout:hover,
+.twm-nav-logout:focus {
+  background: var(--color-primary);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* =====================================
+   Hero / Banner Redesign — Design System
+====================================== */
+
+/* 1. Hero background + floating blobs */
+.jz-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-hero);
+}
+.jz-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(8px);
+}
+.jz-blob-1 {
+  width: 400px;
+  height: 400px;
+  top: -80px;
+  left: -60px;
+  background: rgba(37, 99, 235, 0.06);
+  animation: jz-float1 20s ease-in-out infinite;
+}
+.jz-blob-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -60px;
+  right: 8%;
+  background: rgba(16, 185, 129, 0.05);
+  animation: jz-float2 15s ease-in-out infinite;
+}
+.jz-blob-3 {
+  width: 250px;
+  height: 250px;
+  top: 30%;
+  right: 30%;
+  background: rgba(245, 158, 11, 0.04);
+  animation: jz-float3 25s ease-in-out infinite;
+}
+.jz-hero .row,
+.jz-hero .twm-gradient-text { position: relative; z-index: 1; }
+
+/* 2. Headline */
+.jz-hero .twm-bnr-title-large {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.jz-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: jz-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+}
+.jz-text-gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-success));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* 3. Search bar */
+.jz-search-bar {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  transition: var(--transition-base);
+}
+.jz-search-bar:focus-within {
+  box-shadow: 0 0 0 3px var(--border-focus), var(--shadow-lg);
+}
+.jz-search-pulse {
+  animation: jz-pulse-ring 2s ease-out infinite;
+}
+.jz-search-pulse:hover,
+.jz-search-pulse:focus {
+  animation: none;
+}
+
+/* 4. Stats row */
+.jz-stats-row {
+  margin-top: -40px;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 40px;
+}
+.jz-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 24px;
+  transition: var(--transition-fast);
+}
+.jz-stat-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.jz-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.jz-stat-body { display: flex; flex-direction: column; line-height: 1.2; }
+.jz-stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-primary);
+}
+.jz-stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* 5. Scroll indicator */
+.jz-scroll-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: var(--color-primary);
+  opacity: 0.6;
+  font-size: 26px;
+  animation: jz-bounce 1.5s ease-in-out infinite;
+}
+
+/* Keyframes */
+@keyframes jz-float1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px, -20px) scale(1.05); } }
+@keyframes jz-float2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-20px, 30px) scale(0.95); } }
+@keyframes jz-float3 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(15px, -15px); } }
+@keyframes jz-bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+@keyframes jz-reveal { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes jz-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.3); } 70% { box-shadow: 0 0 0 10px rgba(37,99,235,0); } 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .jz-blob, .jz-reveal, .jz-scroll-indicator { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* =====================================
+   Job Cards + Filter Sidebar — Design System
+====================================== */
+
+/* 1. Base card */
+.twm-jobs-list-style1 {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 2. Hover */
+.twm-jobs-list-style1:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* 3. Left accent bar on hover */
+.twm-jobs-list-style1::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-success));
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
+}
+.twm-jobs-list-style1:hover::before {
+  transform: scaleY(1);
+}
+
+/* 4. Company logo circle */
+.twm-jobs-list-style1 .twm-media {
+  background: var(--color-primary-pale);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.twm-jobs-list-style1 .twm-media img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* 5. Badge pills */
+.jz-badge,
+.jz-badge-remote,
+.jz-badge-onsite,
+.jz-badge-hybrid,
+.jz-badge-fulltime,
+.jz-badge-new {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.jz-badge-remote   { background: var(--color-success-pale); color: #059669; }
+.jz-badge-onsite   { background: var(--color-primary-pale); color: var(--color-primary); }
+.jz-badge-hybrid   { background: #F5F3FF; color: #7C3AED; }
+.jz-badge-fulltime { background: var(--color-primary-pale); color: var(--color-primary); }
+.jz-badge-new      { background: var(--color-accent-pale); color: #D97706; }
+
+/* 6. New job pulse dot */
+.jz-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-success);
+  display: inline-block;
+  margin-right: 5px;
+  animation: jz-pulse-ring 1.5s infinite;
+}
+
+/* 7. Salary */
+.twm-jobs-list-style1 .twm-jobs-amount {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+/* 8. Apply button */
+.twm-jobs-list-style1 .twm-jobs-browse {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 8px 20px;
+  transition: var(--transition-fast);
+}
+.twm-jobs-list-style1 .twm-jobs-browse:hover {
+  background: var(--color-primary-light);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* 9. Save / bookmark button */
+.jz-save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  padding: 8px 16px;
+  transition: var(--transition-fast);
+}
+.jz-save-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-pale);
+}
+
+/* ===== Filter Sidebar ===== */
+
+/* 1. Panel */
+.rightSidebar .side-bar {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+/* 2. Section titles */
+.rightSidebar .section-head-small {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+/* 3. Custom checkboxes / radios */
+.rightSidebar .twm-sidebar-ele-filter .form-check {
+  position: relative;
+  padding-left: 0;
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-input {
+  position: absolute;
+  opacity: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-label {
+  position: relative;
+  padding-left: 26px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-surface);
+  transition: var(--transition-fast);
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-label::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-input:checked ~ .form-check-label::before {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-input:checked ~ .form-check-label::after {
+  transform: rotate(45deg) scale(1);
+}
+.rightSidebar .twm-sidebar-ele-filter .form-check-input:focus ~ .form-check-label::before {
+  box-shadow: 0 0 0 3px var(--border-focus);
+}
+
+/* 4. Selected filter pills */
+.jz-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+.jz-filter-pill:hover {
+  background: var(--color-primary-light);
+}
+.jz-filter-pill .jz-filter-pill-x {
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.85;
+}
+.jz-filter-pill .jz-filter-pill-x:hover {
+  opacity: 1;
+}
+
+/* =====================================
+   Dashboard — Sidebar / Stat Cards / Tables
+====================================== */
+
+/* ===== Admin / Employer Sidebar ===== */
+#sidebar-admin-wraper {
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#sidebar-admin-wraper .page-logo {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  position: relative;
+}
+#sidebar-admin-wraper .admin-nav > ul > li > a {
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+#sidebar-admin-wraper .admin-nav > ul > li > a i {
+  color: inherit;
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+#sidebar-admin-wraper .admin-nav > ul > li > a:hover {
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+}
+#sidebar-admin-wraper .admin-nav > ul > li.active > a {
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-left: 3px solid var(--color-primary);
+}
+
+/* Collapse toggle button */
+.jz-sidebar-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+.jz-sidebar-toggle:hover {
+  background: var(--color-primary-pale);
+}
+
+/* Collapsed state */
+.jz-sidebar-collapsed #sidebar-admin-wraper {
+  width: 64px;
+  overflow: hidden;
+}
+.jz-sidebar-collapsed #sidebar-admin-wraper .admin-nav-text,
+.jz-sidebar-collapsed #sidebar-admin-wraper .page-logo img,
+.jz-sidebar-collapsed #sidebar-admin-wraper .sub-menu {
+  opacity: 0;
+  overflow: hidden;
+  width: 0;
+  display: inline-block;
+}
+.jz-sidebar-collapsed #sidebar-admin-wraper .admin-nav > ul > li > a {
+  justify-content: center;
+}
+.jz-sidebar-collapsed .jz-sidebar-toggle i {
+  transform: rotate(180deg);
+}
+
+/* ===== Candidate Sidebar ===== */
+.side-bar-st-1 {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.twm-nav-list-1 ul li a {
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.twm-nav-list-1 ul li a i {
+  color: inherit;
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+.twm-nav-list-1 ul li a:hover {
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+}
+.twm-nav-list-1 ul li.active a {
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-left: 3px solid var(--color-primary);
+}
+
+/* ===== Stat Cards ===== */
+.twm-dash-b-blocks .dashboard-card,
+.twm-dash-b-blocks .dashboard-card-2 {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--color-primary);
+  transition: var(--transition-base);
+}
+.twm-dash-b-blocks .dashboard-card:hover,
+.twm-dash-b-blocks .dashboard-card-2:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+.twm-dash-b-blocks .gradi-2.dashboard-card,
+.twm-dash-b-blocks .block-gradient-2.dashboard-card-2 { border-top-color: var(--color-success); }
+.twm-dash-b-blocks .gradi-3.dashboard-card,
+.twm-dash-b-blocks .block-gradient-3.dashboard-card-2 { border-top-color: var(--color-accent); }
+.twm-dash-b-blocks .gradi-4.dashboard-card,
+.twm-dash-b-blocks .block-gradient-4.dashboard-card-2 { border-top-color: #7C3AED; }
+.twm-dash-b-blocks .wt-card-icon,
+.twm-dash-b-blocks .wt-card-icon-2 {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.twm-dash-b-blocks .wt-card-right {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Trend label */
+.jz-trend {
+  color: var(--color-success);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Sparkline */
+.jz-sparkline {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 28px;
+  margin-top: 8px;
+}
+.jz-sparkline span {
+  flex: 1;
+  background: var(--color-primary-pale);
+  border-radius: 2px;
+}
+
+/* ===== Tables ===== */
+.jz-dash-table {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.jz-dash-table thead th,
+.content-admin-main .table thead th {
+  background: var(--color-primary-pale);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+}
+.jz-dash-table tbody tr,
+.content-admin-main .table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition-fast);
+}
+.jz-dash-table tbody tr:hover,
+.content-admin-main .table tbody tr:hover {
+  background: var(--color-primary-pale);
+}
+.jz-dash-table tbody tr:hover td:first-child {
+  border-left: 3px solid var(--color-primary);
+}
+
+/* Row entrance animation */
+.jz-row-animate {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.jz-row-animate.jz-row-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ===== Status badges ===== */
+.jz-status-review,
+.jz-status-shortlist,
+.jz-status-hired,
+.jz-status-rejected {
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.jz-status-review    { background: var(--color-accent-pale);  color: #D97706; }
+.jz-status-shortlist { background: var(--color-primary-pale); color: var(--color-primary); }
+.jz-status-hired     { background: var(--color-success-pale); color: #059669; }
+.jz-status-rejected  { background: var(--color-danger-pale);  color: #DC2626; }
+
+/* =====================================
+   Footer Redesign + Global Polish
+====================================== */
+
+/* 1. Footer background + dot grid */
+.jz-footer {
+  position: relative;
+  background-color: var(--bg-footer);
+  background-image: radial-gradient(circle, rgba(37, 99, 235, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--text-secondary);
+}
+.jz-footer .widget-title,
+.jz-footer .ftr-nw-title,
+.jz-footer .logo-footer + p,
+.jz-footer h3 {
+  color: var(--text-primary);
+}
+.jz-footer p,
+.jz-footer .ftr-list span,
+.jz-footer .copyrights-text {
+  color: var(--text-muted);
+}
+
+/* 2. Wave divider */
+.jz-wave-divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  overflow: hidden;
+  line-height: 0;
+}
+.jz-wave-divider svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 3. Footer links */
+.jz-footer .widget_services ul li a,
+.jz-footer .ftr-list-center ul li a {
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+  position: relative;
+  display: inline-block;
+}
+.jz-footer .widget_services ul li a::before {
+  content: "→ ";
+  opacity: 0;
+  transform: translateX(-6px);
+  display: inline-block;
+  transition: var(--transition-fast);
+}
+.jz-footer .widget_services ul li a:hover {
+  color: var(--color-primary);
+}
+.jz-footer .widget_services ul li a:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 4. Social icons */
+.jz-footer .social-icons li a {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+.jz-footer .social-icons li a:hover {
+  background: var(--color-primary);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 5. Newsletter */
+.jz-footer .ftr-nw-form .form-control {
+  background: #fff;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+}
+.jz-footer .ftr-nw-form .form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--border-focus);
+}
+.jz-footer .ftr-nw-subcribe-btn {
+  background: var(--color-success);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+}
+.jz-footer .ftr-nw-subcribe-btn:hover {
+  background: #34D399;
+  transform: translateY(-1px);
+}
+
+/* 6. Bottom bar */
+.jz-footer .footer-bottom {
+  border-top: 1px solid rgba(37, 99, 235, 0.1);
+  padding-top: 20px;
+  color: var(--text-muted);
+}
+
+/* 7. Global button transition */
+button, .btn, a.btn {
+  transition: var(--transition-fast);
+}
+
+/* 8. Global input focus */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--border-focus);
+}
+
+/* 9. Back to top */
+.jz-back-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 44px;
+  height: 44px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: var(--transition-base);
+  pointer-events: none;
+  z-index: 999;
+}
+.jz-back-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+.jz-back-top:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+/* 10. Lazy-load image fade */
+.jz-lazy {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.jz-lazy.loaded {
+  opacity: 1;
+}
+
+/* =====================================
+   Scroll Reveal + Page Transition
+====================================== */
+
+/* Step 1 — Scroll reveal */
+.jz-reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+.jz-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.jz-reveal-left { opacity: 0; transform: translateX(-24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.jz-reveal-left.is-visible { opacity: 1; transform: translateX(0); }
+.jz-reveal-scale { opacity: 0; transform: scale(0.95); transition: opacity 0.4s ease, transform 0.4s ease; }
+.jz-reveal-scale.is-visible { opacity: 1; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) { .jz-reveal, .jz-reveal-left, .jz-reveal-scale { opacity: 1 !important; transform: none !important; transition: none !important; } }
+
+/* Step 3 — Page transition overlay */
+#jz-page-overlay { position: fixed; inset: 0; background: white; z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+#jz-page-overlay.active { opacity: 1; pointer-events: all; }
+
+/* ============================================================
+   PREMIUM GLASS THEME  ·  Light  ·  Polished
+   Global redesign layer — loaded LAST, wins the cascade.
+   Turns the stock Jobzilla template into a glassmorphic UI.
+   ============================================================ */
+
+:root {
+  /* Glass material tokens */
+  --glass-bg:          rgba(255, 255, 255, 0.60);
+  --glass-bg-strong:   rgba(255, 255, 255, 0.80);
+  --glass-bg-soft:     rgba(255, 255, 255, 0.42);
+  --glass-border:      rgba(255, 255, 255, 0.65);
+  --glass-hairline:    rgba(148, 163, 184, 0.22);
+  --glass-blur:        18px;
+  --glass-blur-sm:     10px;
+  --glass-inset:       inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --glass-shadow:      0 8px 32px rgba(15, 23, 42, 0.10), 0 2px 8px rgba(37, 99, 235, 0.05);
+  --glass-shadow-lg:   0 24px 64px rgba(15, 23, 42, 0.16), 0 8px 24px rgba(37, 99, 235, 0.10);
+  --glow-primary:      0 10px 30px rgba(37, 99, 235, 0.40);
+  --glow-success:      0 10px 30px rgba(16, 185, 129, 0.36);
+  --grad-primary:      linear-gradient(135deg, #2563EB 0%, #3B82F6 60%, #6366F1 100%);
+  --grad-success:      linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  --bg-page:           #eef1fb;
+}
+
+/* ---- Layered page background: soft colour mesh so glass has something to refract ---- */
+body { background-color: var(--bg-page); position: relative; }
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 42% at 12% 16%, rgba(37, 99, 235, 0.16), transparent 70%),
+    radial-gradient(34% 38% at 88% 12%, rgba(16, 185, 129, 0.14), transparent 70%),
+    radial-gradient(42% 46% at 80% 84%, rgba(99, 102, 241, 0.13), transparent 70%),
+    radial-gradient(34% 40% at 18% 88%, rgba(245, 158, 11, 0.10), transparent 70%);
+  background-color: var(--bg-page);
+  animation: jz-mesh-drift 26s ease-in-out infinite alternate;
+}
+@keyframes jz-mesh-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(0, -2.5%, 0) scale(1.06); }
+}
+
+/* Let the mesh show through the template's solid section backgrounds */
+.section-full.site-bg-white,
+.section-full.site-bg-gray,
+.site-bg-gray,
+.twm-how-it-work-area,
+.twm-pro-view-chart-wrap { background: transparent !important; }
+
+/* ---- Universal glass surface ---- */
+.panel,
+.panel.panel-default,
+.widget,
+.card,
+.wt-panel-body,
+.bg-white,
+.twm-jobs-list-style1,
+.twm-jobs-grid-style1,
+.twm-employer-list-style1,
+.twm-bookmark-list-wrap,
+.jz-search-bar,
+.jz-stat-pill,
+.side-bar,
+.side-bar-st-1,
+.twm-right-section-panel,
+.wt-admin-dashboard-msg-2,
+.dashboard-card,
+.dashboard-card-2,
+.twm-dash-candidates-list,
+.twm-D_table,
+.modal-content,
+.dropdown-menu {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+}
+
+/* Fallback where backdrop-filter unsupported -> opaque frost, still readable */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .panel, .widget, .card, .wt-panel-body, .bg-white,
+  .twm-jobs-list-style1, .twm-jobs-grid-style1, .twm-employer-list-style1,
+  .jz-search-bar, .jz-stat-pill, .side-bar, .side-bar-st-1,
+  .dashboard-card, .dashboard-card-2, .twm-D_table,
+  .modal-content, .dropdown-menu { background: rgba(255, 255, 255, 0.94); }
+}
+
+/* ---- Frosted header ---- */
+.site-header .main-bar,
+.site-header .sticky-header {
+  background: var(--glass-bg-strong) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid var(--glass-hairline);
+}
+.site-header.scrolled .main-bar { box-shadow: var(--glass-shadow); }
+
+/* ---- Buttons: glossy primary, glass secondary ---- */
+.site-button,
+.btn-primary,
+.wt-btn,
+.twm-nav-sign-up {
+  background: var(--grad-primary) !important;
+  border: none !important;
+  border-radius: var(--radius-pill) !important;
+  color: #fff !important;
+  box-shadow: var(--glow-primary), var(--glass-inset);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-base);
+}
+.site-button:hover,
+.btn-primary:hover,
+.wt-btn:hover,
+.twm-nav-sign-up:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(37, 99, 235, 0.48), var(--glass-inset);
+  color: #fff !important;
+}
+.site-button::after,
+.btn-primary::after,
+.twm-nav-sign-up::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -120%;
+  width: 80%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.6s ease;
+}
+.site-button:hover::after,
+.btn-primary:hover::after,
+.twm-nav-sign-up:hover::after { left: 130%; }
+
+.btn-success, .twm-nav-post-a-job {
+  background: var(--grad-success) !important;
+  border: none !important;
+  border-radius: var(--radius-pill) !important;
+  color: #fff !important;
+  box-shadow: var(--glow-success), var(--glass-inset);
+}
+.btn-success:hover, .twm-nav-post-a-job:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(16, 185, 129, 0.46), var(--glass-inset);
+}
+
+.btn-outline-primary, .site-button-secondry, .twm-nav-logout {
+  background: var(--glass-bg-soft) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+  backdrop-filter: blur(var(--glass-blur-sm));
+  border: 1.5px solid rgba(37, 99, 235, 0.45) !important;
+  color: var(--color-primary) !important;
+  border-radius: var(--radius-pill) !important;
+  transition: var(--transition-fast);
+}
+.btn-outline-primary:hover, .site-button-secondry:hover, .twm-nav-logout:hover {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: var(--glow-primary);
+}
+
+/* ---- Inputs / forms / selects ---- */
+.form-control,
+.form-select,
+.bootstrap-select > .btn,
+.wt-select-bar-large,
+.dataTables_filter input,
+textarea.form-control {
+  background: var(--glass-bg-soft) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+  backdrop-filter: blur(var(--glass-blur-sm));
+  border: 1.5px solid var(--glass-hairline) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  transition: var(--transition-fast);
+  box-shadow: none;
+}
+.form-control::placeholder { color: var(--text-subtle); }
+.form-control:focus,
+.form-select:focus,
+.bootstrap-select.show > .btn,
+.wt-select-bar-large:focus,
+textarea.form-control:focus {
+  background: var(--glass-bg-strong) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 4px var(--border-focus) !important;
+  outline: none;
+}
+
+/* ---- Inner page banner (override the template's inline bg image) ---- */
+.wt-bnr-inr {
+  background-image:
+    radial-gradient(40% 80% at 15% 20%, rgba(37,99,235,0.18), transparent 70%),
+    radial-gradient(40% 80% at 85% 30%, rgba(16,185,129,0.16), transparent 70%),
+    linear-gradient(135deg, #EEF2FF 0%, #F0F9FF 50%, #ECFDF5 100%) !important;
+  position: relative;
+}
+.wt-bnr-inr .overlay-main { opacity: 0 !important; }
+.wt-bnr-inr .wt-title, .wt-bnr-inr h1, .wt-bnr-inr h2 { color: var(--text-primary) !important; }
+.wt-breadcrumb li, .wt-breadcrumb li a { color: var(--text-secondary) !important; }
+.wt-breadcrumb {
+  display: inline-flex; gap: 6px; padding: 8px 16px;
+  background: var(--glass-bg); border-radius: var(--radius-pill);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+
+/* ---- Section heads / separators ---- */
+.wt-small-separator {
+  display: inline-block; color: var(--color-primary); font-weight: 600;
+  background: var(--color-primary-pale); padding: 6px 16px;
+  border-radius: var(--radius-pill); letter-spacing: 0.04em;
+}
+.section-head .wt-title, .wt-title { letter-spacing: -0.01em; }
+
+/* ---- Job / employer cards: glass + lift ---- */
+.twm-jobs-list-style1, .twm-jobs-grid-style1, .twm-employer-list-style1 {
+  transition: var(--transition-base);
+}
+.twm-jobs-list-style1:hover,
+.twm-jobs-grid-style1:hover,
+.twm-employer-list-style1:hover {
+  box-shadow: var(--glass-shadow-lg);
+  border-color: rgba(37, 99, 235, 0.30);
+}
+
+/* ---- Dashboard sidebars ---- */
+#sidebar-admin-wraper {
+  background: var(--glass-bg-strong) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border-right: 1px solid var(--glass-border);
+}
+#sidebar-admin-wraper .admin-nav > ul > li.active > a,
+.twm-nav-list-1 ul li.active a {
+  background: var(--grad-primary) !important;
+  color: #fff !important;
+  border-radius: var(--radius-md);
+  box-shadow: var(--glow-primary);
+  border-left: none;
+}
+#sidebar-admin-wraper .admin-nav > ul > li.active > a i,
+.twm-nav-list-1 ul li.active a i { color: #fff !important; }
+
+/* ---- Stat cards: top sheen + glow icon ---- */
+.twm-dash-b-blocks .dashboard-card,
+.twm-dash-b-blocks .dashboard-card-2 { border-top: none; overflow: hidden; }
+.twm-dash-b-blocks .dashboard-card::before,
+.twm-dash-b-blocks .dashboard-card-2::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad-primary);
+}
+.twm-dash-b-blocks .gradi-2.dashboard-card::before,
+.twm-dash-b-blocks .block-gradient-2.dashboard-card-2::before { background: var(--grad-success); }
+.twm-dash-b-blocks .wt-card-icon,
+.twm-dash-b-blocks .wt-card-icon-2 { box-shadow: 0 6px 18px rgba(37,99,235,0.20); }
+
+/* ---- Tables ---- */
+.jz-dash-table thead th,
+.content-admin-main .table thead th {
+  background: rgba(37, 99, 235, 0.10);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.jz-dash-table tbody tr:hover,
+.content-admin-main .table tbody tr:hover { background: rgba(37, 99, 235, 0.06); }
+
+/* ---- Footer: glassy social bubbles + newsletter panel ---- */
+.jz-footer .social-icons li a {
+  background: var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+.jz-footer .ftr-nw-content {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl); padding: 28px;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ---- Modals / dropdowns ---- */
+.modal-content { border-radius: var(--radius-xl); }
+.dropdown-menu { padding: 8px; }
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu li a:hover { background: var(--color-primary-pale); border-radius: var(--radius-sm); }
+
+/* ---- Slim scrollbar ---- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.28); border-radius: var(--radius-pill); border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(37, 99, 235, 0.5); border: 2px solid transparent; background-clip: content-box; }
+
+/* ---- Keep resume documents clean (NOT glass — they print/export) ---- */
+.cvb-canvas, .cv-preview, .resume-preview, .resume-paper,
+.cvb-canvas .panel, .resume-preview .panel {
+  background: #fff !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ---- Motion guard ---- */
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none !important; }
+  .site-button::after, .btn-primary::after, .twm-nav-sign-up::after { display: none; }
+}
+
+/* ============================================================
+   GLASS FIXES — nested double-borders, corner clipping, spacing
+   Loaded after the glass theme; corrects over-broad surfaces.
+   ============================================================ */
+
+/* 1. Inner panel surfaces are NOT their own box — only the outer .panel is.
+      Kills double borders on chart/inbox/blog/testimonial panels. */
+.wt-panel-body,
+.panel .panel-body,
+.panel .bg-white {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.panel.panel-default .panel-heading,
+.panel.panel-default .wt-panel-heading {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--glass-hairline) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* 2. Outer card boxes clip inner square corners + get even spacing */
+.panel.panel-default,
+.twm-jobs-list-style1,
+.twm-jobs-grid-style1,
+.twm-employer-list-style1,
+.twm-bookmark-list-wrap,
+.side-bar,
+.side-bar-st-1,
+.wt-admin-dashboard-msg-2,
+.twm-D_table,
+.card { overflow: hidden; }
+
+.panel.panel-default { margin-bottom: 24px; }
+.twm-jobs-list-style1,
+.twm-employer-list-style1 { margin-bottom: 24px; }
+
+/* 3. Dashboard stat blocks: the .panel wrapper is invisible, the card is the
+      single glass box (was doubling). Disambiguated by .twm-dash-b-blocks. */
+.twm-dash-b-blocks .panel,
+.twm-dash-b-blocks .panel.panel-default {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible;
+}
+.twm-dash-b-blocks .panel.panel-default .dashboard-card,
+.twm-dash-b-blocks .panel.panel-default .dashboard-card-2 {
+  background: var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--glass-shadow), var(--glass-inset) !important;
+  overflow: hidden;
+  padding: 24px !important;
+}
+
+/* 4. Footer columns are plain text, not glass boxes */
+.jz-footer .widget {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* 5. Search bar must not clip its dropdowns / focus rings */
+.jz-search-bar,
+.dropdown-menu,
+.modal-content { overflow: visible; }
+
+/* ============================================================
+   GLASS FIXES 2 — blog list card + job-card logo
+   ============================================================ */
+
+/* Blog list: unify media + info into ONE glass card (was 2 floating whites) */
+.blog-post.twm-blog-list-style {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+.blog-post.twm-blog-list-style .wt-post-media,
+.blog-post.twm-blog-list-style .wt-post-info {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+/* Image fills its column — no empty white gap below the photo */
+.blog-post.twm-blog-list-style .wt-post-media {
+  height: 100%;
+  min-height: 220px;
+}
+.blog-post.twm-blog-list-style .wt-post-media a,
+.blog-post.twm-blog-list-style .wt-post-media .wt-img-effect {
+  display: block;
+  height: 100%;
+}
+.blog-post.twm-blog-list-style .wt-post-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Job-card logo: was a tiny 56px circle in a tall column.
+   Make it a properly sized, vertically-centred logo chip. */
+.twm-jobs-list-style1 .twm-media,
+.twm-employer-list-style1 .twm-media {
+  background: transparent !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.twm-jobs-list-style1 .twm-media img,
+.twm-employer-list-style1 .twm-media img {
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-pale);
+  padding: 12px;
+  object-fit: contain;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   HERO SEARCH ALIGN — higher specificity so it applies without
+   a view recompile (beats the per-view <style> block).
+   ============================================================ */
+.jz-hero .twm-bnr-search-bar .form-control,
+.jz-hero .twm-bnr-search-bar .selectpicker,
+.jz-hero .twm-bnr-search-bar .btn-light,
+.jz-hero .twm-bnr-search-bar .input-group-text,
+.jz-hero .twm-bnr-search-bar button[type="submit"] {
+  height: 52px !important;
+  border-radius: 12px !important;
+}
+.jz-hero .twm-bnr-search-bar .btn-light {
+  padding: 0 15px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.jz-hero .twm-bnr-search-bar .input-group .form-control {
+  border-right: none !important;
+  border-radius: 12px 0 0 12px !important;
+}
+.jz-hero .twm-bnr-search-bar .input-group-text {
+  border-left: none !important;
+  border-radius: 0 12px 12px 0 !important;
+}
+.jz-hero .twm-bnr-search-bar button[type="submit"] {
+  background: var(--grad-primary) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: var(--glow-primary) !important;
+}
+.jz-hero .twm-bnr-search-bar button[type="submit"]:hover { transform: translateY(-1px); }
+
+/* ============================================================
+   AUDIT FIXES — full-site senior-FE pass (CSS-only, live)
+   Consolidated from public / employer / candidate / admin audits.
+   Tokens only. Safe to append (loaded last).
+   ============================================================ */
+
+/* ---- Status pills: dynamic twm-bg-<status> + employment badges ---- */
+span[class^="twm-bg-"],
+span[class*=" twm-bg-"] {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+}
+span.twm-bg-completed, span.twm-bg-active, span.twm-bg-published,
+span.twm-bg-hired, span.twm-bg-approved, span.twm-bg-green {
+  background: var(--color-success-pale) !important; color: #059669 !important;
+}
+span.twm-bg-pending, span.twm-bg-review, span.twm-bg-draft,
+span.twm-bg-golden, span.twm-bg-brown {
+  background: var(--color-accent-pale) !important; color: #D97706 !important;
+}
+span.twm-bg-rejected, span.twm-bg-failed, span.twm-bg-cancelled,
+span.twm-bg-closed, span.twm-bg-red {
+  background: var(--color-danger-pale) !important; color: var(--color-danger) !important;
+}
+span.twm-bg-applied, span.twm-bg-shortlisted, span.twm-bg-purple, span.twm-bg-sky {
+  background: var(--color-primary-pale) !important; color: var(--color-primary) !important;
+}
+
+/* ---- Sidebar tag cloud (Jobs/Blogs/Employers/Candidates) ---- */
+.tagcloud a {
+  display: inline-block;
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  margin: 0 4px 8px 0;
+  transition: var(--transition-fast);
+}
+.tagcloud a:hover { background: var(--color-primary); color: #fff; }
+
+/* ---- "Recruiting?" advertisment promo + Explore section (off-palette #1967d2 + stock photos) ---- */
+.twm-advertisment {
+  background-image: none !important;
+  background: var(--grad-primary) !important;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.twm-advertisment .overlay,
+.twm-advertisment .overlay-main { background: transparent !important; opacity: 1 !important; }
+.twm-explore-area.bg-cover { background-image: none !important; background: transparent !important; }
+.twm-explore-content { background: var(--grad-primary) !important; border-radius: var(--radius-xl) !important; }
+
+/* ---- FAQ accordion (was unthemed stock Bootstrap) ---- */
+.accordion-item {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg) !important;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.accordion-button {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+  font-weight: 600;
+}
+.accordion-button:not(.collapsed) {
+  background: var(--color-primary-pale) !important;
+  color: var(--color-primary) !important;
+}
+.accordion-body { color: var(--text-secondary); }
+
+/* ---- About feature cards: kill hard grey border over the glass border ---- */
+.wt-icon-box-wraper.bg-white { border-color: var(--glass-border) !important; }
+
+/* ---- Job details header strip (stock photo → gradient) ---- */
+.twm-job-self-top .twm-media-bg img { display: none; }
+.twm-job-self-top .twm-media-bg { background: var(--grad-primary); min-height: 90px; }
+
+/* ---- Blog details author + comments blocks ---- */
+.twm-posts-author,
+.comments-area .comment-body {
+  background: var(--glass-bg-soft);
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--radius-md);
+}
+
+/* ---- Public table headers (blog Manage) + draft warning color ---- */
+.twm-D_table .table thead th { background: rgba(37, 99, 235, 0.10) !important; color: var(--text-primary); }
+.twm-bookmark-list-wrap .text-warning { color: var(--color-accent) !important; }
+.panel.panel-default .panel-heading.bg-light { background: transparent !important; }
+
+/* ---- Candidate result cards (were not glassed like job/employer cards) ---- */
+.twm-candidates-list-style1 {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* ---- AccessDenied secondary button ---- */
+.twm-log-reg-inner .btn-outline-secondary {
+  background: var(--glass-bg-soft) !important;
+  border: 1.5px solid var(--glass-hairline) !important;
+  color: var(--text-secondary) !important;
+  border-radius: var(--radius-pill) !important;
+}
+
+/* ============================================================
+   DASHBOARDS (Employer / Candidate / Admin)
+   ============================================================ */
+
+/* ---- #content breathing room + show the mesh ---- */
+#content {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+  padding-bottom: 32px !important;
+  background: transparent !important;
+}
+@media (max-width: 768px) {
+  #content { padding-left: 16px !important; padding-right: 16px !important; }
+}
+
+/* ---- Stat card text/icons (template painted them white for solid cards) ---- */
+.twm-dash-b-blocks .dashboard-card .wt-card-bottom,
+.twm-dash-b-blocks .dashboard-card .wt-card-bottom h4,
+.twm-dash-b-blocks .dashboard-card-2 .wt-card-bottom-2,
+.twm-dash-b-blocks .dashboard-card-2 .wt-card-bottom-2 h4 { color: var(--text-primary) !important; }
+.twm-dash-b-blocks .wt-card-icon i,
+.twm-dash-b-blocks .wt-card-icon-2 i { color: var(--color-primary) !important; }
+.jz-sparkline span { background: var(--color-primary) !important; opacity: 0.5; }
+
+/* ---- Panel titles ---- */
+.panel-tittle { color: var(--text-primary); }
+.panel-tittle > i { color: var(--color-primary); margin-right: 8px; }
+
+/* ---- Secondary / outline buttons that fell through (btn-secondary, btn-outline-info) ---- */
+.site-button.btn-secondary {
+  background: var(--glass-bg-soft) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)); backdrop-filter: blur(var(--glass-blur-sm));
+  border: 1.5px solid rgba(37, 99, 235, 0.45) !important;
+  color: var(--color-primary) !important;
+  box-shadow: none !important;
+}
+.site-button.btn-secondary:hover { background: var(--color-primary) !important; color: #fff !important; }
+.site-button.btn-secondary::after { display: none; }
+.content-admin-main .btn-outline-info {
+  background: var(--glass-bg-soft) !important;
+  border: 1.5px solid rgba(37, 99, 235, 0.45) !important;
+  color: var(--color-primary) !important;
+  border-radius: var(--radius-pill) !important;
+}
+.content-admin-main .btn-outline-info:hover { background: var(--color-primary) !important; color: #fff !important; }
+
+/* ---- Admin page header + status text colors ---- */
+.wt-admin-right-page-header h2 { color: var(--text-primary); font-weight: 700; }
+.content-admin-main .text-clr-green2 { color: var(--color-success) !important; }
+.content-admin-main .text-clr-red { color: var(--color-danger) !important; }
+
+/* ---- Forms: labels, readonly, file inputs, field icons, selects ---- */
+.content-admin-main .form-group > label,
+.twm-right-section-panel .form-group label {
+  color: var(--text-secondary); font-weight: 600; margin-bottom: 6px;
+}
+.twm-right-section-panel .form-control[readonly] {
+  background: var(--glass-bg-strong) !important; color: var(--text-muted) !important; cursor: not-allowed;
+}
+.ls-inputicon-box { position: relative; }
+.ls-inputicon-box .form-control { padding-right: 42px !important; }
+.ls-inputicon-box .fs-input-icon {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none;
+}
+input[type="file"].form-control { padding: 8px 12px; }
+input[type="file"].form-control::file-selector-button {
+  background: var(--color-primary-pale); color: var(--color-primary);
+  border: none; border-radius: var(--radius-pill); padding: 6px 14px;
+  margin-right: 12px; font-weight: 600; cursor: pointer;
+}
+.bootstrap-select > .btn { color: var(--text-primary) !important; }
+.bootstrap-select .dropdown-menu li a { color: var(--text-primary); }
+
+/* ---- Table action-icon buttons + action spacing + density ---- */
+.twm-table-controls .twm-DT-controls-icon > li > a,
+.twm-table-controls .twm-DT-controls-icon > li button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: var(--radius-md);
+  background: var(--color-primary-pale); color: var(--color-primary);
+  transition: var(--transition-fast); border: none;
+}
+.twm-table-controls .twm-DT-controls-icon > li > a:hover { background: var(--color-primary); color: #fff; }
+.jz-dash-table td form.d-inline + form.d-inline,
+.jz-dash-table td form.d-inline + .twm-table-controls { margin-left: 8px; }
+.content-admin-main .panel-body .twm-D_table { padding: 0 !important; }
+.content-admin-main .table td, .content-admin-main .table th { white-space: nowrap; vertical-align: middle; }
+.content-admin-main .panel.panel-default > .wt-panel-heading { padding: 16px 20px; }
+.content-admin-main .panel.panel-default > .wt-panel-body { padding: 20px; }
+.content-admin-main .bg-light { background: var(--glass-bg-soft) !important; }
+.content-admin-main .preview-box { border: 1px dashed var(--glass-border); }
+
+/* ============================================================
+   CANDIDATE specifics
+   ============================================================ */
+
+/* Resume manager rows (were orphaned / unstyled) */
+.twm-cv-manager-list-style1 {
+  display: flex; gap: 16px; align-items: center;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  padding: 16px 20px; margin-bottom: 16px;
+}
+.twm-cv-manager-list-style1 .twm-media,
+.twm-cv-manager-list-style1 .twm-mid-content { background: transparent !important; border: none !important; box-shadow: none !important; }
+.twm-cv-manager-list-style1 .twm-view-button { display: inline-flex; gap: 10px; align-items: center; margin-left: auto; }
+.twm-cv-manager-list-style1 .twm-view-button a,
+.twm-cv-manager-list-style1 .twm-view-button button {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-color);
+}
+
+/* Raw status text on Applied/Saved jobs → legible pill */
+.twm-dash-candidates-list .twm-jobs-vacancies {
+  display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill);
+  background: var(--color-primary-pale); color: var(--color-primary);
+  font-size: .75rem; font-weight: 600;
+}
+
+/* Candidate sidebar: upload-photo file overlay + profile name/title */
+.twm-candidate-profile-pic { position: relative; text-align: center; }
+.twm-candidate-profile-pic .upload-btn-wrapper { position: relative; display: inline-block; margin-top: 12px; }
+.twm-candidate-profile-pic .upload-btn-wrapper #file-uploader {
+  position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+}
+.side-bar-st-1 .twm-mid-content h4 { color: var(--text-primary); margin-bottom: 2px; }
+.side-bar-st-1 .twm-mid-content p { color: var(--text-muted); font-size: .85rem; }
+
+/* Pin candidate content panel padding (toolbar negative-margin assumes 24px) */
+.twm-right-section-panel { padding: 24px; }
+
+/* ============================================================
+   CHAT (#1967d2 / hardcoded colors fought via higher specificity)
+   ============================================================ */
+.wt-admin-dashboard-msg-2 .active-chat {
+  background-color: var(--color-primary-pale) !important;
+  border-left: 4px solid var(--color-primary) !important;
+}
+.wt-admin-dashboard-msg-2 .single-user-com-text {
+  background: var(--color-primary-pale) !important; color: var(--text-primary);
+  border-radius: var(--radius-lg) !important;
+}
+.wt-admin-dashboard-msg-2 .sigle-user-reply .single-user-com-text {
+  background: var(--glass-bg-soft) !important; border: 1px solid var(--glass-hairline);
+}
+.wt-dashboard-msg-search .input-group .btn {
+  background: var(--color-primary-pale); color: var(--color-primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* ============================================================
+   HOME FIXES — hero search box, job logos, duplicate back-to-top
+   ============================================================ */
+
+/* 1. Keep What/Category/Location/button inside the white search box, aligned */
+.jz-hero .twm-bnr-search-bar { padding: 20px !important; }
+.jz-hero .twm-bnr-search-bar form { margin: 0; }
+.jz-hero .twm-bnr-search-bar form > .row {
+  margin-left: 0 !important; margin-right: 0 !important;
+  align-items: flex-end;
+}
+.jz-hero .twm-bnr-search-bar .bootstrap-select { width: 100% !important; }
+.jz-hero .twm-bnr-search-bar .bootstrap-select > .btn {
+  height: 52px !important; display: flex !important; align-items: center !important;
+}
+
+/* 2. Center the company logo in each job-post card's media column */
+.twm-jobs-list-style1 .twm-media {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: stretch;
+}
+
+/* 3. Hide the theme's duplicate back-to-top (button.scroltop, home only);
+      keep the single global .jz-back-top */
+button.scroltop { display: none !important; }

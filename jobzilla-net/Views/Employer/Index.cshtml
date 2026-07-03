@@ -16,9 +16,11 @@
                 <div class="panel-body wt-panel-body gradi-1 dashboard-card ">
                     <div class="wt-card-wrap">
                         <div class="wt-card-icon"><i class="far fa-address-book"></i></div>
-                        <div class="wt-card-right wt-total-active-listing counter">@Model.Overview.PostedJobsCount</div>
+                        <div class="wt-card-right wt-total-active-listing counter" data-count="@Model.Overview.PostedJobsCount">@Model.Overview.PostedJobsCount</div>
                         <div class="wt-card-bottom ">
                             <h4 class="m-b0">Posted Jobs</h4>
+                            <span class="jz-trend"><i class="feather-trending-up"></i> Active</span>
+                            <div class="jz-sparkline"><span style="height:40%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:90%"></span><span style="height:65%"></span></div>
                         </div>
                     </div>
                 </div>
@@ -29,9 +31,11 @@
                 <div class="panel-body wt-panel-body gradi-2 dashboard-card ">
                     <div class="wt-card-wrap">
                         <div class="wt-card-icon"><i class="far fa-file-alt"></i></div>
-                        <div class="wt-card-right  wt-total-listing-view counter">@Model.Overview.TotalApplicationsCount</div>
+                        <div class="wt-card-right  wt-total-listing-view counter" data-count="@Model.Overview.TotalApplicationsCount">@Model.Overview.TotalApplicationsCount</div>
                         <div class="wt-card-bottom">
-                            <h4 class="m-b0">Total Applications</h4> 
+                            <h4 class="m-b0">Total Applications</h4>
+                            <span class="jz-trend"><i class="feather-trending-up"></i> Growing</span>
+                            <div class="jz-sparkline"><span style="height:50%"></span><span style="height:65%"></span><span style="height:45%"></span><span style="height:80%"></span><span style="height:95%"></span></div>
                         </div>
                     </div>
                 </div>
@@ -42,9 +46,11 @@
                 <div class="panel-body wt-panel-body gradi-3 dashboard-card ">
                     <div class="wt-card-wrap">
                         <div class="wt-card-icon"><i class="far fa-envelope"></i></div>
-                        <div class="wt-card-right wt-total-listing-review counter">@Model.Overview.MessagesCount</div>
+                        <div class="wt-card-right wt-total-listing-review counter" data-count="@Model.Overview.MessagesCount">@Model.Overview.MessagesCount</div>
                         <div class="wt-card-bottom">
                             <h4 class="m-b0">Messages</h4>
+                            <span class="jz-trend"><i class="feather-trending-up"></i> Inbox</span>
+                            <div class="jz-sparkline"><span style="height:60%"></span><span style="height:40%"></span><span style="height:75%"></span><span style="height:50%"></span><span style="height:85%"></span></div>
                         </div>
                     </div>
                 </div>
@@ -55,9 +61,11 @@
                 <div class="panel-body wt-panel-body gradi-4 dashboard-card ">
                     <div class="wt-card-wrap">
                         <div class="wt-card-icon"><i class="far fa-bell"></i></div>
-                        <div class="wt-card-right wt-total-listing-bookmarked counter">@Model.Overview.ShortlistedCount</div>
+                        <div class="wt-card-right wt-total-listing-bookmarked counter" data-count="@Model.Overview.ShortlistedCount">@Model.Overview.ShortlistedCount</div>
                         <div class="wt-card-bottom">
                             <h4 class="m-b0">Notifications</h4>
+                            <span class="jz-trend"><i class="feather-trending-up"></i> Shortlisted</span>
+                            <div class="jz-sparkline"><span style="height:45%"></span><span style="height:60%"></span><span style="height:50%"></span><span style="height:70%"></span><span style="height:88%"></span></div>
                         </div>
                     </div>
                 </div>
@@ -125,7 +133,16 @@
                                                 <div class="twm-fot-content">
                                                     <div class="twm-left-info">
                                                         <p class="twm-candidate-address"><i class="far fa-clock"></i>@applicant.AppliedAtUtc.ToString("MMM dd, yyyy")</p>
-                                                        <div class="twm-jobs-vacancies">@applicant.Status</div>
+                                                        @{
+                                                            var applicantStatusClass = applicant.Status switch
+                                                            {
+                                                                "Pending"  => "jz-status-review",
+                                                                "Approved" => "jz-status-hired",
+                                                                "Rejected" => "jz-status-rejected",
+                                                                _          => "jz-status-shortlist"
+                                                            };
+                                                        }
+                                                        <div class="twm-jobs-vacancies"><span class="@applicantStatusClass">@applicant.Status</span></div>
                                                     </div>
                                                     <div class="twm-right-btn">
                                                         <ul class="twm-controls-icon list-unstyled">

@@ -62,7 +62,7 @@
                             <td>
                                 @if (template.IsPremium)
                                 {
-                                    <span class="text-danger">${@template.Price.ToString("0.00")}</span>
+                                    <span class="text-danger">$@template.Price.ToString("0.00")</span>
                                     @if (template.DiscountPrice.HasValue)
                                     {
                                         <br />

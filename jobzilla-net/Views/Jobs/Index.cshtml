@@ -232,7 +232,7 @@
                                 .Replace("PartTime", "Part Time");
 
                             <li>
-                                <div class="twm-jobs-list-style1 mb-5">
+                                <div class="twm-jobs-list-style1 mb-5 jz-reveal">
                                     <div class="twm-media">
                                         @if (!string.IsNullOrEmpty(job.CompanyLogoPath))
                                         {
@@ -247,6 +247,10 @@
                                         <a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id" class="twm-job-title">
                                             <h4>@job.Title <span class="twm-job-post-duration">/ @ageLabel</span></h4>
                                         </a>
+                                        @if (daysAgo <= 2)
+                                        {
+                                            <span class="jz-badge jz-badge-new"><span class="jz-pulse-dot"></span>NEW</span>
+                                        }
                                         <p class="twm-job-address">@job.Location</p>
                                         <a asp-controller="Employers" asp-action="Details" class="twm-job-websites site-text-primary">@job.CompanyName</a>
                                     </div>

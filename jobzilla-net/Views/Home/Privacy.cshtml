@@ -1,6 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<div class="wt-bnr-inr overlay-wraper bg-center">
+    <div class="overlay-main site-bg-white opacity-01"></div>
+    <div class="container">
+        <div class="wt-bnr-inr-entry">
+            <div class="banner-title-outer">
+                <div class="banner-title-name"><h2 class="wt-title">@ViewData["Title"]</h2></div>
+            </div>
+            <div>
+                <ul class="wt-breadcrumb breadcrumb-style-2">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li>@ViewData["Title"]</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="section-full p-t120 p-b90 site-bg-white">
+    <div class="container">
+        <p>Use this page to detail your site's privacy policy.</p>
+    </div>
+</div>

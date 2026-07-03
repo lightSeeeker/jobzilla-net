@@ -2,7 +2,12 @@
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString();
     bool isMinimalFooter = controllerName == "Candidate" || controllerName == "Employer" || controllerName == "Account";
 }
-        <footer class="footer-dark" style="background-image: url(/images/f-bg.jpg); @(isMinimalFooter ? "padding-top: 0;" : "")">
+        <footer class="footer-dark jz-footer" style="@(isMinimalFooter ? "padding-top: 0;" : "")">
+            <div class="jz-wave-divider" aria-hidden="true">
+                <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d="M0,30 C360,60 1080,0 1440,30 L1440,0 L0,0 Z" fill="#F0F4FF"/>
+                </svg>
+            </div>
             <div class="container">
 
                 @if (!isMinimalFooter)
@@ -36,7 +41,7 @@
                                 
                                 <div class="widget widget_about">
                                     <div class="logo-footer clearfix">
-                                        <a href="@Url.Action("Index", "Home")"><img src="~/images/logo-light.png" alt=""></a>
+                                        <a href="@Url.Action("Index", "Home")"><img src="~/images/logo-dark.png" alt=""></a>
                                     </div>
                                     <p>Many desktop publishing packages and web page editors now.</p>
                                     <ul class="ftr-list">
@@ -117,7 +122,7 @@
                     <div class="footer-bottom-info" style="@(isMinimalFooter ? "padding: 10px 0;" : "")">
                     
                         <div class="footer-copy-right">
-                            <span class="copyrights-text">Copyright Â© 2023 by thewebmax All Rights Reserved.</span>
+                            <span class="copyrights-text">Copyright &copy; 2023 by thewebmax All Rights Reserved.</span>
                         </div>
                         <ul class="social-icons">
                             <li><a href="javascript:void(0);" class="fab fa-facebook-f"></a></li>

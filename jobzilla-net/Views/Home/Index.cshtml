@@ -1,44 +1,58 @@
 ﻿@model jobzilla_net.Models.Home.HomePageViewModel
 
 <style>
-    .twm-bnr-search-bar .selectpicker {
-        border: 1px solid #ddd !important;
-        padding: 0 !important;
-        font-size: 14px !important;
-        border-radius: 4px !important;
-        background-color: #f9f9f9 !important;
-        transition: all 0.3s !important;
-        cursor: pointer !important;
-        color: #666 !important;
-        height: auto !important;
+    /* Hero text on the light glass banner */
+    .jz-hero .twm-bnr-title-small { color: var(--text-secondary); }
+    .jz-hero .twm-bnr-title-large { color: var(--text-primary); }
+    .jz-hero .twm-bnr-discription { color: var(--text-muted); }
+    .jz-hero .twm-bnr-popular-search,
+    .jz-hero .twm-bnr-popular-search .twm-title { color: var(--text-secondary); }
+
+    /* Glass search inputs — uniform height + alignment */
+    .twm-bnr-search-bar .form-control,
+    .twm-bnr-search-bar .selectpicker,
+    .twm-bnr-search-bar .btn-light,
+    .twm-bnr-search-bar .input-group-text,
+    .twm-bnr-search-bar button[type="submit"] {
+        height: 52px !important;
+        background-color: rgba(255, 255, 255, 0.55) !important;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        border: 1.5px solid rgba(148, 163, 184, 0.28) !important;
+        border-radius: 12px !important;
+        color: var(--text-secondary) !important;
         background-image: none !important;
+        transition: all 0.25s !important;
     }
 
     .twm-bnr-search-bar .btn-light {
-        border: 1px solid #ddd !important;
-        padding: 10px 15px !important;
-        font-size: 14px !important;
-        border-radius: 4px !important;
-        background-color: #f9f9f9 !important;
-        color: #666 !important;
+        padding: 0 15px !important;
         text-align: left !important;
-        transition: all 0.3s !important;
-        height: 46px !important;
-        line-height: 1.5 !important;
         display: flex !important;
         align-items: center !important;
     }
 
-    .twm-bnr-search-bar .btn-light:hover {
-        background-color: #fff !important;
-        border-color: #1967d2 !important;
-    }
+    /* Location field + pin button read as one joined control */
+    .twm-bnr-search-bar .input-group .form-control { border-right: none !important; border-radius: 12px 0 0 12px !important; }
+    .twm-bnr-search-bar .input-group-text { border-left: none !important; border-radius: 0 12px 12px 0 !important; }
 
+    /* Find Job button — gradient, matches input height */
+    .twm-bnr-search-bar button[type="submit"] {
+        background: var(--grad-primary) !important;
+        border: none !important;
+        color: #fff !important;
+        font-weight: 600;
+        box-shadow: var(--glow-primary) !important;
+    }
+    .twm-bnr-search-bar button[type="submit"]:hover { transform: translateY(-1px); }
+
+    .twm-bnr-search-bar .form-control:focus,
+    .twm-bnr-search-bar .btn-light:hover,
     .twm-bnr-search-bar .btn-light:focus,
     .twm-bnr-search-bar .btn-light.active {
-        background-color: #fff !important;
-        border-color: #1967d2 !important;
-        box-shadow: none !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        border-color: var(--color-primary) !important;
+        box-shadow: 0 0 0 4px var(--border-focus) !important;
     }
 </style>
 
@@ -86,28 +100,31 @@
         <div class="page-content">
 
             <!--Banner Start-->
-            <div class="twm-home1-banner-section site-bg-gray bg-cover" style="background-image:url(/images/main-slider/slider1/bg1.jpg)">
+            <div class="twm-home1-banner-section jz-hero site-bg-gray bg-cover" style="background: var(--bg-hero);">
+                <div class="jz-blob jz-blob-1"></div>
+                <div class="jz-blob jz-blob-2"></div>
+                <div class="jz-blob jz-blob-3"></div>
                 <div class="row">
                     
                     <!--Left Section-->
                     <div class="col-xl-6 col-lg-6 col-md-12">
                         <div class="twm-bnr-left-section">
                             <div class="twm-bnr-title-small">We Have <span class="site-text-primary">208,000+</span> Live Jobs</div>
-                            <div class="twm-bnr-title-large">Find the <span class="site-text-primary">job</span> that fits your life</div>
+                            <div class="twm-bnr-title-large jz-reveal">Find the <span class="site-text-primary jz-text-gradient">job</span> that fits your life</div>
                             <div class="twm-bnr-discription">Type your keyword, then click search to find your perfect job.</div>
 
-                            <div class="twm-bnr-search-bar">
+                            <div class="twm-bnr-search-bar jz-search-bar">
                                 <form asp-controller="Jobs" asp-action="Index" method="get">
                                     <div class="row align-items-end g-2 g-md-3">
                                         <!--Keyword Search-->
                                         <div class="col-12 col-sm-6 col-lg-3">
-                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #b0b0b0; margin-bottom: 10px; text-transform: uppercase;">What</label>
-                                            <input type="text" name="keyword" class="form-control" placeholder="Job title, keywords..." style="border: 1px solid #ddd; padding: 13px 15px; font-size: 14px; border-radius: 4px; transition: all 0.3s; background-color: #f9f9f9;" onmouseover="this.style.backgroundColor='#fff'; this.style.borderColor='#1967d2';" onmouseout="this.style.backgroundColor='#f9f9f9'; this.style.borderColor='#ddd';">
+                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">What</label>
+                                            <input type="text" name="keyword" class="form-control" placeholder="Job title, keywords...">
                                         </div>
 
                                         <!--Category-->
                                         <div class="col-12 col-sm-6 col-lg-3">
-                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #b0b0b0; margin-bottom: 10px; text-transform: uppercase;">Category</label>
+                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">Category</label>
                                             <select class="form-control selectpicker" name="categoryId" data-live-search="true">
                                                 <option value="">All Categories</option>
                                                 @if (Model?.JobCategories != null && Model.JobCategories.Any())
@@ -122,16 +139,16 @@
 
                                         <!--Location-->
                                         <div class="col-12 col-sm-6 col-lg-3">
-                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #b0b0b0; margin-bottom: 10px; text-transform: uppercase;">Location</label>
+                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">Location</label>
                                             <div class="input-group">
-                                                <input name="location" type="text" class="form-control" placeholder="City, region..." style="border: 1px solid #ddd; padding: 13px 15px; font-size: 14px; border-radius: 4px 0 0 4px; background-color: #f9f9f9;">
-                                                <span class="input-group-text" style="border: 1px solid #ddd; border-left: none; background-color: #f9f9f9; border-radius: 0 4px 4px 0;"><i class="fas fa-map-marker-alt" style="color: #999; font-size: 16px;"></i></span>
+                                                <input name="location" type="text" class="form-control" placeholder="City, region...">
+                                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                                             </div>
                                         </div>
 
                                         <!--Find job btn-->
                                         <div class="col-12 col-sm-6 col-lg-3">
-                                            <button type="submit" class="btn w-100" style="padding: 13px 20px; font-size: 15px; font-weight: 600; background-color: #1967d2; border: 2px solid #1967d2; color: white; border-radius: 4px; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.backgroundColor='#0d47a1'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(25,103,210,0.35)';" onmouseout="this.style.backgroundColor='#1967d2'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">Find Job</button>
+                                            <button type="submit" class="btn w-100 jz-search-pulse">Find Job</button>
                                         </div>
 
                                     </div>
@@ -251,8 +268,56 @@
                 <div class="twm-gradient-text">
                     Jobs
                 </div>
+
+                <!--Scroll Indicator-->
+                <div class="jz-scroll-indicator"><i class="feather-chevron-down"></i></div>
             </div>
             <!--Banner End-->
+
+            <!--Stats Row Start-->
+            <div class="jz-stats-row">
+                <div class="container">
+                    <div class="row justify-content-center g-3">
+                        <div class="col-6 col-md-3">
+                            <div class="jz-stat-pill jz-reveal">
+                                <span class="jz-stat-icon"><i class="feather-briefcase"></i></span>
+                                <div class="jz-stat-body">
+                                    <span class="jz-stat-num counter" data-count="208000">208000</span>
+                                    <span class="jz-stat-label">Live Jobs</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="jz-stat-pill jz-reveal">
+                                <span class="jz-stat-icon"><i class="feather-home"></i></span>
+                                <div class="jz-stat-body">
+                                    <span class="jz-stat-num counter" data-count="@(Model.TotalCompanies > 0 ? Model.TotalCompanies : 12000)">@(Model.TotalCompanies > 0 ? Model.TotalCompanies : 12000)</span>
+                                    <span class="jz-stat-label">Companies</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="jz-stat-pill jz-reveal">
+                                <span class="jz-stat-icon"><i class="feather-globe"></i></span>
+                                <div class="jz-stat-body">
+                                    <span class="jz-stat-num counter" data-count="@Model.TotalCountries">@Model.TotalCountries</span>
+                                    <span class="jz-stat-label">Countries</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="jz-stat-pill jz-reveal">
+                                <span class="jz-stat-icon"><i class="feather-check-circle"></i></span>
+                                <div class="jz-stat-body">
+                                    <span class="jz-stat-num counter" data-count="@(Model.TotalJobsDone > 0 ? Model.TotalJobsDone : 3000)">@(Model.TotalJobsDone > 0 ? Model.TotalJobsDone : 3000)</span>
+                                    <span class="jz-stat-label">Jobs Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Stats Row End-->
 
             <!-- HOW IT WORK SECTION START -->
             <div class="section-full p-t120 p-b90 site-bg-white twm-how-it-work-area">
@@ -264,7 +329,7 @@
                         <div class="wt-small-separator site-text-primary">
                            <div>Working Process</div>                                
                         </div>
-                        <h2 class="wt-title">How It Works</h2>
+                        <h2 class="wt-title jz-reveal">How It Works</h2>
                         
                     </div>                  
                     <!-- TITLE END-->
@@ -331,7 +396,7 @@
                                     <div class="wt-small-separator site-text-primary">
                                     <div>Jobs by Categories</div>                                
                                     </div>
-                                    <h2 class="wt-title">Choose Your Desire Category</h2>
+                                    <h2 class="wt-title jz-reveal">Choose Your Desire Category</h2>
                                 </div>                  
                                 <!-- TITLE END-->
                             </div>
@@ -665,9 +730,9 @@
 
                                         <div class="twm-title-small">Explore New Life</div>
                                         <div class="twm-title-large">
-                                            <h2>DonÃ¢â‚¬â„¢t just find. be found 
-                                            put your CV in front of 
-                                            great employers </h2>
+                                            <h2>Don't just find. Be found —
+                                            put your CV in front of
+                                            great employers</h2>
                                             <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry the standard dummy text ever since the  when an printer took.</p>
                                         </div>
                                         <div class="twm-upload-file">
@@ -696,7 +761,7 @@
                         <div class="wt-small-separator site-text-primary">
                            <div>Top Companies</div>                                
                         </div>
-                        <h2 class="wt-title">Get hired in top companies</h2>
+                        <h2 class="wt-title jz-reveal">Get hired in top companies</h2>
                     </div>                  
                     <!-- TITLE END-->
 
@@ -833,7 +898,7 @@
                         <div class="wt-small-separator site-text-primary">
                            <div>All Jobs Post</div>                                
                         </div>
-                        <h2 class="wt-title">Find Your Career You Deserve it</h2>
+                        <h2 class="wt-title jz-reveal">Find Your Career You Deserve it</h2>
                     </div>                  
                     <!-- TITLE END-->
 
@@ -842,7 +907,7 @@
                        <div class="twm-jobs-list-wrap">
                            <ul>
                                 <li>
-                                    <div class="twm-jobs-list-style1 mb-5">
+                                    <div class="twm-jobs-list-style1 mb-5 jz-reveal">
                                         <div class="twm-media">
                                             <img src="~/images/jobs-company/pic1.jpg" alt="#">
                                         </div>
@@ -862,7 +927,7 @@
                                 </li>
 
                                 <li>
-                                    <div class="twm-jobs-list-style1 mb-5">
+                                    <div class="twm-jobs-list-style1 mb-5 jz-reveal">
                                         <div class="twm-media">
                                             <img src="~/images/jobs-company/pic2.jpg" alt="#">
                                         </div>
@@ -882,7 +947,7 @@
                                 </li>
 
                                 <li>
-                                    <div class="twm-jobs-list-style1 mb-5">
+                                    <div class="twm-jobs-list-style1 mb-5 jz-reveal">
                                         <div class="twm-media">
                                             <img src="~/images/jobs-company/pic3.jpg" alt="#">
                                         </div>
@@ -902,7 +967,7 @@
                                 </li>
 
                                 <li>
-                                    <div class="twm-jobs-list-style1 mb-5">
+                                    <div class="twm-jobs-list-style1 mb-5 jz-reveal">
                                         <div class="twm-media">
                                             <img src="~/images/jobs-company/pic4.jpg" alt="#">
                                         </div>
@@ -922,7 +987,7 @@
                                 </li>
 
                                 <li>
-                                    <div class="twm-jobs-list-style1 mb-5">
+                                    <div class="twm-jobs-list-style1 mb-5 jz-reveal">
                                         <div class="twm-media">
                                             <img src="~/images/jobs-company/pic5.jpg" alt="#">
                                         </div>
@@ -964,7 +1029,7 @@
                                     <div class="wt-small-separator site-text-primary">
                                     <div>Clients Testimonials</div>                                
                                     </div>
-                                    <h2 class="wt-title">What Our Customers Say About Us</h2>
+                                    <h2 class="wt-title jz-reveal">What Our Customers Say About Us</h2>
                                 </div>                  
                                 <!-- TITLE END-->
                             </div>
@@ -1104,7 +1169,7 @@
                         <div class="wt-small-separator site-text-primary">
                            <div>Our Blogs</div>                                
                         </div>
-                        <h2 class="wt-title">Latest Article</h2>
+                        <h2 class="wt-title jz-reveal">Latest Article</h2>
                         
                     </div>                  
                     <!-- TITLE END-->

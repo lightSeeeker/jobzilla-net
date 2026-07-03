@@ -29,9 +29,10 @@
                                         <div class="panel-body wt-panel-body dashboard-card-2 block-gradient">
                                             <div class="wt-card-wrap-2">
                                                 <div class="wt-card-icon-2"><i class="flaticon-job"></i></div>
-                                                <div class="wt-card-right wt-total-active-listing counter ">@Model.Overview.AppliedJobsCount</div>
+                                                <div class="wt-card-right wt-total-active-listing counter " data-count="@Model.Overview.AppliedJobsCount">@Model.Overview.AppliedJobsCount</div>
                                                 <div class="wt-card-bottom-2 ">
                                                     <h4 class="m-b0">Applied Jobs</h4>
+                                                    <div class="jz-sparkline"><span style="height:40%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:90%"></span><span style="height:65%"></span></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -42,9 +43,10 @@
                                         <div class="panel-body wt-panel-body dashboard-card-2 block-gradient-2">
                                             <div class="wt-card-wrap-2">
                                                 <div class="wt-card-icon-2"><i class="flaticon-resume"></i></div>
-                                                <div class="wt-card-right  wt-total-listing-view counter ">@Model.Overview.SavedJobsCount</div>
+                                                <div class="wt-card-right  wt-total-listing-view counter " data-count="@Model.Overview.SavedJobsCount">@Model.Overview.SavedJobsCount</div>
                                                 <div class="wt-card-bottom-2">
-                                                    <h4 class="m-b0">Saved Jobs</h4> 
+                                                    <h4 class="m-b0">Saved Jobs</h4>
+                                                    <div class="jz-sparkline"><span style="height:50%"></span><span style="height:65%"></span><span style="height:45%"></span><span style="height:80%"></span><span style="height:95%"></span></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -55,9 +57,10 @@
                                         <div class="panel-body wt-panel-body dashboard-card-2 block-gradient-3">
                                             <div class="wt-card-wrap-2">
                                                 <div class="wt-card-icon-2"><i class="flaticon-envelope"></i></div>
-                                                <div class="wt-card-right wt-total-listing-review counter ">@Model.Overview.MessagesCount</div>
+                                                <div class="wt-card-right wt-total-listing-review counter " data-count="@Model.Overview.MessagesCount">@Model.Overview.MessagesCount</div>
                                                 <div class="wt-card-bottom-2">
                                                     <h4 class="m-b0">Messages</h4>
+                                                    <div class="jz-sparkline"><span style="height:60%"></span><span style="height:40%"></span><span style="height:75%"></span><span style="height:50%"></span><span style="height:85%"></span></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -68,9 +71,10 @@
                                         <div class="panel-body wt-panel-body dashboard-card-2 block-gradient-4">
                                             <div class="wt-card-wrap-2">
                                                 <div class="wt-card-icon-2"><i class="flaticon-bell"></i></div>
-                                                <div class="wt-card-right wt-total-listing-bookmarked counter ">@Model.Overview.AlertsCount</div>
+                                                <div class="wt-card-right wt-total-listing-bookmarked counter " data-count="@Model.Overview.AlertsCount">@Model.Overview.AlertsCount</div>
                                                 <div class="wt-card-bottom-2">
                                                     <h4 class="m-b0">Job Alerts</h4>
+                                                    <div class="jz-sparkline"><span style="height:45%"></span><span style="height:60%"></span><span style="height:50%"></span><span style="height:70%"></span><span style="height:88%"></span></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -110,7 +114,16 @@
                                                                         <div class="twm-fot-content">
                                                                             <div class="twm-left-info">
                                                                                 <p class="twm-candidate-address"><i class="feather-map-pin"></i>@app.Location</p>
-                                                                                <div class="twm-jobs-vacancies">@app.Status</div>
+                                                                                @{
+                                                                                    var appStatusClass = app.Status switch
+                                                                                    {
+                                                                                        "Pending"  => "jz-status-review",
+                                                                                        "Approved" => "jz-status-hired",
+                                                                                        "Rejected" => "jz-status-rejected",
+                                                                                        _          => "jz-status-shortlist"
+                                                                                    };
+                                                                                }
+                                                                                <div class="twm-jobs-vacancies"><span class="@appStatusClass">@app.Status</span></div>
                                                                             </div>
                                                                             <div class="twm-right-btn">
                                                                                 <ul class="twm-controls-icon list-unstyled">

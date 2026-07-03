@@ -18,6 +18,6 @@ namespace jobzilla_net.Application.Constants
         /// Specifies the target environment name to use as a fallback if the 
         /// ASPNETCORE_ENVIRONMENT environment variable is not set.
         /// </summary>
-        public const string CurrentEnv = Local;
+        public const string CurrentEnv = Development;
     }
 }

@@ -115,17 +115,18 @@
 
                             <div class="twm-bnr-search-bar jz-search-bar">
                                 <form asp-controller="Jobs" asp-action="Index" method="get">
-                                    <div class="row align-items-end g-2 g-md-3">
+                                    <div class="jz-search-grid">
                                         <!--Keyword Search-->
-                                        <div class="col-12 col-sm-6 col-lg-3">
-                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">What</label>
-                                            <input type="text" name="keyword" class="form-control" placeholder="Job title, keywords...">
+                                        <div class="jz-search-field">
+                                            <label for="jz-search-what">What</label>
+                                            <input id="jz-search-what" type="text" name="keyword" class="form-control" placeholder="Job title, keywords...">
                                         </div>
 
                                         <!--Category-->
-                                        <div class="col-12 col-sm-6 col-lg-3">
-                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">Category</label>
-                                            <select class="form-control selectpicker" name="categoryId" data-live-search="true">
+                                        @* form-control *@
+                                        <div class="jz-search-field">
+                                            <label for="jz-search-category">Category</label>
+                                            <select id="jz-search-category" class=" selectpicker" name="categoryId" data-live-search="true">
                                                 <option value="">All Categories</option>
                                                 @if (Model?.JobCategories != null && Model.JobCategories.Any())
                                                 {
@@ -138,16 +139,16 @@
                                         </div>
 
                                         <!--Location-->
-                                        <div class="col-12 col-sm-6 col-lg-3">
-                                            <label style="display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">Location</label>
+                                        <div class="jz-search-field">
+                                            <label for="jz-search-location">Location</label>
                                             <div class="input-group">
-                                                <input name="location" type="text" class="form-control" placeholder="City, region...">
+                                                <input id="jz-search-location" name="location" type="text" class="form-control" placeholder="City, region...">
                                                 <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                                             </div>
                                         </div>
 
                                         <!--Find job btn-->
-                                        <div class="col-12 col-sm-6 col-lg-3">
+                                        <div class="jz-search-field jz-search-action">
                                             <button type="submit" class="btn w-100 jz-search-pulse">Find Job</button>
                                         </div>
 
@@ -184,9 +185,7 @@
                                     </div>
                                     <div class="item">
                                       <div class="slide-img">
-                                        <div class="slide-img">
-                                            <img src="~/images/main-slider/slider1/r-img2.png" alt="#">
-                                          </div>
+                                        <img src="~/images/main-slider/slider1/r-img2.png" alt="#">
                                       </div>
                                     </div>
                                 </div>
@@ -199,9 +198,13 @@
                                         </div>
                                         <div class="twm-content">
                                             <div class="tw-count-number text-clr-sky">
-                                                @if (Model.TotalCompanies > 0)
+                                                @if (Model.TotalCompanies >= 1000)
                                                 {
-                                                    <span class="counter">@((Model.TotalCompanies / 1000).ToString("0"))</span><text>K+</text>
+                                                    <span class="counter">@(Model.TotalCompanies / 1000)</span><text>K+</text>
+                                                }
+                                                else if (Model.TotalCompanies > 0)
+                                                {
+                                                    <span class="counter">@Model.TotalCompanies</span><text>+</text>
                                                 }
                                                 else
                                                 {
@@ -237,9 +240,13 @@
                                         </div>
                                         <div class="twm-content">
                                             <div class="tw-count-number text-clr-green">
-                                                @if (Model.TotalJobsDone > 0)
+                                                @if (Model.TotalJobsDone >= 1000)
                                                 {
-                                                    <span class="counter">@((Model.TotalJobsDone / 1000).ToString("0"))</span><text>K+</text>
+                                                    <span class="counter">@(Model.TotalJobsDone / 1000)</span><text>K+</text>
+                                                }
+                                                else if (Model.TotalJobsDone > 0)
+                                                {
+                                                    <span class="counter">@Model.TotalJobsDone</span><text>+</text>
                                                 }
                                                 else
                                                 {
@@ -282,7 +289,7 @@
                             <div class="jz-stat-pill jz-reveal">
                                 <span class="jz-stat-icon"><i class="feather-briefcase"></i></span>
                                 <div class="jz-stat-body">
-                                    <span class="jz-stat-num counter" data-count="208000">208000</span>
+                                    <span class="jz-stat-num counter" data-count="208000">208,000</span>
                                     <span class="jz-stat-label">Live Jobs</span>
                                 </div>
                             </div>
@@ -291,7 +298,7 @@
                             <div class="jz-stat-pill jz-reveal">
                                 <span class="jz-stat-icon"><i class="feather-home"></i></span>
                                 <div class="jz-stat-body">
-                                    <span class="jz-stat-num counter" data-count="@(Model.TotalCompanies > 0 ? Model.TotalCompanies : 12000)">@(Model.TotalCompanies > 0 ? Model.TotalCompanies : 12000)</span>
+                                    <span class="jz-stat-num counter" data-count="@(Model.TotalCompanies > 0 ? Model.TotalCompanies : 12000)">@((Model.TotalCompanies > 0 ? Model.TotalCompanies : 12000).ToString("N0"))</span>
                                     <span class="jz-stat-label">Companies</span>
                                 </div>
                             </div>
@@ -309,7 +316,7 @@
                             <div class="jz-stat-pill jz-reveal">
                                 <span class="jz-stat-icon"><i class="feather-check-circle"></i></span>
                                 <div class="jz-stat-body">
-                                    <span class="jz-stat-num counter" data-count="@(Model.TotalJobsDone > 0 ? Model.TotalJobsDone : 3000)">@(Model.TotalJobsDone > 0 ? Model.TotalJobsDone : 3000)</span>
+                                    <span class="jz-stat-num counter" data-count="@(Model.TotalJobsDone > 0 ? Model.TotalJobsDone : 3000)">@((Model.TotalJobsDone > 0 ? Model.TotalJobsDone : 3000).ToString("N0"))</span>
                                     <span class="jz-stat-label">Jobs Completed</span>
                                 </div>
                             </div>

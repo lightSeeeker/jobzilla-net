@@ -1746,26 +1746,159 @@ input[type="file"].form-control::file-selector-button {
    HOME FIXES — hero search box, job logos, duplicate back-to-top
    ============================================================ */
 
-/* 1. Keep What/Category/Location/button inside the white search box, aligned */
-.jz-hero .twm-bnr-search-bar { padding: 20px !important; }
-.jz-hero .twm-bnr-search-bar form { margin: 0; }
-.jz-hero .twm-bnr-search-bar form > .row {
-  margin-left: 0 !important; margin-right: 0 !important;
-  align-items: flex-end;
+/* 1. Hero search panel: template fixes it at height:70px — our labelled
+      fields need the box to grow, so it's a grid panel instead */
+.jz-hero .twm-bnr-search-bar {
+  height: auto !important;
+  padding: 24px !important;
+  border: 1px solid var(--glass-border) !important;
+  /* stacking context (backdrop-filter) sits at z:auto — lift it or the
+     popular-searches line paints over the open category dropdown */
+  position: relative;
+  z-index: 20;
 }
+.jz-hero .twm-bnr-search-bar form { margin: 0; }
+/* Template zeroes input padding — placeholders hugged the edges */
+.jz-hero .twm-bnr-search-bar .form-control { padding: 0 16px !important; }
+.jz-hero .twm-bnr-search-bar .input-group .form-control { padding-right: 8px !important; }
+.jz-hero .twm-bnr-search-bar .input-group-text { padding: 0 14px !important; }
+.jz-search-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr minmax(150px, 0.8fr);
+  gap: 16px;
+  align-items: end;
+}
+.jz-search-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 8px 2px;
+}
+.jz-search-field .input-group { flex-wrap: nowrap; }
 .jz-hero .twm-bnr-search-bar .bootstrap-select { width: 100% !important; }
 .jz-hero .twm-bnr-search-bar .bootstrap-select > .btn {
   height: 52px !important; display: flex !important; align-items: center !important;
 }
+/* bootstrap-select nests the value 3 divs deep; each must inherit the
+   flex centring or the text pins to the top of the 52px button */
+.jz-hero .twm-bnr-search-bar .bootstrap-select > .btn .filter-option,
+.jz-hero .twm-bnr-search-bar .bootstrap-select > .btn .filter-option-inner,
+.jz-hero .twm-bnr-search-bar .bootstrap-select > .btn .filter-option-inner-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: static;
+  float: none;
+}
+/* value takes the free space so the caret pins to the right edge,
+   matching the icon position of the Location field */
+.jz-hero .twm-bnr-search-bar .bootstrap-select > .btn .filter-option { flex: 1 1 auto; }
+/* Category dropdown: solid panel (glass translucency made it unreadable
+   over the text behind), tidy search box and item rows */
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu {
+  width: auto;
+  min-width: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid var(--glass-hairline);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  margin-top: 6px !important;
+}
+/* bootstrap-select nests a second ul.dropdown-menu.inner — that one is a
+   plain list, not another card */
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu.inner {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0 !important;
+  min-width: 0;
+}
+.jz-hero .twm-bnr-search-bar .bs-searchbox { padding: 4px 4px 10px; }
+.jz-hero .twm-bnr-search-bar .bs-searchbox .form-control {
+  height: 40px !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  border: 1.5px solid var(--border-color) !important;
+  box-shadow: none !important;
+}
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu li a {
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text-secondary);
+}
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu li a:hover {
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+}
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu .dropdown-item.active,
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu .dropdown-item:active,
+.jz-hero .twm-bnr-search-bar .bootstrap-select .dropdown-menu li.selected a {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-radius: 8px;
+}
+@media (max-width: 991px) {
+  .jz-search-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 575px) {
+  .jz-search-grid { grid-template-columns: 1fr; }
+}
+/* Breathing room between the panel and the popular-searches line */
+.jz-hero .twm-bnr-popular-search { margin-top: 20px; }
 
-/* 2. Center the company logo in each job-post card's media column */
+/* 2. Center the company logo in each job-post card's media column.
+      Template hangs it absolute below the card (bottom:-20px) — the glass
+      card clips it (overflow:hidden), so put it back in normal flow. */
 .twm-jobs-list-style1 .twm-media {
+  position: static !important;
+  bottom: auto !important;
+  margin-right: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   align-self: stretch;
 }
+.twm-jobs-list-style1 .twm-mid-content {
+  padding-left: 24px !important;
+  flex: 1;
+}
 
 /* 3. Hide the theme's duplicate back-to-top (button.scroltop, home only);
       keep the single global .jz-back-top */
 button.scroltop { display: none !important; }
+
+/* 4. Kill the template's white offset slab behind the categories carousel —
+      sections are transparent in the glass theme, the slab reads as a glitch */
+.twm-job-categories-section:after { display: none; }
+
+/* 5. Explore banner "Upload Your Resume": template uses a transparent-text
+      + text-shadow trick tuned for a white button — unreadable on the glass
+      gradient. Plain white text instead. */
+.twm-explore-content .twm-upload-file .site-button {
+  color: #fff !important;
+  text-shadow: none !important;
+  background: var(--grad-primary) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.55) !important;
+}
+.twm-explore-content .twm-upload-file .site-button:hover { text-shadow: none !important; }
+.twm-explore-content .twm-upload-file .site-button i { color: #fff !important; }
+
+/* 6. Footer copyright: template paints it white (.footer-dark) — invisible
+      on the light glass footer */
+.jz-footer .footer-bottom .footer-copy-right .copyrights-text { color: var(--text-muted); }
+
+/* 7. Hero right blocks: keep the countries label on one line and move the
+      decorative ring out from under it */
+.jz-hero .twm-bnr-blocks-position-2 .icon-content-info { white-space: nowrap; }
+.jz-hero .twm-bnr-right-section .twm-small-ring-2 { top: 55%; }
+
+/* 8. How-it-works watermark numbers: #efefef vanishes on the mesh background */
+.twm-w-process-steps .twm-large-number { color: rgba(37, 99, 235, 0.14); }

@@ -222,7 +222,7 @@
                                     <div class="twm-media">
                                         @if (!string.IsNullOrEmpty(job.CompanyLogoPath))
                                         {
-                                            <img src="@job.CompanyLogoPath" alt="@job.CompanyName" />
+                                            <img src="@job.CompanyLogoPath" alt="@job.CompanyName" onerror="this.onerror=null;this.src='/images/jobs-company/pic1.jpg';" />
                                         }
                                         else
                                         {

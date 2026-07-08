@@ -376,22 +376,41 @@ body {
   transform: scaleY(1);
 }
 
-/* 4. Company logo circle */
+/* 4. Card row + company logo box.
+   Template makes .twm-media absolute (bottom:-20px, 150px) and pads
+   .twm-mid-content 180px left → tall panel with big up/down gaps.
+   Reset to an in-flow, vertically-centred compact logo. */
+.twm-jobs-list-style1 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+}
 .twm-jobs-list-style1 .twm-media {
+  position: static !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  width: 64px;
+  height: 64px;
+  line-height: normal;
+  flex-shrink: 0;
   background: var(--color-primary-pale);
   border-radius: var(--radius-md);
   padding: 10px;
-  width: 56px;
-  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-shadow: none;
 }
 .twm-jobs-list-style1 .twm-media img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+.twm-jobs-list-style1 .twm-mid-content {
+  padding-left: 0 !important;
+  flex: 1;
 }
 
 /* 5. Badge pills */

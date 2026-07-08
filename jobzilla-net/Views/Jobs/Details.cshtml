@@ -56,7 +56,7 @@
                                         <div class="twm-media">
                                             @if (!string.IsNullOrEmpty(Model.CompanyLogoPath))
                                             {
-                                                <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName" />
+                                                <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName" onerror="this.onerror=null;this.src='/images/jobs-company/pic1.jpg';" />
                                             }
                                             else
                                             {
@@ -289,7 +289,7 @@
                                 <div class="twm-media">
                                     @if (!string.IsNullOrEmpty(Model.CompanyLogoPath))
                                     {
-                                        <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName" />
+                                        <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName" onerror="this.onerror=null;this.src='/images/jobs-company/pic1.jpg';" />
                                     }
                                     else
                                     {

@@ -589,6 +589,7 @@ body {
   transition: var(--transition-fast);
   display: flex;
   align-items: center;
+  gap: 12px;
   position: relative;
 }
 #sidebar-admin-wraper .admin-nav > ul > li > a i {
@@ -596,6 +597,11 @@ body {
   font-size: 18px;
   width: 24px;
   text-align: center;
+  position: static;
+  margin: 0;
+  top: auto;
+  left: auto;
+  flex-shrink: 0;
 }
 #sidebar-admin-wraper .admin-nav > ul > li > a:hover {
   background: var(--color-primary-pale);
@@ -1718,6 +1724,10 @@ input[type="file"].form-control::file-selector-button {
 
 /* Candidate sidebar: upload-photo file overlay + profile name/title */
 .twm-candidate-profile-pic { position: relative; text-align: center; }
+/* Empty dropzone preview box reserves 128px + 30px offset → dead space.
+   Collapse it until a preview image is appended (JS on file select). */
+.twm-candidate-profile-pic #upload-image-grid { width: auto; height: auto; top: 0; margin: 0 auto; }
+.twm-candidate-profile-pic #upload-image-grid:empty { display: none; }
 .twm-candidate-profile-pic .upload-btn-wrapper { position: relative; display: inline-block; margin-top: 12px; }
 .twm-candidate-profile-pic .upload-btn-wrapper #file-uploader {
   position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;

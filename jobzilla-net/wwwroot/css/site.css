@@ -2406,3 +2406,47 @@ button.scroltop { display: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .jzx-orb, .jzx-hero-photo img, .jzx-float, .jzx-scroll-cue, .jzx-eyebrow-dot, .jzx-marquee-track { animation: none !important; }
 }
+
+/* ============================================================
+   HEADER FIT (desktop): logged-in state adds extra action
+   buttons (Post a job / Logout). The template floats logo left
+   + extra-nav right, leaving the centre menu to wrap. Lay the
+   bar out as a real 3-column flex row so the menu stays on one
+   line and the whole width is used before anything wraps.
+   ============================================================ */
+@media (min-width: 992px) {
+  .site-header .main-bar > .container-fluid {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+  .site-header .main-bar > .container-fluid > .logo-header {
+    float: none;
+    flex: 0 0 auto;
+  }
+  .site-header .main-bar > .container-fluid > .header-nav {
+    float: none;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .site-header .main-bar > .container-fluid > .extra-nav {
+    float: none;
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+  .site-header .header-nav .nav.navbar-nav {
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+  .site-header .header-nav .nav.navbar-nav > li > a {
+    white-space: nowrap;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  /* keep the action buttons from wrapping internally */
+  .site-header .header-nav-btn-section { display: flex; align-items: center; flex-wrap: nowrap; gap: 10px; }
+  .site-header .twm-nav-sign-up,
+  .site-header .twm-nav-post-a-job,
+  .site-header .twm-nav-logout { white-space: nowrap; }
+}

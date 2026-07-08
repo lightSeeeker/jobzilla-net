@@ -144,7 +144,9 @@ public class CandidateController : Controller
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ProfileImage.FileName;
+            // Use a fully generated name — never the raw upload filename, which can
+            // contain spaces/unicode that break the served URL.
+            string uniqueFileName = Guid.NewGuid().ToString("N") + extension;
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))

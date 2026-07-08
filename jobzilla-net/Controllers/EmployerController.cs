@@ -95,7 +95,9 @@ public class EmployerController : Controller
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.LogoImage.FileName;
+            // Generated name only — raw upload filenames can contain spaces/unicode
+            // that break the served URL.
+            string uniqueFileName = Guid.NewGuid().ToString("N") + extension;
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="560" viewBox="0 0 480 560" fill="none" role="img" aria-label="Job seeker illustration">
+  <defs>
+    <linearGradient id="jzxShirt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="jzxPants" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="jzxBlob" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#DBEAFE"/>
+      <stop offset="1" stop-color="#D1FAE5"/>
+    </linearGradient>
+    <linearGradient id="jzxCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#EFF6FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- backdrop blob -->
+  <path d="M240 40 C360 40 440 120 440 250 C440 380 380 500 250 510 C130 520 40 430 40 300 C40 150 120 40 240 40 Z" fill="url(#jzxBlob)" opacity="0.7"/>
+
+  <!-- floating accents -->
+  <circle cx="86" cy="150" r="12" fill="#10B981" opacity="0.55"/>
+  <circle cx="410" cy="360" r="16" fill="#F59E0B" opacity="0.45"/>
+  <rect x="380" y="120" width="22" height="22" rx="7" fill="#2563EB" opacity="0.35" transform="rotate(20 391 131)"/>
+  <path d="M70 380 l10 -18 10 18 -10 8 z" fill="#6366F1" opacity="0.4"/>
+
+  <!-- pedestal -->
+  <ellipse cx="240" cy="500" rx="140" ry="22" fill="#2563EB" opacity="0.08"/>
+
+  <!-- legs -->
+  <path d="M206 350 h30 v120 q0 14 -15 14 q-15 0 -15 -14 z" fill="url(#jzxPants)"/>
+  <path d="M244 350 h30 v120 q0 14 -15 14 q-15 0 -15 -14 z" fill="url(#jzxPants)"/>
+  <!-- shoes -->
+  <path d="M198 480 q-4 20 20 22 h22 v-24 z" fill="#1E293B"/>
+  <path d="M282 480 q4 20 -20 22 h-22 v-24 z" fill="#1E293B"/>
+
+  <!-- back arm -->
+  <path d="M300 250 q34 8 30 70 l-14 -2 q-8 -46 -28 -50 z" fill="#2563EB"/>
+
+  <!-- torso / shirt -->
+  <path d="M240 196 c-34 0 -58 20 -62 54 l-10 96 c-1 12 8 18 20 18 h104 c12 0 21 -6 20 -18 l-10 -96 c-4 -34 -28 -54 -62 -54 Z" fill="url(#jzxShirt)"/>
+  <path d="M240 196 l0 168" stroke="#1D4ED8" stroke-width="2" opacity="0.4"/>
+  <!-- collar -->
+  <path d="M222 200 l18 22 18 -22 -8 -8 -10 10 -10 -10 z" fill="#EFF6FF"/>
+
+  <!-- front arm holding tablet -->
+  <path d="M182 252 q-30 20 -20 74 l16 -4 q-4 -42 18 -56 z" fill="#3B82F6"/>
+  <!-- forearm + hand -->
+  <rect x="150" y="312" width="60" height="20" rx="10" fill="#EBB89A" transform="rotate(-6 180 322)"/>
+
+  <!-- tablet -->
+  <g transform="rotate(-8 210 320)">
+    <rect x="176" y="286" width="92" height="66" rx="10" fill="url(#jzxCard)" stroke="#DBEAFE" stroke-width="2"/>
+    <rect x="188" y="300" width="46" height="7" rx="3.5" fill="#2563EB"/>
+    <rect x="188" y="314" width="66" height="6" rx="3" fill="#CBD5E1"/>
+    <rect x="188" y="326" width="52" height="6" rx="3" fill="#CBD5E1"/>
+    <circle cx="248" cy="332" r="12" fill="#10B981"/>
+    <path d="M242 332 l4 4 8 -9" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- neck -->
+  <rect x="228" y="168" width="24" height="34" rx="10" fill="#EBB89A"/>
+  <!-- head -->
+  <circle cx="240" cy="140" r="44" fill="#F1C9A5"/>
+  <!-- ear -->
+  <circle cx="200" cy="144" r="8" fill="#EBB89A"/>
+  <!-- hair -->
+  <path d="M196 138 c-6 -46 34 -70 66 -60 26 8 34 34 30 58 -2 -20 -14 -34 -34 -36 4 10 2 18 -4 24 -2 -14 -12 -22 -26 -22 -18 0 -30 14 -32 36 z" fill="#3F3A56"/>
+  <!-- face -->
+  <circle cx="228" cy="140" r="3.4" fill="#3F3A56"/>
+  <circle cx="256" cy="140" r="3.4" fill="#3F3A56"/>
+  <path d="M230 156 q10 9 20 0" stroke="#B45C3A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+</svg>

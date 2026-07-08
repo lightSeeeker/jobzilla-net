@@ -2119,8 +2119,8 @@ button.scroltop { display: none !important; }
   background: radial-gradient(circle, rgba(37,99,235,0.28), transparent 65%);
   filter: blur(20px);
 }
-.jzx-hero-photo { position: relative; z-index: 1; }
-.jzx-hero-photo img { max-width: 100%; height: auto; filter: drop-shadow(0 30px 50px rgba(15,23,42,0.22)); animation: jzx-bob 6s ease-in-out infinite; }
+.jzx-hero-photo { position: relative; z-index: 1; width: min(100%, 440px); }
+.jzx-hero-photo img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 50px rgba(15,23,42,0.22)); animation: jzx-bob 6s ease-in-out infinite; }
 @keyframes jzx-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
 
 .jzx-float {
@@ -2266,11 +2266,6 @@ button.scroltop { display: none !important; }
 .jzx-job-meta span { font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; }
 .jzx-job-meta i { color: var(--color-primary); }
 .jzx-job-side { display: flex; align-items: center; gap: 22px; }
-.jzx-job-tag { font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: var(--radius-pill); }
-.jzx-tag-green { color: var(--color-success); background: var(--color-success-pale); }
-.jzx-tag-amber { color: #B45309; background: var(--color-accent-pale); }
-.jzx-tag-indigo { color: #4F46E5; background: rgba(99,102,241,0.12); }
-.jzx-tag-sky { color: #0284C7; background: rgba(14,165,233,0.12); }
 .jzx-job-pay { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-primary); font-size: 17px; white-space: nowrap; }
 .jzx-job-pay small { color: var(--text-muted); font-weight: 500; font-size: 12px; }
 .jzx-job-apply { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; font-size: 14px; color: var(--color-primary); text-decoration: none;

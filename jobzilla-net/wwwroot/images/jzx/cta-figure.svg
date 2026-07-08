@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="480" viewBox="0 0 420 480" fill="none" role="img" aria-label="Upload resume illustration">
+  <defs>
+    <linearGradient id="ctaShirt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="ctaPants" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <radialGradient id="ctaGlow" cx="0.5" cy="0.42" r="0.6">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- glow -->
+  <circle cx="210" cy="205" r="200" fill="url(#ctaGlow)"/>
+
+  <!-- floating accents -->
+  <circle cx="60" cy="120" r="10" fill="#FBBF24" opacity="0.8"/>
+  <circle cx="360" cy="300" r="13" fill="#34D399" opacity="0.7"/>
+  <rect x="330" y="90" width="20" height="20" rx="6" fill="#ffffff" opacity="0.3" transform="rotate(18 340 100)"/>
+
+  <!-- ground -->
+  <ellipse cx="210" cy="440" rx="120" ry="18" fill="#000000" opacity="0.18"/>
+
+  <!-- legs -->
+  <path d="M182 300 h26 v112 q0 12 -13 12 q-13 0 -13 -12 z" fill="url(#ctaPants)"/>
+  <path d="M216 300 h26 v112 q0 12 -13 12 q-13 0 -13 -12 z" fill="url(#ctaPants)"/>
+  <path d="M166 420 q-4 16 18 18 h20 v-20 z" fill="#F8FAFC"/>
+  <path d="M258 420 q4 16 -18 18 h-20 v-20 z" fill="#F8FAFC"/>
+
+  <!-- torso -->
+  <path d="M212 168 c-30 0 -50 18 -54 48 l-8 82 c-1 11 7 16 18 16 h88 c11 0 19 -5 18 -16 l-8 -82 c-4 -30 -24 -48 -54 -48 Z" fill="url(#ctaShirt)"/>
+  <path d="M197 172 l15 20 15 -20 -7 -7 -8 9 -8 -9 z" fill="#ECFDF5"/>
+
+  <!-- resume document held up -->
+  <g transform="rotate(-6 210 250)">
+    <rect x="150" y="196" width="120" height="150" rx="10" fill="#ffffff"/>
+    <rect x="168" y="216" width="42" height="42" rx="8" fill="#D1FAE5"/>
+    <path d="M182 236 l6 6 12 -13" stroke="#10B981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="220" y="220" width="34" height="7" rx="3.5" fill="#0F172A"/>
+    <rect x="220" y="234" width="28" height="6" rx="3" fill="#94A3B8"/>
+    <rect x="220" y="246" width="30" height="6" rx="3" fill="#94A3B8"/>
+    <rect x="168" y="278" width="86" height="6" rx="3" fill="#CBD5E1"/>
+    <rect x="168" y="292" width="86" height="6" rx="3" fill="#CBD5E1"/>
+    <rect x="168" y="306" width="60" height="6" rx="3" fill="#CBD5E1"/>
+    <rect x="168" y="320" width="74" height="6" rx="3" fill="#CBD5E1"/>
+  </g>
+
+  <!-- arms holding doc -->
+  <rect x="120" y="300" width="56" height="18" rx="9" fill="#EBB89A" transform="rotate(-14 148 309)"/>
+  <rect x="250" y="300" width="56" height="18" rx="9" fill="#EBB89A" transform="rotate(14 278 309)"/>
+
+  <!-- neck + head -->
+  <rect x="201" y="142" width="22" height="30" rx="9" fill="#EBB89A"/>
+  <circle cx="212" cy="116" r="40" fill="#F1C9A5"/>
+  <circle cx="174" cy="120" r="7" fill="#EBB89A"/>
+  <!-- hair -->
+  <path d="M172 116 c-4 -40 30 -62 60 -54 24 8 30 30 26 52 -2 -18 -12 -30 -30 -32 2 -14 -8 -22 -22 -22 -18 0 -30 16 -34 40 z" fill="#2B2B3A"/>
+  <circle cx="200" cy="116" r="3.2" fill="#2B2B3A"/>
+  <circle cx="226" cy="116" r="3.2" fill="#2B2B3A"/>
+  <path d="M202 130 q10 8 18 0" stroke="#B45C3A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+</svg>

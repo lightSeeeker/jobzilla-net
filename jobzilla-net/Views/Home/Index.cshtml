@@ -77,7 +77,7 @@
                         <div class="jzx-stage-glow"></div>
 
                         <div class="jzx-hero-photo">
-                            <img src="~/images/main-slider/slider1/r-img1.png" alt="Find your job">
+                            <img src="~/images/jzx/hero-figure.svg" alt="Find your job">
                         </div>
 
                         <!-- floating glass card: featured job -->
@@ -243,7 +243,7 @@
                         </button>
                     </div>
                     <div class="jzx-cta-media">
-                        <img src="~/images/gir-large.png" alt="Upload your resume">
+                        <img src="~/images/jzx/cta-figure.svg" alt="Upload your resume">
                     </div>
                 </div>
             </div>
@@ -260,13 +260,13 @@
 
             <div class="jzx-jobs">
                 @{
-                    var jobs = new (string pic, string title, string time, string loc, string tag, string tagCls, string pay)[]
+                    var jobs = new (string pic, string title, string time, string loc, string pay)[]
                     {
-                        ("pic1.jpg", "Senior Web Designer & Developer", "1 day ago", "Los Angeles, CA, USA", "New", "jzx-tag-green", "$2,500"),
-                        ("pic2.jpg", "Senior Rolling Stock Technician", "15 days ago", "Los Angeles, CA, USA", "Internship", "jzx-tag-amber", "$2,000"),
-                        ("pic3.jpg", "IT Department Manager", "6 months ago", "Los Angeles, CA, USA", "Full time", "jzx-tag-indigo", "$1,500"),
-                        ("pic4.jpg", "Art Production Specialist", "2 days ago", "Los Angeles, CA, USA", "Freelance", "jzx-tag-sky", "$1,200"),
-                        ("pic5.jpg", "Recreation & Fitness Worker", "1 day ago", "Los Angeles, CA, USA", "Temporary", "jzx-tag-green", "$1,700"),
+                        ("pic1.jpg", "Senior Web Designer & Developer", "1 day ago", "Los Angeles, CA, USA", "$2,500"),
+                        ("pic2.jpg", "Senior Rolling Stock Technician", "15 days ago", "Los Angeles, CA, USA", "$2,000"),
+                        ("pic3.jpg", "IT Department Manager", "6 months ago", "Los Angeles, CA, USA", "$1,500"),
+                        ("pic4.jpg", "Art Production Specialist", "2 days ago", "Los Angeles, CA, USA", "$1,200"),
+                        ("pic5.jpg", "Recreation & Fitness Worker", "1 day ago", "Los Angeles, CA, USA", "$1,700"),
                     };
                 }
                 @foreach (var j in jobs)
@@ -283,7 +283,6 @@
                             </div>
                         </div>
                         <div class="jzx-job-side">
-                            <span class="jzx-job-tag @j.tagCls">@j.tag</span>
                             <span class="jzx-job-pay">@j.pay <small>/ month</small></span>
                             <a asp-controller="Jobs" asp-action="Details" class="jzx-job-apply">Browse <i class="feather-arrow-right"></i></a>
                         </div>

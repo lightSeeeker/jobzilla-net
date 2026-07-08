@@ -2507,3 +2507,28 @@ button.scroltop { display: none !important; }
 }
 .jzx-jobs-empty i { font-size: 40px; color: var(--color-primary); opacity: 0.5; display: block; margin-bottom: 12px; }
 .jzx-jobs-empty p { margin: 0; font-size: 15px; }
+
+/* ============================================================
+   SIDEBAR WIDGETS — de-nest cards
+   The universal `.widget` rule turns every widget into a glass card,
+   but inside `.side-bar` (which is already the card) that nests cards
+   with no padding → cramped, edge-hugging content. Make sidebar
+   widgets plain, spaced sections instead.
+   ============================================================ */
+.rightSidebar .side-bar .widget,
+.side-bar .widget {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 28px;
+}
+.rightSidebar .side-bar .widget:last-child,
+.side-bar .widget:last-child { margin-bottom: 0; }
+
+/* Category / services list spacing inside the sidebar */
+.side-bar .all_services ul li { margin-bottom: 12px; }
+.side-bar .all_services ul li a { font-size: 15px; }

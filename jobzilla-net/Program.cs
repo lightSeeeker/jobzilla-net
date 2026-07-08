@@ -30,6 +30,54 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// ── External (social) login providers ─────────────────────────────────────
+// Each provider is registered only when its credentials are present in config
+// (appsettings "Authentication:*" or user-secrets / env vars), so the app runs
+// fine before credentials are supplied.
+var authBuilder = builder.Services.AddAuthentication();
+var authConfig = builder.Configuration.GetSection("Authentication");
+
+var google = authConfig.GetSection("Google");
+if (!string.IsNullOrWhiteSpace(google["ClientId"]))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = google["ClientId"]!;
+        options.ClientSecret = google["ClientSecret"]!;
+    });
+}
+
+var facebook = authConfig.GetSection("Facebook");
+if (!string.IsNullOrWhiteSpace(facebook["AppId"]))
+{
+    authBuilder.AddFacebook(options =>
+    {
+        options.AppId = facebook["AppId"]!;
+        options.AppSecret = facebook["AppSecret"]!;
+    });
+}
+
+var twitter = authConfig.GetSection("Twitter");
+if (!string.IsNullOrWhiteSpace(twitter["ApiKey"]))
+{
+    authBuilder.AddTwitter(options =>
+    {
+        options.ConsumerKey = twitter["ApiKey"]!;
+        options.ConsumerSecret = twitter["ApiSecret"]!;
+        options.RetrieveUserDetails = true;
+    });
+}
+
+var linkedIn = authConfig.GetSection("LinkedIn");
+if (!string.IsNullOrWhiteSpace(linkedIn["ClientId"]))
+{
+    authBuilder.AddLinkedIn(options =>
+    {
+        options.ClientId = linkedIn["ClientId"]!;
+        options.ClientSecret = linkedIn["ClientSecret"]!;
+    });
+}
+
 var app = builder.Build();
 
 // ── Startup: migrate database and seed identity data ──────────────────────

@@ -24,7 +24,7 @@
         </div>
         
         <!-- Right Msg section (Messages Area) -->
-        <div class="wt-dashboard-msg-box" id="activeChatBox" style="display: none; width: 100%;">
+        <div class="wt-dashboard-msg-box" id="activeChatBox">
             <div class="single-msg-user-name-box">
                 <div class="single-msg-short-discription d-flex justify-content-between align-items-center w-100">
                     <div class="d-flex align-items-center gap-3">
@@ -77,13 +77,21 @@
         border-right: none !important;
     }
     
-    /* Flexbox layout for chat box to fix overlapping perfectly */
+    /* Drilldown: list shows by default, chat box hidden until a conversation
+       is opened. Visibility is driven by .is-open / .is-hidden classes (not
+       inline display) so the template's own rules can't override it. */
     .wt-admin-dashboard-msg-2.twm-dashboard-style-2 .wt-dashboard-msg-box {
         width: 100% !important;
+        display: none;
+    }
+    .wt-admin-dashboard-msg-2.twm-dashboard-style-2 .wt-dashboard-msg-box.is-open {
         display: flex !important;
         flex-direction: column !important;
         height: calc(100vh - 150px) !important;
         min-height: 750px !important;
+    }
+    .wt-admin-dashboard-msg-2.twm-dashboard-style-2 .wt-dashboard-msg-user-list.is-hidden {
+        display: none !important;
     }
     
     /* The messages container takes up all remaining space */
@@ -168,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const response = await fetch(`/api/chat/conversations/${activeConversationId}`, { method: 'DELETE' });
             if (response.ok) {
-                document.getElementById('activeChatBox').style.display = 'none';
+                document.getElementById('activeChatBox').classList.remove('is-open');
+                document.getElementById('chatListPanel').classList.remove('is-hidden');
                 activeConversationId = null;
                 loadConversations();
             } else {
@@ -179,9 +188,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Back to list
     document.getElementById('backToListBtn').addEventListener('click', function() {
-        document.getElementById('activeChatBox').style.display = 'none';
-        document.getElementById('chatListPanel').style.display = 'block';
+        document.getElementById('activeChatBox').classList.remove('is-open');
+        document.getElementById('chatListPanel').classList.remove('is-hidden');
         activeConversationId = null;
+        updateActiveChatClass();
     });
 
     // Global exposed functions for message actions
@@ -273,9 +283,9 @@ document.addEventListener('DOMContentLoaded', function () {
     async function openConversation(conv, skipHistoryLoad = false) {
         activeConversationId = conv.conversationId;
         
-        // Update UI
-        document.getElementById('chatListPanel').style.display = 'none';
-        activeChatBox.style.display = 'block';
+        // Update UI — drilldown: hide list, show focused chat box
+        document.getElementById('chatListPanel').classList.add('is-hidden');
+        activeChatBox.classList.add('is-open');
         document.getElementById('activeChatName').textContent = conv.otherPartyName;
         document.getElementById('activeChatJob').textContent = conv.subject;
         

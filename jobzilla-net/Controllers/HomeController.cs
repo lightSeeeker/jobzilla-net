@@ -18,10 +18,10 @@ namespace jobzilla_net.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ViewData["Title"] = "Jobzilla - Job Board";
-            ViewData["Description"] = "Jobzilla job board home page.";
+            ViewData["Title"] = "Fursanet - Job Board";
+            ViewData["Description"] = "Fursanet job board home page.";
             ViewData["Keywords"] = "jobs, job board, careers, employers, candidates";
-            ViewData["Author"] = "Jobzilla";
+            ViewData["Author"] = "Fursanet";
             ViewData["Robots"] = "index, follow";
 
             var model = new HomePageViewModel();

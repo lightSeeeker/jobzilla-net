@@ -42,8 +42,8 @@ public class JobHomeDto
     public string CompanyName { get; set; } = string.Empty;
     public string CompanyLogoUrl { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
-    public decimal SalaryMin { get; set; }
-    public decimal SalaryMax { get; set; }
+    public decimal? SalaryMin { get; set; }
+    public decimal? SalaryMax { get; set; }
     public string JobType { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime PostedDate { get; set; }

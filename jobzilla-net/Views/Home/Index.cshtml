@@ -1,4 +1,5 @@
 @model jobzilla_net.Models.Home.HomePageViewModel
+@inject jobzilla_net.Services.CurrencyContext Ccy
 
 <!-- LOADING AREA START ===== -->
 <div class="loading-area">
@@ -258,37 +259,40 @@
                 <h2 class="jzx-title">Find the career you deserve</h2>
             </div>
 
-            <div class="jzx-jobs">
-                @{
-                    var jobs = new (string pic, string title, string time, string loc, string pay)[]
+            @if (Model.FeaturedJobs != null && Model.FeaturedJobs.Any())
+            {
+                <div class="jzx-jobs">
+                    @foreach (var j in Model.FeaturedJobs)
                     {
-                        ("pic1.jpg", "Senior Web Designer & Developer", "1 day ago", "Los Angeles, CA, USA", "$2,500"),
-                        ("pic2.jpg", "Senior Rolling Stock Technician", "15 days ago", "Los Angeles, CA, USA", "$2,000"),
-                        ("pic3.jpg", "IT Department Manager", "6 months ago", "Los Angeles, CA, USA", "$1,500"),
-                        ("pic4.jpg", "Art Production Specialist", "2 days ago", "Los Angeles, CA, USA", "$1,200"),
-                        ("pic5.jpg", "Recreation & Fitness Worker", "1 day ago", "Los Angeles, CA, USA", "$1,700"),
-                    };
-                }
-                @foreach (var j in jobs)
-                {
-                    <div class="jzx-job jz-reveal">
-                        <div class="jzx-job-logo">
-                            <img src="~/images/jobs-company/@j.pic" alt="">
-                        </div>
-                        <div class="jzx-job-main">
-                            <a asp-controller="Jobs" asp-action="Details" class="jzx-job-title">@j.title</a>
-                            <div class="jzx-job-meta">
-                                <span><i class="feather-map-pin"></i> @j.loc</span>
-                                <span><i class="feather-clock"></i> @j.time</span>
+                        var days = (int)(DateTime.UtcNow - j.PostedDate).TotalDays;
+                        var posted = days <= 0 ? "Today" : days == 1 ? "1 day ago" : days < 30 ? $"{days} days ago" : $"{days / 30} month ago";
+                        <div class="jzx-job jz-reveal">
+                            <div class="jzx-job-logo">
+                                <img src="@j.CompanyLogoUrl" alt="@j.CompanyName" onerror="this.onerror=null;this.src='/images/jobs-company/pic1.jpg';">
+                            </div>
+                            <div class="jzx-job-main">
+                                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@j.Id" class="jzx-job-title">@j.Title</a>
+                                <div class="jzx-job-meta">
+                                    <span><i class="feather-briefcase"></i> @j.CompanyName</span>
+                                    <span><i class="feather-map-pin"></i> @j.Location</span>
+                                    <span><i class="feather-clock"></i> @posted</span>
+                                </div>
+                            </div>
+                            <div class="jzx-job-side">
+                                <span class="jzx-job-pay">@Ccy.FormatRange(j.SalaryMin, j.SalaryMax)@if (j.SalaryMin.HasValue || j.SalaryMax.HasValue){<small> / month</small>}</span>
+                                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@j.Id" class="jzx-job-apply">Browse <i class="feather-arrow-right"></i></a>
                             </div>
                         </div>
-                        <div class="jzx-job-side">
-                            <span class="jzx-job-pay">@j.pay <small>/ month</small></span>
-                            <a asp-controller="Jobs" asp-action="Details" class="jzx-job-apply">Browse <i class="feather-arrow-right"></i></a>
-                        </div>
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="jzx-jobs-empty">
+                    <i class="feather-briefcase"></i>
+                    <p>No jobs posted yet. Check back soon.</p>
+                </div>
+            }
 
             <div class="jzx-center">
                 <a asp-controller="Jobs" asp-action="Index" class="jzx-btn-outline">Browse all jobs</a>

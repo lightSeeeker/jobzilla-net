@@ -1,5 +1,6 @@
 using jobzilla_net.Models;
 using jobzilla_net.Models.Home;
+using jobzilla_net.Core.Enums;
 using jobzilla_net.Infrasture.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -62,24 +63,33 @@ namespace jobzilla_net.Controllers
                 .Take(10)
                 .ToListAsync();
 
-            // Featured/Recent Jobs
+            // Featured/Recent Jobs (live, real data)
             model.FeaturedJobs = await _context.JobPosts
                 .AsNoTracking()
-                .OrderByDescending(j => j.CreatedAtUtc)
+                .Where(j => !j.IsDeleted && j.Status == JobStatus.Published)
+                .OrderByDescending(j => j.IsFeatured)
+                .ThenByDescending(j => j.CreatedAtUtc)
                 .Select(j => new JobHomeDto
                 {
                     Id = j.Id,
                     Title = j.Title,
-                    CompanyName = "Company Name",
-                    CompanyLogoUrl = "/images/client-logo/default.png",
+                    CompanyName = j.EmployerProfile != null ? j.EmployerProfile.CompanyName : "Company",
+                    CompanyLogoUrl = j.EmployerProfile != null && j.EmployerProfile.LogoPath != null
+                        ? j.EmployerProfile.LogoPath
+                        : "/images/jobs-company/pic1.jpg",
                     Location = j.Location ?? "Remote",
-                    SalaryMin = 0,
-                    SalaryMax = 0,
-                    JobType = "Full-time",
+                    SalaryMin = j.MinimumSalary,
+                    SalaryMax = j.MaximumSalary,
+                    JobType = j.EmploymentType == EmploymentType.PartTime ? "Part time"
+                            : j.EmploymentType == EmploymentType.Contract ? "Contract"
+                            : j.EmploymentType == EmploymentType.Freelance ? "Freelance"
+                            : j.EmploymentType == EmploymentType.Internship ? "Internship"
+                            : j.EmploymentType == EmploymentType.Temporary ? "Temporary"
+                            : "Full time",
                     Description = "",
                     PostedDate = j.CreatedAtUtc
                 })
-                .Take(5)
+                .Take(6)
                 .ToListAsync();
 
             // Testimonials - empty for now

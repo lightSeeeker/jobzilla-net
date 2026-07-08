@@ -88,6 +88,7 @@ var app = builder.Build();
 await DatabaseInitializer.InitializeAsync(app.Services);
 await IdentitySeeder.SeedRolesAsync(app.Services);
 await jobzilla_net.Infrasture.Seed.ContentPageSeeder.SeedAsync(app.Services);
+await jobzilla_net.Infrasture.Seed.BlogCategorySeeder.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

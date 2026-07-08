@@ -30,6 +30,10 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Per-request display-currency context (salary conversion).
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<jobzilla_net.Services.CurrencyContext>();
+
 // ── External (social) login providers ─────────────────────────────────────
 // Each provider is registered only when its credentials are present in config
 // (appsettings "Authentication:*" or user-secrets / env vars), so the app runs
@@ -101,6 +105,13 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Resolve the visitor's display currency once per request (cookie or geo).
+app.Use(async (ctx, next) =>
+{
+    await ctx.RequestServices.GetRequiredService<jobzilla_net.Services.CurrencyContext>().EnsureInitializedAsync();
+    await next();
+});
 
 app.MapStaticAssets();
 

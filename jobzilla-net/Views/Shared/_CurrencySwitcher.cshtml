@@ -1,0 +1,25 @@
+@inject jobzilla_net.Services.CurrencyContext Ccy
+@{
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<div class="dropdown jz-ccy">
+    <button class="jz-ccy-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Change currency">
+        <i class="feather-globe"></i>
+        <span>@Ccy.CurrencyCode</span>
+        <i class="feather-chevron-down jz-ccy-caret"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end jz-ccy-menu">
+        <li class="jz-ccy-head">Show salaries in</li>
+        @foreach (var o in Ccy.Options)
+        {
+            <li>
+                <a class="dropdown-item @(string.Equals(o.Code, Ccy.CurrencyCode, StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                   asp-controller="Currency" asp-action="Set" asp-route-code="@o.Code" asp-route-returnUrl="@returnUrl">
+                    <span class="jz-ccy-sym">@o.Symbol</span>
+                    <span class="jz-ccy-code">@o.Code</span>
+                    <span class="jz-ccy-name">@o.Name</span>
+                </a>
+            </li>
+        }
+    </ul>
+</div>

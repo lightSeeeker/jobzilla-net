@@ -1,5 +1,6 @@
 ﻿@model jobzilla_net.Models.Jobs.JobSearchViewModel
 @using jobzilla_net.Application.Jobs.Dtos
+@inject jobzilla_net.Services.CurrencyContext Ccy
 @{
     ViewData["Title"] = "Jobs List";
 
@@ -242,7 +243,7 @@
                                     <div class="twm-right-content">
                                         <div class="twm-jobs-category green"><span class="@badgeCss">@typeLabel</span></div>
                                         <div class="twm-jobs-amount">
-                                            @(job.MinimumSalary.HasValue ? job.MinimumSalary.Value.ToString("C0") : "Negotiable")
+                                            @Ccy.FormatRange(job.MinimumSalary, job.MaximumSalary)
                                             <span>/ Month</span>
                                         </div>
                                         <a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id" class="twm-jobs-browse site-text-primary">Browse Job</a>

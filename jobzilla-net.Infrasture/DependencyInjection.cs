@@ -63,6 +63,14 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());
 
+        // ── Currency conversion (live FX + IP geo, cached) ───────────────────
+        services.AddMemoryCache();
+        services.AddHttpClient<ICurrencyService, jobzilla_net.Infrasture.Services.CurrencyService>(c =>
+        {
+            c.Timeout = TimeSpan.FromSeconds(6);
+            c.DefaultRequestHeaders.UserAgent.ParseAdd("Fursanet/1.0");
+        });
+
         // ── Application services ──────────────────────────────────────────────
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<ICandidateService, CandidateService>();

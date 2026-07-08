@@ -1,4 +1,5 @@
 @model jobzilla_net.Application.Jobs.Dtos.JobSummaryDto
+@inject jobzilla_net.Services.CurrencyContext Ccy
 @{
     ViewData["Title"] = Model.Title + " - Job Detail";
 
@@ -8,11 +9,7 @@
                  : daysAgo < 30 ? $"{daysAgo} days ago"
                  : $"{daysAgo / 30} month ago";
 
-    var salaryText = (Model.MinimumSalary.HasValue && Model.MaximumSalary.HasValue)
-        ? $"{Model.MinimumSalary.Value:C0} - {Model.MaximumSalary.Value:C0}"
-        : Model.MinimumSalary.HasValue
-            ? $"{Model.MinimumSalary.Value:C0}"
-            : "Negotiable";
+    var salaryText = Ccy.FormatRange(Model.MinimumSalary, Model.MaximumSalary);
 }
 
 <!-- INNER PAGE BANNER -->

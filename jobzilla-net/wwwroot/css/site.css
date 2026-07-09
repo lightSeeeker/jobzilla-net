@@ -2603,3 +2603,93 @@ body { overflow-x: clip; }
   .site-header .logo-header img,
   .site-header .logo-header .logo-header-inner img { max-height: 46px; }
 }
+
+/* ============================================================
+   MOBILE SAFETY — never hide content behind the scroll-reveal
+   observer on phones/tablets. If IntersectionObserver misfires
+   (iOS Safari / stale JS), reveal-scale & reveal-left elements
+   would stay opacity:0 → "items missing". Force them visible.
+   ============================================================ */
+@media (max-width: 991px) {
+  .jz-reveal,
+  .jz-reveal-left,
+  .jz-reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  /* Decorative hero cards must never force horizontal scroll */
+  .jzx-hero-stage { max-width: 100%; overflow: visible; }
+}
+
+/* Old-iOS fallback: aspect-ratio unsupported → give blog media a height */
+@supports not (aspect-ratio: 16 / 10) {
+  .jzx-post-media { height: 210px; }
+}
+
+/* ============================================================
+   LANDING PAGES · RESPONSIVE POLISH (mobile + tablet)
+   Public pages share the template's banner (.wt-bnr-inr),
+   .section-full p-t120/p-b90 spacing, .wt-title heads and the
+   content+filter-sidebar split. Tighten + clean for small screens.
+   Dashboards use separate layouts/classes — unaffected.
+   ============================================================ */
+
+/* 1. Comfortable page gutters */
+@media (max-width: 991px) {
+  .container, .container-fluid { padding-left: 22px; padding-right: 22px; }
+}
+@media (max-width: 575px) {
+  .container, .container-fluid { padding-left: 16px; padding-right: 16px; }
+}
+
+/* 2. Inner-page banner — shorter, centred, readable
+      (page-wraper spacer already clears the fixed header) */
+@media (max-width: 991px) {
+  .wt-bnr-inr { height: auto !important; padding: 48px 0 36px; }
+  .wt-bnr-inr .wt-bnr-inr-entry { vertical-align: middle; }
+  .wt-bnr-inr .wt-title { font-size: 30px; line-height: 1.2; margin-bottom: 6px; }
+  .wt-breadcrumb { flex-wrap: wrap; }
+}
+@media (max-width: 575px) {
+  .wt-bnr-inr { padding: 36px 0 28px; }
+  .wt-bnr-inr .wt-title { font-size: 24px; }
+}
+
+/* 3. Balanced section rhythm (override the template's cramped 38/10) */
+@media (max-width: 991px) {
+  .section-full.p-t120, .section-full.p-t150, .section-full.p-tb120 { padding-top: 60px !important; }
+  .section-full.p-b90,  .section-full.p-b120, .section-full.p-tb120 { padding-bottom: 60px !important; }
+}
+@media (max-width: 575px) {
+  .section-full.p-t120, .section-full.p-t150, .section-full.p-tb120 { padding-top: 44px !important; }
+  .section-full.p-b90,  .section-full.p-b120, .section-full.p-tb120 { padding-bottom: 44px !important; }
+}
+
+/* 4. Section headings scale fluidly */
+@media (max-width: 991px) {
+  .section-head .wt-title, .wt-title { font-size: clamp(23px, 5vw, 32px); line-height: 1.22; }
+  .wt-separator-two-part-row { row-gap: 14px; }
+  .section-head.wt-small-separator-outer { margin-bottom: 26px; }
+}
+
+/* 5. Filter sidebar drops under the content — space it out */
+@media (max-width: 991px) {
+  .rightSidebar { margin-top: 32px; }
+  .rightSidebar .side-bar { padding: 20px; }
+}
+
+/* 6. List cards + pagination */
+@media (max-width: 575px) {
+  .twm-jobs-list-style1,
+  .twm-employer-list-style1,
+  .twm-candidate-list-style1,
+  .twm-jobs-grid-style1 { padding: 18px !important; }
+  .pagination-outer { text-align: center !important; }
+  .pagination-style1 ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  /* stacked job card: logo + text align left, meta wraps */
+  .twm-jobs-list-style1 .twm-media { width: 56px; height: 56px; }
+}
+
+/* 7. In-page anchors clear the fixed header when jumped to */
+:target { scroll-margin-top: 96px; }

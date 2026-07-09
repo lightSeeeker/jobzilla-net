@@ -2548,3 +2548,18 @@ button.scroltop { display: none !important; }
 @media (max-width: 767px) {
   .jzx-home .container { padding-left: 16px; padding-right: 16px; }
 }
+
+/* ============================================================
+   STICKY GLASS HEADER
+   Template's JS sticky keys on `.is-fixed` (never added) so the bar
+   scrolled away. Use CSS position:sticky — works both scroll
+   directions, no JS. Glass bg already applied above.
+   ============================================================ */
+.site-header .sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+.site-header.scrolled .sticky-header {
+  box-shadow: var(--glass-shadow-lg);
+}

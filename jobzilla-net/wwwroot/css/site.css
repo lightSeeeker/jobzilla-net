@@ -2563,3 +2563,33 @@ button.scroltop { display: none !important; }
 .site-header.scrolled .sticky-header {
   box-shadow: var(--glass-shadow-lg);
 }
+
+/* ============================================================
+   HEADER width — full edge-to-edge glass bar.
+   Template caps .main-bar at 1170px + centres it with a transform;
+   undo that so the bar spans the viewport, content padded to edges.
+   ============================================================ */
+@media (min-width: 992px) {
+  .site-header .main-bar {
+    max-width: none;
+    width: 100%;
+    left: auto;
+    transform: none;
+  }
+  .site-header .main-bar > .container-fluid {
+    max-width: none;
+    width: 100%;
+    padding-left: 48px;
+    padding-right: 48px;
+    min-height: 84px;
+  }
+}
+
+/* position:sticky needs no overflow:hidden ancestor. The template sets
+   body{overflow-x:hidden} which breaks it — use clip (no scroll container). */
+body { overflow-x: clip; }
+/* Slightly larger logo to match the taller bar */
+@media (min-width: 992px) {
+  .site-header .logo-header img,
+  .site-header .logo-header .logo-header-inner img { max-height: 46px; }
+}

@@ -2532,3 +2532,19 @@ button.scroltop { display: none !important; }
 /* Category / services list spacing inside the sidebar */
 .side-bar .all_services ul li { margin-bottom: 12px; }
 .side-bar .all_services ul li a { font-size: 15px; }
+
+/* ============================================================
+   HOME width — use more of the screen (was narrow Bootstrap .container)
+   ============================================================ */
+.jzx-home .container {
+  max-width: 1600px;
+  width: 100%;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+@media (min-width: 1800px) {
+  .jzx-home .container { max-width: 1760px; }
+}
+@media (max-width: 767px) {
+  .jzx-home .container { padding-left: 16px; padding-right: 16px; }
+}

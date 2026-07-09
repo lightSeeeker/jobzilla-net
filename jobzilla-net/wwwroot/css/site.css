@@ -2693,3 +2693,28 @@ body { overflow-x: clip; }
 
 /* 7. In-page anchors clear the fixed header when jumped to */
 :target { scroll-margin-top: 96px; }
+
+/* ============================================================
+   JOB LIST CARD — stack vertically on mobile (was a squeezed
+   3-column flex row from the desktop layout fix).
+   ============================================================ */
+@media (max-width: 767px) {
+  .twm-jobs-list-style1 {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 14px;
+    padding: 20px !important;
+  }
+  .twm-jobs-list-style1 .twm-media { margin: 0 !important; }
+  .twm-jobs-list-style1 .twm-mid-content { padding-left: 0 !important; width: 100%; }
+  .twm-jobs-list-style1 .twm-right-content {
+    width: 100% !important;
+    text-align: left !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 20px;
+  }
+  .twm-jobs-list-style1 .twm-jobs-browse { margin-left: auto; }
+}

@@ -2556,12 +2556,22 @@ button.scroltop { display: none !important; }
    directions, no JS. Glass bg already applied above.
    ============================================================ */
 .site-header .sticky-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1030;
 }
 .site-header.scrolled .sticky-header {
   box-shadow: var(--glass-shadow-lg);
+}
+/* Spacer so the fixed header doesn't overlap content — only on layouts
+   that actually render the public header (candidate/employer/admin
+   dashboards share .page-wraper but have no .site-header). */
+.page-wraper:has(> .site-header) { padding-top: 72px; }
+@media (min-width: 992px) {
+  .page-wraper:has(> .site-header) { padding-top: 88px; }
 }
 
 /* ============================================================

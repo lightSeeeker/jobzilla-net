@@ -111,11 +111,9 @@ All JavaScript fuctions Start
 
 // > Main menu sticky on top  when scroll down function by = custom.js ========== //		
 	function sticky_header(){
-		if(jQuery('.sticky-header').length){
-			var sticky = new Waypoint.Sticky({
-			  element: jQuery('.sticky-header')
-			});
-		}
+		// Header stickiness is handled purely in CSS (position:fixed).
+		// The old Waypoint.Sticky only wrapped the element without ever
+		// applying fixed positioning, so it scrolled away — disabled.
 	}
 
 // > Sidebar sticky  when scroll down function by = theia-sticky-sidebar.js ========== //		

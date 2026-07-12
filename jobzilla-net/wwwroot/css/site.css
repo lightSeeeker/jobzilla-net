@@ -2721,19 +2721,29 @@ body { overflow-x: clip; }
 
 /* ============================================================
    Fix: horizontal scroll for dashboard data tables.
-   .twm-D_table sets `overflow: hidden` (for rounded corners) on the same
-   element that also carries Bootstrap's `.table-responsive`, so its
-   `overflow-x: auto` scroller was clipped — cramped columns squished with no
-   way to reach the hidden ones. Restore the x-scroll and give the tables a
-   min-width so they scroll instead of compressing on narrow screens.
+   Two problems were solved:
+   1. `.twm-D_table` sets `overflow: hidden` (rounded corners) on the same
+      element that carries Bootstrap's `.table-responsive`, clipping its
+      `overflow-x: auto` scroller so cramped columns just squished.
+   2. Giving the table a min-width made its container grow and overflow the
+      PAGE (position:absolute #content has no width clamp) instead of scrolling
+      inside the table wrapper — content got pushed off-screen.
+   The content wrapper is clamped so the page never scrolls sideways, and the
+   `.table-responsive` becomes the one and only horizontal scroller.
    ============================================================ */
+#content { max-width: 100%; }
+.content-admin-main { max-width: 100%; overflow-x: hidden; }
+
 .twm-D_table.table-responsive,
 .content-admin-main .table-responsive {
+  display: block;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto !important;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
 }
 .twm-D_table.table-responsive > .table,
 .content-admin-main .table-responsive > .table {
-  min-width: 820px;
+  min-width: 700px;
 }

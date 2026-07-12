@@ -19,21 +19,21 @@
         print-color-adjust: exact;
     }
     
-    /* PDF page-break handling to prevent awkward cuts across A4 pages */
+    /* Keep entries whole and headings attached to their content across A4 page breaks.
+       Safe now that full-bleed backgrounds fill each page independently of content
+       (Modern's fixed band, Technical's body canvas), so any break gap stays covered. */
     .resume-item {
         page-break-inside: avoid;
         break-inside: avoid;
-        display: block; /* Required for page-break-inside to work reliably */
+        display: block;
     }
     .resume-section-title {
         page-break-after: avoid;
         break-after: avoid;
-        page-break-inside: avoid;
     }
     .resume-item-header {
         page-break-after: avoid;
         break-after: avoid;
-        page-break-inside: avoid;
     }
     .resume-skills-list, .resume-references-grid {
         page-break-inside: avoid;
@@ -44,13 +44,17 @@
     @if (Model.IsExport)
     {
         <text>
+        /* Uniform page margins on EVERY page (top spacing on continuation pages,
+           consistent single-column spacing). Left/right = 0 so full-bleed designs
+           reach the side edges; each template owns its horizontal padding. Chromium
+           paints body/root backgrounds across the whole sheet (incl. these margins),
+           so full-height sidebars stay edge-to-edge. */
+        @@page { size: A4; margin: 14mm 0; }
+
         .resume-container {
             width: 100%;
             max-width: 100%;
             margin: 0;
-            background: #fff;
-            overflow: hidden;
-            min-height: 296mm;
             box-sizing: border-box;
         }
         </text>
@@ -61,7 +65,6 @@
         .resume-container {
             margin: 0 auto;
             background: #fff;
-            overflow: hidden;
             box-sizing: border-box;
             /* Box shadows and padding differ by template */
         }

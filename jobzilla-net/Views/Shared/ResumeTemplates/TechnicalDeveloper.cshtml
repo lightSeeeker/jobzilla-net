@@ -26,6 +26,15 @@
             padding: 40px;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-radius: 4px; max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
+        @if (Model.IsExport)
+        {
+            <text>
+            /* Dark theme fills every printed page edge-to-edge: a body/root background
+               propagates to the full page canvas on every page in Chromium, so the last
+               page's empty area stays dark instead of showing a white gap. */
+            html, body { background-color: var(--td-bg); }
+            </text>
+        }
         .header {
             margin-bottom: 30px;
             border-bottom: 1px solid #555;

@@ -28,9 +28,11 @@ public class SelectPdfGenerator : IPdfGenerator
         converter.Options.PdfPageSize = PdfPageSize.A4;
         converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
 
-        // Zero outer margins: spacing is owned by each template's own CSS (padding /
-        // full-bleed sidebars). A blanket page margin would double the padding on
-        // text templates and leave a white border around full-bleed designs.
+        // Zero margins on all sides so full-bleed designs (e.g. Modern Professional's
+        // dark sidebar) reach every edge — top, bottom and left — on every page.
+        // Each template owns its own inner spacing via padding. A non-zero page margin
+        // would leave white bands around the sidebar and shave usable height (spilling
+        // content onto a near-empty extra page).
         converter.Options.MarginLeft = 0;
         converter.Options.MarginRight = 0;
         converter.Options.MarginTop = 0;

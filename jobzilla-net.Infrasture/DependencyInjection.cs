@@ -88,7 +88,27 @@ public static class DependencyInjection
         services.AddScoped<IResumeBuilderService, ResumeBuilderService>();
         services.AddScoped<ITemplateRenderer, RazorTemplateRenderer>();
         services.AddScoped<IResumeHtmlComposer, ResumeHtmlComposer>();
-        services.AddScoped<IPdfGenerator, SelectPdfGenerator>();
+
+        // PDF engine is switchable via the "Pdf:Engine" config value:
+        //   "Gotenberg"  — self-hosted headless Chromium (free, best fidelity) [recommended]
+        //   "Browserless"— hosted headless Chromium API (paid)
+        //   "SelectPdf"  — in-process, limited CSS (default fallback)
+        var pdfEngine = config["Pdf:Engine"];
+        if (string.Equals(pdfEngine, "Gotenberg", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddHttpClient<IPdfGenerator, GotenbergPdfGenerator>(client =>
+                client.Timeout = TimeSpan.FromSeconds(60));
+        }
+        else if (string.Equals(pdfEngine, "Browserless", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddHttpClient<IPdfGenerator, BrowserlessPdfGenerator>(client =>
+                client.Timeout = TimeSpan.FromSeconds(60));
+        }
+        else
+        {
+            services.AddScoped<IPdfGenerator, SelectPdfGenerator>();
+        }
+
         services.AddScoped<IResumeExportService, ResumeExportService>();
 
         return services;

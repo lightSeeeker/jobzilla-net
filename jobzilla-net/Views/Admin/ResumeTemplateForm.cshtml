@@ -176,6 +176,9 @@
                                 <a href="@Url.Action("TemplatePreview", "Admin", new { id = Model.TemplateId })" target="_blank" class="site-button outline w-100 mt-3">
                                     <i class="fa fa-expand"></i> Open full preview
                                 </a>
+                                <a href="@Url.Action("TemplatePreviewPdf", "Admin", new { id = Model.TemplateId })" target="_blank" class="site-button w-100 mt-2">
+                                    <i class="fa fa-file-pdf"></i> Test PDF (current engine)
+                                </a>
                             }
                             else
                             {

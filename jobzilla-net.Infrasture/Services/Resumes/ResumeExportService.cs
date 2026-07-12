@@ -99,19 +99,16 @@ public class ResumeExportService : IResumeExportService
 
     /// <summary>
     /// Appends print-specific CSS so the PDF faithfully reflects the on-screen design:
-    /// zero page margin (each template owns its spacing), forced background-color
-    /// printing (colored sidebars/headers), and page-break rules that keep entries
-    /// and their headings from splitting across pages.
+    /// zero page margin (each template owns its spacing) and forced background-color
+    /// printing (colored sidebars/headers). No page-break-avoid rules — content flows
+    /// to fill each page so faux-column backgrounds never leave an empty gap.
     /// </summary>
     private static string InjectPrintCss(string html)
     {
         const string css =
             "<style>" +
-            "@page{margin:0;}" +
             "html,body{margin:0 !important;padding:0 !important;}" +
             "*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}" +
-            ".resume-item,.resume-reference-item,.resume-custom-item{page-break-inside:avoid;}" +
-            ".resume-section-title{page-break-after:avoid;}" +
             "</style>";
 
         var headCloseIndex = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);

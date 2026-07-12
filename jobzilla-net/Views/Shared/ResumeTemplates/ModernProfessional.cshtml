@@ -23,18 +23,11 @@
                 color: #333;
                 line-height: var(--cvb-line-height);
                 box-sizing: border-box;
-                @if (Model.IsExport)
+                display: flex;
+                align-items: stretch;
+                @if (!Model.IsExport)
                 {
                     <text>
-                    /* Faux column background for PDF */
-                    background: linear-gradient(to right, var(--mp-sidebar-bg) 0%, var(--mp-sidebar-bg) 32%, #ffffff 32%, #ffffff 100%);
-                    </text>
-                }
-                else
-                {
-                    <text>
-                    display: flex;
-                    align-items: stretch;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                     border-radius: 8px;
                     max-width: 850px;
@@ -42,27 +35,32 @@
                 }
             }
 
-            .resume-container::after {
-                content: "";
-                display: table;
-                clear: both;
+            @if (Model.IsExport)
+            {
+                <text>
+                /* Full-height two-column background painted on the page canvas. Chromium
+                   propagates a body/root background across the WHOLE sheet on every page
+                   (including the page-margin area), so the dark sidebar column reaches all
+                   four edges on every page — no gaps, no fixed-element hacks. */
+                html, body {
+                    background: linear-gradient(to right, var(--mp-sidebar-bg) 0%, var(--mp-sidebar-bg) 32%, #ffffff 32%, #ffffff 100%);
+                }
+                </text>
             }
 
             .sidebar {
-                @if (Model.IsExport) { <text>float: left; background: transparent !important;</text> }
                 width: 32%;
-                background: var(--mp-sidebar-bg);
                 color: #fff;
                 padding: 40px 30px;
                 box-sizing: border-box;
+                @if (Model.IsExport) { <text>background: transparent;</text> } else { <text>background: var(--mp-sidebar-bg);</text> }
             }
 
             .main-content {
-                @if (Model.IsExport) { <text>float: right; background: transparent !important;</text> }
                 width: 68%;
                 padding: 40px;
-                background: #fff;
                 box-sizing: border-box;
+                @if (Model.IsExport) { <text>background: transparent;</text> } else { <text>background: #fff;</text> }
             }
 
             .name {

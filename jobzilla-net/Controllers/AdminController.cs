@@ -28,6 +28,8 @@ public class AdminController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHomePageContentService _homePageContentService;
     private readonly IResumeHtmlComposer _resumeComposer;
+    private readonly IPdfGenerator _pdfGenerator;
+    private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         IAdminService adminService,
@@ -37,7 +39,9 @@ public class AdminController : Controller
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
         IHomePageContentService homePageContentService,
-        IResumeHtmlComposer resumeComposer)
+        IResumeHtmlComposer resumeComposer,
+        IPdfGenerator pdfGenerator,
+        ILogger<AdminController> logger)
     {
         _adminService = adminService;
         _jobService = jobService;
@@ -47,6 +51,8 @@ public class AdminController : Controller
         _userManager = userManager;
         _homePageContentService = homePageContentService;
         _resumeComposer = resumeComposer;
+        _pdfGenerator = pdfGenerator;
+        _logger = logger;
     }
 
     private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
@@ -489,6 +495,41 @@ public class AdminController : Controller
 
         var html = await _resumeComposer.ComposeAsync(dto, BuildSampleResumeModel(id));
         return Content(html, "text/html");
+    }
+
+    // Isolated PDF test: renders one template (with sample data) straight through the
+    // configured IPdfGenerator (SelectPdf or Browserless) and returns the PDF. Use it to
+    // verify the PDF engine end-to-end without touching the real candidate export flow.
+    [HttpGet]
+    public async Task<IActionResult> TemplatePreviewPdf(int id, CancellationToken ct)
+    {
+        var template = await _adminService.GetResumeTemplateByIdAsync(id);
+        if (template == null || string.IsNullOrWhiteSpace(template.TemplateFilePath))
+            return NotFound("Template not found or has no layout file.");
+
+        var dto = new ResumeTemplateDto
+        {
+            Id = template.Id,
+            Name = template.Name,
+            TemplateFilePath = template.TemplateFilePath,
+            PreviewImagePath = template.PreviewImagePath,
+            Source = template.Source
+        };
+
+        var model = BuildSampleResumeModel(id);
+        model.IsExport = true;
+
+        try
+        {
+            var html = await _resumeComposer.ComposeAsync(dto, model, ct);
+            var pdf = await _pdfGenerator.GeneratePdfFromHtmlAsync(html, ct);
+            return File(pdf, "application/pdf", $"Test_{template.Name}.pdf");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Isolated PDF test failed for template {TemplateId}", id);
+            return Content($"PDF generation failed: {ex.Message}", "text/plain");
+        }
     }
 
     // Static placeholder CV data used only for admin template previews.

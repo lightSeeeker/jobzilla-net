@@ -1,7 +1,11 @@
 using jobzilla_net.Application.Admin;
 using jobzilla_net.Application.Admin.Dtos;
+using jobzilla_net.Application.Candidates.Dtos;
 using jobzilla_net.Application.Common.Interfaces;
 using jobzilla_net.Application.Jobs;
+using jobzilla_net.Application.Resumes.Dtos;
+using jobzilla_net.Application.Resumes.Interfaces;
+using jobzilla_net.Application.Resumes.ViewModels;
 using jobzilla_net.Infrasture.Identity;
 using jobzilla_net.Models.Account;
 using jobzilla_net.Models.AdminDash;
@@ -23,6 +27,7 @@ public class AdminController : Controller
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHomePageContentService _homePageContentService;
+    private readonly IResumeHtmlComposer _resumeComposer;
 
     public AdminController(
         IAdminService adminService,
@@ -31,7 +36,8 @@ public class AdminController : Controller
         IWebHostEnvironment webHostEnvironment,
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
-        IHomePageContentService homePageContentService)
+        IHomePageContentService homePageContentService,
+        IResumeHtmlComposer resumeComposer)
     {
         _adminService = adminService;
         _jobService = jobService;
@@ -40,6 +46,7 @@ public class AdminController : Controller
         _signInManager = signInManager;
         _userManager = userManager;
         _homePageContentService = homePageContentService;
+        _resumeComposer = resumeComposer;
     }
 
     private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
@@ -460,6 +467,77 @@ public class AdminController : Controller
         if (string.IsNullOrWhiteSpace(relativePath)) return;
         var absolute = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar));
         if (System.IO.File.Exists(absolute)) System.IO.File.Delete(absolute);
+    }
+
+    // Renders the full CV design for a template, filled with Lorem-Ipsum sample data,
+    // so admins see how the layout looks. Returned as raw HTML for the preview iframe.
+    [HttpGet]
+    public async Task<IActionResult> TemplatePreview(int id)
+    {
+        var template = await _adminService.GetResumeTemplateByIdAsync(id);
+        if (template == null || string.IsNullOrWhiteSpace(template.TemplateFilePath))
+            return Content("<html><body></body></html>", "text/html");
+
+        var dto = new ResumeTemplateDto
+        {
+            Id = template.Id,
+            Name = template.Name,
+            TemplateFilePath = template.TemplateFilePath,
+            PreviewImagePath = template.PreviewImagePath,
+            Source = template.Source
+        };
+
+        var html = await _resumeComposer.ComposeAsync(dto, BuildSampleResumeModel(id));
+        return Content(html, "text/html");
+    }
+
+    // Static placeholder CV data used only for admin template previews.
+    private static ResumeExportViewModel BuildSampleResumeModel(int templateId)
+    {
+        const string lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.";
+
+        return new ResumeExportViewModel
+        {
+            TemplateId = templateId,
+            IsExport = false,
+            Profile = new CandidateProfileDto
+            {
+                FullName = "Jordan Doe",
+                ProfessionalTitle = "Senior Software Engineer",
+                Email = "jordan.doe@example.com",
+                PhoneNumber = "+1 555 012 3456",
+                Location = "Doha, Qatar",
+                Summary = lorem,
+                ExperienceYears = 8
+            },
+            SocialLinks = new()
+            {
+                new() { PlatformName = "LinkedIn", Url = "https://linkedin.com/in/loremipsum" },
+                new() { PlatformName = "GitHub", Url = "https://github.com/loremipsum" }
+            },
+            Skills = new() { "Lorem Ipsum", "Dolor Sit", "Amet Consectetur", "Adipiscing", "Tempor Labore", "Magna Aliqua" },
+            Experiences = new()
+            {
+                new() { JobTitle = "Lead Developer", CompanyName = "Ipsum Technologies", Location = "Doha, QA", StartDate = new DateTime(2021, 1, 1), Description = lorem },
+                new() { JobTitle = "Software Engineer", CompanyName = "Dolor Systems", Location = "Dubai, AE", StartDate = new DateTime(2017, 6, 1), EndDate = new DateTime(2020, 12, 1), Description = lorem }
+            },
+            Educations = new()
+            {
+                new() { InstitutionName = "Lorem University", Degree = "B.Sc.", FieldOfStudy = "Computer Science", StartDate = new DateTime(2013, 9, 1), EndDate = new DateTime(2017, 5, 1) }
+            },
+            Certifications = new()
+            {
+                new() { Name = "Certified Lorem Professional", IssuingOrganization = "Ipsum Institute", IssueDate = new DateTime(2022, 3, 1), CredentialUrl = "https://example.com/cert" }
+            },
+            Projects = new()
+            {
+                new() { Name = "Ipsum Platform", Description = lorem, ProjectUrl = "https://example.com", StartDate = new DateTime(2022, 1, 1), EndDate = new DateTime(2023, 1, 1) }
+            },
+            References = new()
+            {
+                new() { ReferenceName = "Alex Amet", Designation = "Engineering Manager", Company = "Ipsum Technologies", Phone = "+1 555 987 6543", Email = "alex.amet@example.com" }
+            }
+        };
     }
 
     [HttpPost]

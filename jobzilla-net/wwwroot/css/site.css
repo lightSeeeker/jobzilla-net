@@ -2718,3 +2718,22 @@ body { overflow-x: clip; }
   }
   .twm-jobs-list-style1 .twm-jobs-browse { margin-left: auto; }
 }
+
+/* ============================================================
+   Fix: horizontal scroll for dashboard data tables.
+   .twm-D_table sets `overflow: hidden` (for rounded corners) on the same
+   element that also carries Bootstrap's `.table-responsive`, so its
+   `overflow-x: auto` scroller was clipped — cramped columns squished with no
+   way to reach the hidden ones. Restore the x-scroll and give the tables a
+   min-width so they scroll instead of compressing on narrow screens.
+   ============================================================ */
+.twm-D_table.table-responsive,
+.content-admin-main .table-responsive {
+  overflow-x: auto !important;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+.twm-D_table.table-responsive > .table,
+.content-admin-main .table-responsive > .table {
+  min-width: 820px;
+}

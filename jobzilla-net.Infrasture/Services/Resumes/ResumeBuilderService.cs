@@ -337,7 +337,8 @@ public class ResumeBuilderService : IResumeBuilderService
                 Name = t.Name,
                 Description = t.Description,
                 TemplateFilePath = t.TemplateFilePath,
-                PreviewImagePath = t.PreviewImagePath
+                PreviewImagePath = t.PreviewImagePath,
+                Source = t.Source
             })
             .ToListAsync(cancellationToken);
     }
@@ -356,7 +357,8 @@ public class ResumeBuilderService : IResumeBuilderService
             Name = template.Name,
             Description = template.Description,
             TemplateFilePath = template.TemplateFilePath,
-            PreviewImagePath = template.PreviewImagePath
+            PreviewImagePath = template.PreviewImagePath,
+            Source = template.Source
         };
     }
 

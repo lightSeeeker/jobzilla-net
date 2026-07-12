@@ -1,3 +1,5 @@
+using jobzilla_net.Core.Enums;
+
 namespace jobzilla_net.Application.Admin.Dtos;
 
 // Dashboard DTOs
@@ -125,12 +127,14 @@ public sealed class AdminResumeTemplateDto
     public string Name { get; init; } = string.Empty;
     public string? Description { get; init; }
     public string? Category { get; init; }
+    public string TemplateFilePath { get; init; } = string.Empty;
     public string? PreviewImagePath { get; init; }
     public bool IsActive { get; init; }
     public bool IsPremium { get; init; }
     public decimal Price { get; init; }
     public decimal? DiscountPrice { get; init; }
     public string? TemplateType { get; init; }
+    public ResumeTemplateSource Source { get; init; }
     public DateTime CreatedAtUtc { get; init; }
 }
 
@@ -140,11 +144,13 @@ public sealed class AdminResumeTemplateFormDto
     public string? Description { get; init; }
     public string? Category { get; init; }
     public string TemplateFilePath { get; init; } = string.Empty;
+    public string? PreviewImagePath { get; init; }
     public bool IsActive { get; init; }
     public bool IsPremium { get; init; }
     public decimal Price { get; init; }
     public decimal? DiscountPrice { get; init; }
     public string? TemplateType { get; init; }
+    public ResumeTemplateSource Source { get; init; } = ResumeTemplateSource.Custom;
 }
 
 // Job Management DTOs

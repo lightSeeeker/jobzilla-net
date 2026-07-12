@@ -87,6 +87,7 @@ public static class DependencyInjection
         services.AddScoped<IResumeParsingOrchestrator, ResumeParsingOrchestrator>();
         services.AddScoped<IResumeBuilderService, ResumeBuilderService>();
         services.AddScoped<ITemplateRenderer, RazorTemplateRenderer>();
+        services.AddScoped<IResumeHtmlComposer, ResumeHtmlComposer>();
         services.AddScoped<IPdfGenerator, SelectPdfGenerator>();
         services.AddScoped<IResumeExportService, ResumeExportService>();
 

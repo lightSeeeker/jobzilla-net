@@ -290,6 +290,15 @@ public class AdminController : Controller
         return View(viewModel);
     }
 
+    // Only HTML templates (with placeholder tokens) can be uploaded from the admin
+    // panel. They are rendered by string substitution, never executed, so untrusted
+    // uploads are safe — unlike Razor views, which the 5 built-in templates use.
+    private const string TemplateUploadDir = "uploads/resume-templates";
+    private const string PreviewUploadDir = "uploads/resume-templates/previews";
+    private const long MaxTemplateBytes = 2 * 1024 * 1024;   // 2 MB
+    private const long MaxPreviewBytes = 2 * 1024 * 1024;    // 2 MB
+    private static readonly string[] AllowedPreviewExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
     [HttpGet]
     public async Task<IActionResult> ResumeTemplateForm(int? id)
     {
@@ -303,17 +312,21 @@ public class AdminController : Controller
 
             viewModel.TemplateId = id;
             viewModel.IsEditMode = true;
+            viewModel.ExistingTemplateFilePath = template.TemplateFilePath;
+            viewModel.ExistingPreviewImagePath = template.PreviewImagePath;
             viewModel.Template = new AdminResumeTemplateFormDto
             {
                 Name = template.Name,
                 Description = template.Description,
                 Category = template.Category,
-                TemplateFilePath = "",
+                TemplateFilePath = template.TemplateFilePath,
+                PreviewImagePath = template.PreviewImagePath,
                 IsActive = template.IsActive,
                 IsPremium = template.IsPremium,
                 Price = template.Price,
                 DiscountPrice = template.DiscountPrice,
-                TemplateType = template.TemplateType
+                TemplateType = template.TemplateType,
+                Source = template.Source
             };
         }
 
@@ -323,23 +336,72 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> ResumeTemplateForm(AdminResumeTemplateFormViewModel viewModel)
     {
+        // Built-in (System) templates are Razor views; only their metadata is editable.
+        // Uploaded HTML files apply to Custom templates and new templates.
+        var isSystem = viewModel.IsEditMode && viewModel.Template.Source == Core.Enums.ResumeTemplateSource.System;
+
+        // A new HTML file is required when creating a Custom template; on edit the existing file is kept.
+        if (!viewModel.IsEditMode && viewModel.TemplateFile == null)
+            ModelState.AddModelError(nameof(viewModel.TemplateFile), "A template HTML file is required.");
+
+        if (!isSystem && viewModel.TemplateFile != null)
+        {
+            if (Path.GetExtension(viewModel.TemplateFile.FileName).ToLowerInvariant() != ".html")
+                ModelState.AddModelError(nameof(viewModel.TemplateFile), "Only .html template files are allowed.");
+            if (viewModel.TemplateFile.Length > MaxTemplateBytes)
+                ModelState.AddModelError(nameof(viewModel.TemplateFile), "Template file must be 2 MB or smaller.");
+        }
+
+        if (viewModel.PreviewImage != null)
+        {
+            if (!AllowedPreviewExtensions.Contains(Path.GetExtension(viewModel.PreviewImage.FileName).ToLowerInvariant()))
+                ModelState.AddModelError(nameof(viewModel.PreviewImage), "Preview image must be JPG, PNG, GIF, or WEBP.");
+            if (viewModel.PreviewImage.Length > MaxPreviewBytes)
+                ModelState.AddModelError(nameof(viewModel.PreviewImage), "Preview image must be 2 MB or smaller.");
+        }
+
         if (!ModelState.IsValid)
             return View(viewModel);
 
         try
         {
+            // System templates keep their Razor view path; a new upload is ignored for them.
+            var templateFilePath = (!isSystem && viewModel.TemplateFile != null)
+                ? await SaveUploadAsync(viewModel.TemplateFile, TemplateUploadDir, ".html")
+                : viewModel.ExistingTemplateFilePath ?? string.Empty;
+
+            var previewImagePath = viewModel.PreviewImage != null
+                ? await SaveUploadAsync(viewModel.PreviewImage, PreviewUploadDir, Path.GetExtension(viewModel.PreviewImage.FileName).ToLowerInvariant())
+                : viewModel.ExistingPreviewImagePath;
+
+            var dto = new AdminResumeTemplateFormDto
+            {
+                Name = viewModel.Template.Name,
+                Description = viewModel.Template.Description,
+                Category = viewModel.Template.Category,
+                TemplateType = viewModel.Template.TemplateType,
+                IsActive = viewModel.Template.IsActive,
+                IsPremium = viewModel.Template.IsPremium,
+                Price = viewModel.Template.IsPremium ? viewModel.Template.Price : 0m,
+                DiscountPrice = viewModel.Template.IsPremium ? viewModel.Template.DiscountPrice : null,
+                TemplateFilePath = templateFilePath,
+                PreviewImagePath = previewImagePath,
+                Source = isSystem ? Core.Enums.ResumeTemplateSource.System : Core.Enums.ResumeTemplateSource.Custom
+            };
+
             if (viewModel.IsEditMode && viewModel.TemplateId.HasValue)
             {
-                var result = await _adminService.UpdateResumeTemplateAsync(viewModel.TemplateId.Value, viewModel.Template, GetUserId());
+                var result = await _adminService.UpdateResumeTemplateAsync(viewModel.TemplateId.Value, dto, GetUserId());
                 if (result)
                 {
                     TempData["SuccessMessage"] = "Template updated successfully";
                     return RedirectToAction(nameof(ResumeTemplates));
                 }
+                TempData["ErrorMessage"] = "Template not found.";
             }
             else
             {
-                var templateId = await _adminService.CreateResumeTemplateAsync(viewModel.Template, GetUserId());
+                await _adminService.CreateResumeTemplateAsync(dto, GetUserId());
                 TempData["SuccessMessage"] = "Template created successfully";
                 return RedirectToAction(nameof(ResumeTemplates));
             }
@@ -352,12 +414,37 @@ public class AdminController : Controller
         return View(viewModel);
     }
 
+    private async Task<string> SaveUploadAsync(IFormFile file, string relativeDir, string extension)
+    {
+        var absoluteDir = Path.Combine(_webHostEnvironment.WebRootPath, relativeDir.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(absoluteDir);
+
+        var fileName = $"{Guid.NewGuid():N}{extension}";
+        var absolutePath = Path.Combine(absoluteDir, fileName);
+
+        await using (var stream = new FileStream(absolutePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return $"{relativeDir}/{fileName}";
+    }
+
     [HttpPost]
     public async Task<IActionResult> DeleteResumeTemplate(int id)
     {
+        var template = await _adminService.GetResumeTemplateByIdAsync(id);
+        if (template?.Source == Core.Enums.ResumeTemplateSource.System)
+        {
+            TempData["ErrorMessage"] = "Built-in templates cannot be deleted. Disable it instead.";
+            return RedirectToAction(nameof(ResumeTemplates));
+        }
+
         var result = await _adminService.DeleteResumeTemplateAsync(id, GetUserId());
         if (result)
         {
+            DeleteWebRootFile(template?.TemplateFilePath);
+            DeleteWebRootFile(template?.PreviewImagePath);
             TempData["SuccessMessage"] = "Template deleted successfully";
         }
         else
@@ -366,6 +453,13 @@ public class AdminController : Controller
         }
 
         return RedirectToAction(nameof(ResumeTemplates));
+    }
+
+    private void DeleteWebRootFile(string? relativePath)
+    {
+        if (string.IsNullOrWhiteSpace(relativePath)) return;
+        var absolute = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar));
+        if (System.IO.File.Exists(absolute)) System.IO.File.Delete(absolute);
     }
 
     [HttpPost]

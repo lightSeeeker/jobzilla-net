@@ -13,7 +13,7 @@ public class CandidateController : Controller
     private readonly ICandidateboardService _dashboardService;
     private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeParsingOrchestrator _resumeOrchestrator;
     private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService _resumeBuilderService;
-    private readonly jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer _templateRenderer;
+    private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeHtmlComposer _resumeComposer;
     private readonly jobzilla_net.Application.Resumes.Interfaces.IResumeExportService _resumeExportService;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILogger<CandidateController> _logger;
@@ -22,7 +22,7 @@ public class CandidateController : Controller
         ICandidateboardService dashboardService,
         jobzilla_net.Application.Resumes.Interfaces.IResumeParsingOrchestrator resumeOrchestrator,
         jobzilla_net.Application.Resumes.Interfaces.IResumeBuilderService resumeBuilderService,
-        jobzilla_net.Application.Resumes.Interfaces.ITemplateRenderer templateRenderer,
+        jobzilla_net.Application.Resumes.Interfaces.IResumeHtmlComposer resumeComposer,
         jobzilla_net.Application.Resumes.Interfaces.IResumeExportService resumeExportService,
         IWebHostEnvironment webHostEnvironment,
         ILogger<CandidateController> logger)
@@ -30,7 +30,7 @@ public class CandidateController : Controller
         _dashboardService = dashboardService;
         _resumeOrchestrator = resumeOrchestrator;
         _resumeBuilderService = resumeBuilderService;
-        _templateRenderer = templateRenderer;
+        _resumeComposer = resumeComposer;
         _resumeExportService = resumeExportService;
         _webHostEnvironment = webHostEnvironment;
         _logger = logger;
@@ -504,9 +504,7 @@ public class CandidateController : Controller
         model.ResumeId = resumeId;
         model.IsExport = false;
 
-        var htmlContent = await _templateRenderer.RenderTemplateAsync(
-            $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml",
-            model);
+        var htmlContent = await _resumeComposer.ComposeAsync(template, model);
 
         return Content(htmlContent, "text/html");
     }

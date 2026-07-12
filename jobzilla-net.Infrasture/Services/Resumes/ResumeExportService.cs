@@ -6,18 +6,18 @@ namespace jobzilla_net.Infrasture.Services.Resumes;
 public class ResumeExportService : IResumeExportService
 {
     private readonly IResumeBuilderService _builderService;
-    private readonly ITemplateRenderer _templateRenderer;
+    private readonly IResumeHtmlComposer _composer;
     private readonly IPdfGenerator _pdfGenerator;
     private readonly ILogger<ResumeExportService> _logger;
 
     public ResumeExportService(
         IResumeBuilderService builderService,
-        ITemplateRenderer templateRenderer,
+        IResumeHtmlComposer composer,
         IPdfGenerator pdfGenerator,
         ILogger<ResumeExportService> logger)
     {
         _builderService = builderService;
-        _templateRenderer = templateRenderer;
+        _composer = composer;
         _pdfGenerator = pdfGenerator;
         _logger = logger;
     }
@@ -41,10 +41,8 @@ public class ResumeExportService : IResumeExportService
             model.ResumeId = resumeId;
             model.IsExport = true;
 
-            // Render HTML string
-            var html = await _templateRenderer.RenderTemplateAsync(
-                $"~/Views/Shared/ResumeTemplates/{template.TemplateFilePath}.cshtml", 
-                model);
+            // Render HTML string (System = Razor, Custom = uploaded HTML with tokens)
+            var html = await _composer.ComposeAsync(template, model, cancellationToken);
 
             // Polyfill CSS Variables for the PDF Generator
             // SelectPdf/wkhtmltopdf engines do not support var(--variable-name) in CSS.

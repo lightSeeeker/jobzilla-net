@@ -336,12 +336,14 @@ public class AdminService : IAdminService
                 Name = t.Name,
                 Description = t.Description,
                 Category = t.Category,
+                TemplateFilePath = t.TemplateFilePath,
                 PreviewImagePath = t.PreviewImagePath,
                 IsActive = t.IsActive,
                 IsPremium = t.IsPremium,
                 Price = t.Price,
                 DiscountPrice = t.DiscountPrice,
                 TemplateType = t.TemplateType,
+                Source = t.Source,
                 CreatedAtUtc = t.CreatedAtUtc
             })
             .ToListAsync(ct);
@@ -369,12 +371,14 @@ public class AdminService : IAdminService
             Name = template.Name,
             Description = template.Description,
             Category = template.Category,
+            TemplateFilePath = template.TemplateFilePath,
             PreviewImagePath = template.PreviewImagePath,
             IsActive = template.IsActive,
             IsPremium = template.IsPremium,
             Price = template.Price,
             DiscountPrice = template.DiscountPrice,
             TemplateType = template.TemplateType,
+            Source = template.Source,
             CreatedAtUtc = template.CreatedAtUtc
         };
     }
@@ -386,12 +390,14 @@ public class AdminService : IAdminService
             Name = dto.Name,
             Description = dto.Description,
             TemplateFilePath = dto.TemplateFilePath,
+            PreviewImagePath = dto.PreviewImagePath,
             Category = dto.Category,
             IsActive = dto.IsActive,
             IsPremium = dto.IsPremium,
             Price = dto.Price,
             DiscountPrice = dto.DiscountPrice,
             TemplateType = dto.TemplateType,
+            Source = dto.Source,
             CreatedAtUtc = DateTime.UtcNow
         };
 
@@ -410,12 +416,14 @@ public class AdminService : IAdminService
         template.Name = dto.Name;
         template.Description = dto.Description;
         template.TemplateFilePath = dto.TemplateFilePath;
+        template.PreviewImagePath = dto.PreviewImagePath;
         template.Category = dto.Category;
         template.IsActive = dto.IsActive;
         template.IsPremium = dto.IsPremium;
         template.Price = dto.Price;
         template.DiscountPrice = dto.DiscountPrice;
         template.TemplateType = dto.TemplateType;
+        template.Source = dto.Source;
 
         _context.ResumeTemplates.Update(template);
         await _context.SaveChangesAsync();

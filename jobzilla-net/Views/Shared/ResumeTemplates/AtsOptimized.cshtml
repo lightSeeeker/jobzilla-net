@@ -18,8 +18,9 @@
             color: #111;
             line-height: var(--cvb-line-height);
             background-color: #fff;
-            padding: 40px;
-            @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
+            /* Export: horizontal padding only — vertical spacing comes from the page
+               margin so it's uniform on every page. Preview: full padding (card). */
+            @if (Model.IsExport) { <text>padding: 0 48px;</text> } else { <text>padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
         
         .header {
@@ -106,6 +107,8 @@
             </div>
         }
     </div>
+@if (!Model.IsExport)
+{
 <script>
     window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'applyColors') {
@@ -116,5 +119,6 @@
         }
     });
 </script>
+}
 </body>
 </html>

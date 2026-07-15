@@ -1,8 +1,10 @@
 @model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
 
-<style>
-@@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500&family=Lora:wght@400;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap');
+@* <link>, not @import — the SelectPdf engine never resolves @import'ed fonts and
+   silently falls back to Arial; it does load fonts referenced via <link>. *@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500&family=Lora:wght@400;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" />
 
+<style>
     :root {
         --cvb-base-font: 'Inter', sans-serif;
         --cvb-line-height: 1.6;
@@ -19,9 +21,7 @@
         print-color-adjust: exact;
     }
     
-    /* Keep entries whole and headings attached to their content across A4 page breaks.
-       Safe now that full-bleed backgrounds fill each page independently of content
-       (Modern's fixed band, Technical's body canvas), so any break gap stays covered. */
+    /* Keep entries whole and headings attached to their content across A4 page breaks. */
     .resume-item {
         page-break-inside: avoid;
         break-inside: avoid;
@@ -47,8 +47,8 @@
         /* Uniform page margins on EVERY page (top spacing on continuation pages,
            consistent single-column spacing). Left/right = 0 so full-bleed designs
            reach the side edges; each template owns its horizontal padding. Chromium
-           paints body/root backgrounds across the whole sheet (incl. these margins),
-           so full-height sidebars stay edge-to-edge. */
+           engines honour this rule; SelectPdf ignores it, so SelectPdfGenerator
+           sets the equivalent 40pt top/bottom margins itself. */
         @@page { size: A4; margin: 14mm 0; }
 
         .resume-container {
@@ -72,6 +72,8 @@
     }
 </style>
 
+@if (!Model.IsExport)
+{
 <script>
     // Universal listener for real-time color updates in the Preview Editor
     window.addEventListener('message', function (e) {
@@ -103,3 +105,4 @@
         }
     });
 </script>
+}

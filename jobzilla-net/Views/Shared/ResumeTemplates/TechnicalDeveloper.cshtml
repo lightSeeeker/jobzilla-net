@@ -44,7 +44,8 @@
         .name::before { content: "const developer = \""; color: var(--td-keyword); font-weight: normal; font-size: 0.5em; }
         .name::after { content: "\";"; color: var(--td-keyword); font-weight: normal; font-size: 0.5em; }
         .title { font-size: 1.1em; color: var(--td-keyword); margin-bottom: 15px; }
-        .contact-info { display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.9em; color: #9cdcfe; }
+        .contact-info { display: flex; flex-wrap: wrap; font-size: 0.9em; color: #9cdcfe; }
+        .contact-info span { margin: 0 15px 5px 0; }
         
         .resume-section-title {
             font-size: 1.2em;
@@ -63,14 +64,15 @@
         .resume-item-subtitle { font-size: 0.95em; color: #dcdcaa; margin-bottom: 8px; }
         .resume-item-desc { font-size: 0.9em; color: #d4d4d4; }
         
-        .resume-skills-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; padding-left: 20px; }
-        .resume-skill-tag { background: #333; color: #9cdcfe; padding: 2px 8px; border-radius: 2px; font-size: 0.9em; border: 1px solid #444; }
+        .resume-skills-list { display: flex; flex-wrap: wrap; margin-top: 10px; padding-left: 20px; }
+        .resume-skill-tag { background: #333; color: #9cdcfe; padding: 2px 8px; border-radius: 2px; font-size: 0.9em; border: 1px solid #444; margin: 0 10px 10px 0; }
         
-        .resume-references-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-left: 20px; }
-        .resume-reference-item { border: none; padding-left: 0; }
+        .resume-references-grid { padding-left: 20px; }
+        .resume-reference-item { border: none; padding-left: 0; display: inline-block; width: 48%; vertical-align: top; margin: 0 1% 15px 0; box-sizing: border-box; }
         
         .resume-custom-item { padding-left: 20px; }
         
+        .section-end { page-break-before: avoid; }
         .section-end::before { content: "}"; color: #d4d4d4; display: block; margin-top: 10px; font-weight: bold; font-size: 1.2em; }
         
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #fff; color: #000; font-family: Arial, sans-serif; }
@@ -96,7 +98,7 @@
             @if (!string.IsNullOrEmpty(imgSrc))
             {
                 <div style="flex-shrink: 0; margin-left: 20px;">
-                    <img src="@imgSrc" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px dashed #569cd6;" />
+                    <div style="width: 100px; height: 100px; background-image: url('@imgSrc'); background-size: cover; background-position: center; border-radius: 8px; border: 2px dashed #569cd6;"></div>
                 </div>
             }
         </div>
@@ -138,6 +140,8 @@
             </div>
         }
     </div>
+@if (!Model.IsExport)
+{
 <script>
     window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'applyColors') {
@@ -148,5 +152,6 @@
         }
     });
 </script>
+}
 </body>
 </html>

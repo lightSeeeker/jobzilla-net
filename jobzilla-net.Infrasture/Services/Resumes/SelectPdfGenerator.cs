@@ -28,22 +28,22 @@ public class SelectPdfGenerator : IPdfGenerator
         converter.Options.PdfPageSize = PdfPageSize.A4;
         converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
 
-        // Zero margins on all sides so full-bleed designs (e.g. Modern Professional's
-        // dark sidebar) reach every edge — top, bottom and left — on every page.
-        // Each template owns its own inner spacing via padding. A non-zero page margin
-        // would leave white bands around the sidebar and shave usable height (spilling
-        // content onto a near-empty extra page).
+        // This engine ignores @page rules, so the 14mm vertical page margin declared in
+        // _ResumeBaseStyles must be emulated here (40pt ≈ 14mm) — without it, content
+        // touches the paper edge on every page. Left/right stay 0 so full-bleed sidebar
+        // designs reach the side edges; templates own their horizontal padding.
         converter.Options.MarginLeft = 0;
         converter.Options.MarginRight = 0;
-        converter.Options.MarginTop = 0;
-        converter.Options.MarginBottom = 0;
+        converter.Options.MarginTop = 40;
+        converter.Options.MarginBottom = 40;
 
         // Render at true page width so the design is 1:1 with the page.
         converter.Options.WebPageWidth = A4WidthPx;
         converter.Options.WebPageHeight = 0; // auto — let content flow across pages
 
-        // Give web fonts / remote CSS a moment to load before rasterizing.
-        converter.Options.MinPageLoadTime = 1;
+        // Give Google Fonts time to download before rasterizing; @import never loads in
+        // this engine (templates use <link>), and even <link> needs a beat on cold cache.
+        converter.Options.MinPageLoadTime = 2;
 
         // Templates are static HTML/CSS; no JS needed (faster, safer).
         converter.Options.JavaScriptEnabled = false;

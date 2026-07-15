@@ -20,7 +20,6 @@
             color: #222;
             line-height: var(--cvb-line-height);
             background-color: #fff;
-            flex-direction: column;
             @if (!Model.IsExport) { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
         }
         .header {
@@ -31,7 +30,8 @@
         }
         .name { font-size: 2.8em; font-weight: 700; margin: 0 0 5px; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
         .title { font-size: 1.2em; color: #ddd; margin-bottom: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
-        .contact-info { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 0.9em; font-weight: 500; }
+        .contact-info { display: flex; justify-content: center; flex-wrap: wrap; font-size: 0.9em; font-weight: 500; }
+        .contact-info span { margin: 0 10px; }
         
         .main-content {
             padding: 0 50px 50px;
@@ -56,11 +56,10 @@
         .resume-item-subtitle { font-size: 1em; color: #333; margin-bottom: 8px; font-style: italic; }
         .resume-item-desc { font-size: 0.95em; color: #333; text-align: justify; }
         
-        .resume-skills-list { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
-        .resume-skill-tag { font-size: 0.95em; font-weight: bold; color: var(--ec-primary); }
-        
-        .resume-references-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .resume-reference-item { margin-bottom: 0; }
+        .resume-skills-list { display: flex; flex-wrap: wrap; margin-top: 10px; }
+        .resume-skill-tag { font-size: 0.95em; font-weight: bold; color: var(--ec-primary); margin: 0 15px 15px 0; }
+
+        .resume-reference-item { display: inline-block; width: 48%; vertical-align: top; margin: 0 1% 15px 0; box-sizing: border-box; }
         
         .resume-custom-item { margin-bottom: 15px; }
         .resume-item-field { margin-bottom: 4px; font-size: 0.95em; }
@@ -83,7 +82,7 @@
             @if (!string.IsNullOrEmpty(imgSrc))
             {
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <img src="@imgSrc" alt="Profile Picture" style="width: 120px; height: 120px; object-fit: cover; border-radius: 4px; border: 1px solid #111;" />
+                    <div style="display: inline-block; width: 120px; height: 120px; background-image: url('@imgSrc'); background-size: cover; background-position: center; border-radius: 4px; border: 1px solid #111;"></div>
                 </div>
             }
             <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
@@ -114,6 +113,8 @@
             }
         </div>
     </div>
+@if (!Model.IsExport)
+{
 <script>
     window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'applyColors') {
@@ -124,5 +125,6 @@
         }
     });
 </script>
+}
 </body>
 </html>

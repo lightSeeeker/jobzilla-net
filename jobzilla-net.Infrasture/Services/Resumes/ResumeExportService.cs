@@ -66,42 +66,54 @@ public class ResumeExportService : IResumeExportService
     }
 
     /// <summary>
-    /// Replaces CSS var(--name) usages with their actual hex values for PDF engines
-    /// that lack modern CSS custom property support.
+    /// Replaces CSS var(--name) usages with their actual values for PDF engines that
+    /// lack CSS custom property support (SelectPdf drops the whole declaration, even
+    /// when a fallback argument is present).
     /// </summary>
     private string PolyfillCssVariablesForPdf(string html)
     {
         var variables = new Dictionary<string, string>();
-        var rootBlockRegex = new System.Text.RegularExpressions.Regex(@":root\s*{([^}]+)}");
-        var varDefRegex = new System.Text.RegularExpressions.Regex(@"(--[\w-]+)\s*:\s*([^;]+);");
+        var rootBlockRegex = new System.Text.RegularExpressions.Regex(@":root\s*{([^}]*)}");
+        var varDefRegex = new System.Text.RegularExpressions.Regex(@"(--[\w-]+)\s*:\s*([^;}]+);?");
+        var varUsageRegex = new System.Text.RegularExpressions.Regex(@"var\s*\(\s*(--[\w-]+)\s*(?:,\s*((?:[^()]|\([^()]*\))*))?\)");
 
-        var rootMatches = rootBlockRegex.Matches(html);
-        foreach (System.Text.RegularExpressions.Match rootMatch in rootMatches)
+        foreach (System.Text.RegularExpressions.Match rootMatch in rootBlockRegex.Matches(html))
         {
-            var block = rootMatch.Groups[1].Value;
-            var varMatches = varDefRegex.Matches(block);
-            foreach (System.Text.RegularExpressions.Match varMatch in varMatches)
+            foreach (System.Text.RegularExpressions.Match varMatch in varDefRegex.Matches(rootMatch.Groups[1].Value))
             {
-                var varName = varMatch.Groups[1].Value.Trim();
-                var varValue = varMatch.Groups[2].Value.Trim();
                 // Later blocks overwrite earlier ones (custom settings overwrite defaults)
-                variables[varName] = varValue;
+                variables[varMatch.Groups[1].Value.Trim()] = varMatch.Groups[2].Value.Trim();
             }
         }
 
-        var varUsageRegex = new System.Text.RegularExpressions.Regex(@"var\s*\(\s*(--[\w-]+)\s*\)");
+        // Definitions may reference other variables; resolve until stable.
+        for (var pass = 0; pass < 4; pass++)
+        {
+            var changed = false;
+            foreach (var key in variables.Keys.ToList())
+            {
+                variables[key] = varUsageRegex.Replace(variables[key], m =>
+                {
+                    if (variables.TryGetValue(m.Groups[1].Value, out var v)) { changed = true; return v; }
+                    if (m.Groups[2].Success) { changed = true; return m.Groups[2].Value.Trim(); }
+                    return m.Value;
+                });
+            }
+            if (!changed) break;
+        }
+
         return varUsageRegex.Replace(html, match =>
         {
-            var varName = match.Groups[1].Value.Trim();
-            return variables.TryGetValue(varName, out var val) ? val : match.Value;
+            if (variables.TryGetValue(match.Groups[1].Value, out var val)) return val;
+            return match.Groups[2].Success ? match.Groups[2].Value.Trim() : match.Value;
         });
     }
 
     /// <summary>
     /// Appends print-specific CSS so the PDF faithfully reflects the on-screen design:
-    /// zero page margin (each template owns its spacing) and forced background-color
-    /// printing (colored sidebars/headers). No page-break-avoid rules — content flows
-    /// to fill each page so faux-column backgrounds never leave an empty gap.
+    /// zero body margin (each template owns its spacing), forced background-color
+    /// printing (colored sidebars/headers), and legacy page-break hygiene so entries
+    /// stay whole — covers custom uploaded templates that skip _ResumeBaseStyles.
     /// </summary>
     private static string InjectPrintCss(string html)
     {
@@ -109,6 +121,8 @@ public class ResumeExportService : IResumeExportService
             "<style>" +
             "html,body{margin:0 !important;padding:0 !important;}" +
             "*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}" +
+            ".resume-item{page-break-inside:avoid;}" +
+            ".resume-section-title,.resume-item-header{page-break-after:avoid;}" +
             "</style>";
 
         var headCloseIndex = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);

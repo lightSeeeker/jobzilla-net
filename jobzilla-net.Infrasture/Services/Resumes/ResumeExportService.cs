@@ -53,9 +53,28 @@ public class ResumeExportService : IResumeExportService
             // force background colors to print and avoid ugly page breaks inside items.
             html = InjectPrintCss(html);
 
+            // Read the optional per-template sidebar directive (after polyfill, so the colour
+            // var is already resolved to a hex — respects the user's colour customization).
+            var underlay = ParseSidebarUnderlay(html);
+
             // Generate PDF from HTML
             var pdfBytes = await _pdfGenerator.GeneratePdfFromHtmlAsync(html, cancellationToken);
-            
+
+            // Two-column templates: paint the sidebar colour full-height behind content on every
+            // page so the left column reaches the bottom edge even on a partial last page.
+            if (pdfBytes != null && underlay != null)
+            {
+                try
+                {
+                    var (r, g, b, fraction) = underlay.Value;
+                    pdfBytes = PdfSidebarUnderlay.Apply(pdfBytes, r, g, b, fraction);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Sidebar underlay post-processing failed; returning base PDF.");
+                }
+            }
+
             return pdfBytes;
         }
         catch (Exception ex)
@@ -107,6 +126,35 @@ public class ResumeExportService : IResumeExportService
             if (variables.TryGetValue(match.Groups[1].Value, out var val)) return val;
             return match.Groups[2].Success ? match.Groups[2].Value.Trim() : match.Value;
         });
+    }
+
+    /// <summary>
+    /// Reads a template's optional sidebar-underlay directive, emitted (export only) as
+    /// <c>&lt;meta name="cvb-pdf-sidebar" content="#RRGGBB|0.35" /&gt;</c>. The colour is written
+    /// as <c>var(--x)</c> in the template so <see cref="PolyfillCssVariablesForPdf"/> resolves it
+    /// to the actual (possibly user-customized) hex before this runs. Returns null when absent.
+    /// </summary>
+    private static (int r, int g, int b, double fraction)? ParseSidebarUnderlay(string html)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(
+            html,
+            @"<meta\s+name=[""']cvb-pdf-sidebar[""']\s+content=[""']\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*\|\s*([0-9]*\.?[0-9]+)\s*[""']",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (!m.Success) return null;
+
+        var hex = m.Groups[1].Value;
+        if (hex.Length == 3)
+            hex = string.Concat(hex[0], hex[0], hex[1], hex[1], hex[2], hex[2]);
+
+        if (!double.TryParse(m.Groups[2].Value, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var fraction))
+            return null;
+        if (fraction <= 0 || fraction >= 1) return null;
+
+        var r = Convert.ToInt32(hex.Substring(0, 2), 16);
+        var g = Convert.ToInt32(hex.Substring(2, 2), 16);
+        var b = Convert.ToInt32(hex.Substring(4, 2), 16);
+        return (r, g, b, fraction);
     }
 
     /// <summary>

@@ -34,30 +34,6 @@
                     </text>
                 }
             }
-            @if (Model.IsExport)
-            {
-                <text>
-                @@page {
-                    size: A4;
-                    margin: 0;
-                }
-                /* Full-height two-column background painted on the page canvas. Chromium
-                   propagates a body/root background across the WHOLE sheet on every page
-                   (including the page-margin area), so the dark sidebar column reaches all
-                   four edges on every page — no gaps, no fixed-element hacks. Page margin
-                   is intentionally kept at 0 here: the sidebar's colored background is
-                   sourced from this html/body canvas, NOT from .sidebar's own box, so it
-                   cannot be affected by any padding/margin applied to .sidebar or
-                   .main-content below. This is what keeps the left bar fixed top-to-bottom
-                   on every page regardless of content spacing changes. */
-                html, body {
-                    margin: 0;
-                    background: linear-gradient(to right, var(--mp-sidebar-bg) 0%, var(--mp-sidebar-bg) 32%, #ffffff 32%, #ffffff 100%);
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
-                }
-                </text>
-            }
             .sidebar {
                 padding: 0 28px;
                 width: 32%;
@@ -65,13 +41,13 @@
                 box-sizing: border-box;
                 /* Export: horizontal padding only; vertical spacing comes from the page
                    margin so it's uniform on every page. Preview: full padding (card look). */
-                @if (Model.IsExport) { <text>padding: 0 28px; background: transparent;</text> } else { <text>padding: 40px 28px; background: var(--mp-sidebar-bg);</text> }
+                @if (Model.IsExport) { <text>padding: 0 28px; background: var(--mp-sidebar-bg);</text> } else { <text>padding: 40px 28px; background: var(--mp-sidebar-bg);</text> }
             }
             .main-content {
                 padding: 0 34px;
                 width: 68%;
                 box-sizing: border-box;
-                @if (Model.IsExport) { <text>padding: 0 34px; background: transparent;</text> } else { <text>padding: 40px 34px; background: #fff;</text> }
+                @if (Model.IsExport) { <text>padding: 0 34px; background: #fff;</text> } else { <text>padding: 40px 34px; background: #fff;</text> }
             }
             .name {
                 font-size: 2.2em;
@@ -82,6 +58,7 @@
             }
             .title {
                 font-size: 1.1em;
+
                 color: var(--mp-accent);
                 margin-bottom: 30px;
                 font-weight: 500;
@@ -237,6 +214,17 @@
                     padding-top: 12mm;
                     padding-bottom: 12mm;
                 }
+                /* SelectPdf has no flex/gradient: two columns via a fixed table, sidebar
+                   color painted on the cell itself (min-height on .resume-container makes
+                   it reach the page bottom on single-page resumes). */
+                .resume-container { display: table; width: 100%; table-layout: fixed; }
+                .sidebar      { display: table-cell; vertical-align: top; width: 32%; background-color: var(--mp-sidebar-bg); }
+                .main-content { display: table-cell; vertical-align: top; width: 68%; background: #fff; }
+                .main-content .resume-item-header { display: table; width: 100%; }
+                .main-content .resume-item-header > .resume-item-title { display: table-cell; }
+                .main-content .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+                .resume-skills-list { display: block; }
+                .resume-skill-tag   { display: inline-block; }
                 </text>
             }
     </style>

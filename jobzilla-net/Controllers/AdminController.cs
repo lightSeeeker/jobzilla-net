@@ -498,7 +498,7 @@ public class AdminController : Controller
     }
 
     // Isolated PDF test: renders one template (with sample data) straight through the
-    // configured IPdfGenerator (SelectPdf or Browserless) and returns the PDF. Use it to
+    // IPdfGenerator (in-process SelectPdf) and returns the PDF. Use it to
     // verify the PDF engine end-to-end without touching the real candidate export flow.
     [HttpGet]
     public async Task<IActionResult> TemplatePreviewPdf(int id, CancellationToken ct)

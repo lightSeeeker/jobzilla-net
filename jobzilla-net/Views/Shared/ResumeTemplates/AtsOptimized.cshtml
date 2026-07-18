@@ -64,6 +64,15 @@
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #f0f0f0; }
         .btn { padding: 10px 20px; background: var(--ats-primary); color: white; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: sans-serif; }
         .btn-secondary { background: #555; }
+        @if (Model.IsExport)
+        {
+            <text>
+            /* SelectPdf export: item header via table (was flex). */
+            .resume-item-header { display: table; width: 100%; }
+            .resume-item-header > .resume-item-title { display: table-cell; }
+            .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+            </text>
+        }
     </style>
     @Html.Raw(Model.RenderColorVarsCss())
 </head>

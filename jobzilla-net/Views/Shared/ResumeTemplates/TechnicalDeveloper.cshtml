@@ -80,6 +80,18 @@
         .btn-secondary { background: #333; }
         
         a.resume-link { color: #3794ff; }
+        @if (Model.IsExport)
+        {
+            <text>
+            /* SelectPdf export: no flex — columns via table. */
+            .contact-info { display: block; }
+            .resume-item-header { display: table; width: 100%; }
+            .resume-item-header > .resume-item-title { display: table-cell; }
+            .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+            .resume-skills-list { display: block; }
+            .resume-skill-tag   { display: inline-block; }
+            </text>
+        }
     </style>
     @Html.Raw(Model.RenderColorVarsCss())
 </head>
@@ -87,8 +99,8 @@
 
 
     <div class="resume-container">
-        <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
+        <div class="header" style="@(Model.IsExport ? "display: table; width: 100%;" : "display: flex; justify-content: space-between; align-items: flex-start;")">
+            <div style="@(Model.IsExport ? "display: table-cell; vertical-align: top;" : "")">
                 <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
                 <div class="title">// @(Model.Profile?.ProfessionalTitle ?? "Professional Title")</div>
             </div>
@@ -97,7 +109,7 @@
             }
             @if (!string.IsNullOrEmpty(imgSrc))
             {
-                <div style="flex-shrink: 0; margin-left: 20px;">
+                <div style="@(Model.IsExport ? "display: table-cell; vertical-align: top; width: 100px; padding-left: 20px;" : "flex-shrink: 0; margin-left: 20px;")">
                     <div style="width: 100px; height: 100px; background-image: url('@imgSrc'); background-size: cover; background-position: center; border-radius: 8px; border: 2px dashed #569cd6;"></div>
                 </div>
             }

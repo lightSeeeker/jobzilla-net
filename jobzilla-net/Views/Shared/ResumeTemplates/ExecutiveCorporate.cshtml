@@ -68,6 +68,18 @@
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #fff; font-family: Arial, sans-serif; }
         .btn { padding: 10px 20px; background: var(--ec-primary); color: white; text-decoration: none; border-radius: 0; margin: 0 5px; display: inline-block; cursor: pointer; border: none; }
         .btn-secondary { background: #555; }
+        @if (Model.IsExport)
+        {
+            <text>
+            /* SelectPdf export: no flex. */
+            .contact-info { display: block; }
+            .resume-item-header { display: table; width: 100%; }
+            .resume-item-header > .resume-item-title { display: table-cell; }
+            .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+            .resume-skills-list { display: block; }
+            .resume-skill-tag   { display: inline-block; }
+            </text>
+        }
     </style>
     @Html.Raw(Model.RenderColorVarsCss())
 </head>

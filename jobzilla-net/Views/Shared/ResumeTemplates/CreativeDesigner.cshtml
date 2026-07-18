@@ -73,6 +73,19 @@
         .action-bar { text-align: center; margin-bottom: 20px; padding: 20px; background: #fff; }
         .btn { padding: 10px 20px; background: var(--cd-accent); color: white; text-decoration: none; border-radius: 25px; margin: 0 5px; font-weight: 600; display: inline-block; font-family: sans-serif; border: none; cursor: pointer; }
         .btn-secondary { background: #555; }
+        @if (Model.IsExport)
+        {
+            <text>
+            /* SelectPdf export: no flex/gradient — solid header, columns via table. */
+            .header { background: var(--cd-accent); }
+            .contact-info { display: block; }
+            .resume-item-header { display: table; width: 100%; }
+            .resume-item-header > .resume-item-title { display: table-cell; }
+            .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+            .resume-skills-list { display: block; }
+            .resume-skill-tag   { display: inline-block; }
+            </text>
+        }
     </style>
     @Html.Raw(Model.RenderColorVarsCss())
 </head>
@@ -80,8 +93,8 @@
 
 
     <div class="resume-container">
-        <div class="header" style="display: flex; align-items: center; justify-content: space-between;">
-            <div>
+        <div class="header" style="@(Model.IsExport ? "display: table; width: 100%;" : "display: flex; align-items: center; justify-content: space-between;")">
+            <div style="@(Model.IsExport ? "display: table-cell; vertical-align: middle;" : "")">
                 <h1 class="name">@(Model.Profile?.FullName ?? "Your Name")</h1>
                 <div class="title">@(Model.Profile?.ProfessionalTitle ?? "Professional Title")</div>
             </div>
@@ -90,7 +103,7 @@
             }
             @if (!string.IsNullOrEmpty(imgSrc))
             {
-                <div style="flex-shrink: 0; margin-left: 20px;">
+                <div style="@(Model.IsExport ? "display: table-cell; vertical-align: middle; width: 130px; padding-left: 20px;" : "flex-shrink: 0; margin-left: 20px;")">
                     <div style="width: 130px; height: 130px; background-image: url('@imgSrc'); background-size: cover; background-position: center; border-radius: 50%; border: 4px solid rgba(255,255,255,0.3);"></div>
                 </div>
             }

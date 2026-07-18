@@ -57,6 +57,9 @@
         @if (Model.IsExport)
         {
             <text>
+            /* Top margin on every page. NOTE: SelectPdf ignores @@page — this only takes
+               effect in engines that honour it (browser print / Chromium). */
+            @@page { margin-top: 14mm; }
             /* SelectPdf: no flex — item header via table. */
             .resume-item-header { display: table; width: 100%; }
             .resume-item-header > .resume-item-title { display: table-cell; }

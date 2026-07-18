@@ -1,0 +1,220 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+@{
+    Layout = null;
+    var sections = Model.GetUnifiedSections().ToList();
+    var sidebarSections = sections.Where(s => s.IsVisible && (s.ColumnPlacement == "Sidebar"
+        || (string.IsNullOrEmpty(s.ColumnPlacement) && (s.SectionType == ResumeBuilderSectionType.Skills || s.SectionType == ResumeBuilderSectionType.Languages)))).ToList();
+    var mainSections = sections.Where(s => s.IsVisible && !sidebarSections.Contains(s)).ToList();
+    var imgSrc = Model.GetProfileImageDataUri(WebHostEnvironment.WebRootPath);
+    var fullName = Model.HeaderName;
+    var initials = string.Concat(fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+        .Take(2).Select(w => char.ToUpper(w[0])));
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@fullName - Corporate</title>
+    @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
+    <style>
+        :root {
+            --cb-ink: #172033;
+            --cb-accent: #246bfd;
+            --cb-muted: #63708a;
+            --cb-line: #dce3ef;
+            --cb-side-title: #9fbeff;
+        }
+        .resume-container {
+            font-family: var(--cvb-base-font);
+            color: var(--cb-ink);
+            line-height: var(--cvb-line-height);
+            box-sizing: border-box;
+            @if (Model.IsExport)
+            {
+                <text>display: table; width: 100%; table-layout: fixed;</text>
+            }
+            else
+            {
+                <text>display: grid; grid-template-columns: 35% 65%; min-height: 297mm; max-width: 850px; margin: 40px auto; background: #fff; box-shadow: 0 14px 45px rgba(21,35,62,.14);</text>
+            }
+        }
+        .sidebar {
+            background: var(--cb-ink);
+            color: #fff;
+            box-sizing: border-box;
+            @if (Model.IsExport) { <text>display: table-cell; vertical-align: top; width: 35%; padding: 30px 26px;</text> } else { <text>padding: 36px 29px;</text> }
+        }
+        .content {
+            background: #fff;
+            box-sizing: border-box;
+            @if (Model.IsExport) { <text>display: table-cell; vertical-align: top; width: 65%; padding: 32px 40px;</text> } else { <text>padding: 38px 43px;</text> }
+        }
+
+        /* Sidebar head */
+        .initials {
+            width: 74px; height: 74px; display: inline-block; text-align: center; line-height: 70px;
+            border: 2px solid rgba(255,255,255,.7); border-radius: 50%;
+            font-size: 22px; font-weight: 700; letter-spacing: 2px; color: #fff; margin-bottom: 22px;
+        }
+        .avatar {
+            width: 78px; height: 78px; display: inline-block; border-radius: 50%;
+            background-size: cover; background-position: center; border: 2px solid rgba(255,255,255,.7); margin-bottom: 22px;
+        }
+        .contact { font-size: 12px; line-height: 1.5; margin-bottom: 4px; }
+        .contact .row { margin: 8px 0; color: rgba(255,255,255,.86); word-break: break-word; }
+        .contact .ico { display: inline-block; width: 16px; color: var(--cb-side-title); vertical-align: middle; margin-right: 7px; }
+        .contact .ico svg { width: 13px; height: 13px; fill: currentColor; vertical-align: middle; }
+        .contact .txt { vertical-align: middle; }
+
+        /* Section titles */
+        .resume-section-title {
+            color: var(--cb-accent);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--cb-line);
+            padding-bottom: 7px;
+            margin: 26px 0 14px;
+        }
+        .sidebar .resume-section-title {
+            color: var(--cb-side-title);
+            border-color: rgba(255,255,255,.16);
+            margin-top: 24px;
+        }
+
+        /* Header (content) */
+        .cb-name { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; color: var(--cb-ink); }
+        .cb-role { color: var(--cb-accent); font-size: 12px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; margin: 8px 0 14px; }
+        .cb-summary { color: #59667b; font-size: 13px; line-height: 1.6; margin-bottom: 6px; }
+
+        /* Items — timeline look in main column only */
+        .resume-item { margin-bottom: var(--cvb-item-margin); }
+        .content .resume-item {
+            position: relative;
+            padding-left: 18px;
+            border-left: 2px solid #dce7ff;
+        }
+        .content .resume-item:before {
+            content: ""; position: absolute; left: -6px; top: 5px;
+            width: 10px; height: 10px; border-radius: 50%; background: var(--cb-accent);
+        }
+        .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+        .resume-item-title { font-size: 14px; font-weight: 700; color: var(--cb-ink); }
+        .resume-item-subtitle { color: var(--cb-accent); font-size: 12.5px; font-weight: 600; margin: 2px 0 5px; }
+        .resume-item-date { color: var(--cb-muted); font-size: 11.5px; font-weight: 600; white-space: nowrap; text-align: right; }
+        .resume-item-desc { color: #4d5a70; font-size: 12.5px; line-height: 1.55; }
+        .resume-item-field { font-size: 12.5px; margin-bottom: 3px; }
+        .resume-field-label { font-weight: 600; color: var(--cb-accent); margin-right: 5px; }
+        .resume-link { color: var(--cb-accent); text-decoration: none; }
+
+        /* Sidebar item overrides */
+        .sidebar .resume-item { padding-left: 0; border-left: none; }
+        .sidebar .resume-item:before { display: none; }
+        .sidebar .resume-item-header { display: block; }
+        .sidebar .resume-item-title { color: #fff; font-size: 12.5px; }
+        .sidebar .resume-item-date { color: rgba(255,255,255,.72); text-align: left; }
+        .sidebar .resume-item-subtitle,
+        .sidebar .resume-item-desc,
+        .sidebar .resume-item-field { color: rgba(255,255,255,.78); }
+        .sidebar .resume-field-label { color: #fff; }
+
+        /* Skills chips */
+        .resume-skills-list { display: flex; flex-wrap: wrap; margin-top: 4px; }
+        .sidebar .resume-skill-tag {
+            display: inline-block; padding: 4px 8px; margin: 0 4px 6px 0;
+            background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16);
+            border-radius: 4px; color: #fff; font-size: 11px;
+        }
+        .content .resume-skill-tag {
+            display: inline-block; padding: 4px 9px; margin: 0 5px 6px 0;
+            background: #eef3ff; border: 1px solid #dce7ff; border-radius: 4px;
+            color: var(--cb-accent); font-size: 11.5px;
+        }
+
+        .resume-references-grid { display: block; }
+        .resume-reference-item { margin-bottom: 12px; font-size: 12.5px; }
+
+        @if (Model.IsExport)
+        {
+            <text>
+            /* SelectPdf export: solid dark page canvas fills EVERY page edge-to-edge (left column
+               reads full-height on all pages + trailing area); white content sits on top as a
+               table cell. No grid/flex/gradient — two columns via fixed table, header via table. */
+            html { background: var(--cb-ink); }
+            .resume-skills-list { display: block; }
+            .resume-skill-tag { display: inline-block; }
+            .content .resume-item-header { display: table; width: 100%; }
+            .content .resume-item-header > .resume-item-title { display: table-cell; }
+            .content .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+            </text>
+        }
+    </style>
+    @Html.Raw(Model.RenderColorVarsCss())
+</head>
+<body>
+    <div class="resume-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            @if (!string.IsNullOrEmpty(imgSrc))
+            {
+                <div class="avatar" style="background-image: url('@imgSrc');"></div>
+            }
+            else
+            {
+                <div class="initials">@initials</div>
+            }
+            <div class="contact">
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderPhone))
+                {
+                    <div class="row"><span class="ico"><svg viewBox="0 0 512 512"><path d="M164 25 44 65c-10 3-17 13-16 24 8 100 51 194 122 265s165 114 265 122c11 1 21-6 24-16l40-120c3-9-1-19-9-24l-115-49c-8-3-17-1-23 5l-46 47c-63-33-114-84-147-147l47-46c6-6 8-15 5-23L188 34c-5-8-15-12-24-9z"/></svg></span><span class="txt">@Model.HeaderPhone</span></div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderEmail))
+                {
+                    <div class="row"><span class="ico"><svg viewBox="0 0 512 512"><path d="M48 96c-18 0-32 14-32 32v18l240 146 240-146v-18c0-18-14-32-32-32H48zm448 92L256 334 16 188v196c0 18 14 32 32 32h416c18 0 32-14 32-32V188z"/></svg></span><span class="txt">@Model.HeaderEmail</span></div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderLocation))
+                {
+                    <div class="row"><span class="ico"><svg viewBox="0 0 384 512"><path d="M192 0C86 0 0 86 0 192c0 141 176 306 184 313 5 4 12 4 16 0 8-7 184-172 184-313C384 86 298 0 192 0zm0 272a80 80 0 110-160 80 80 0 010 160z"/></svg></span><span class="txt">@Model.HeaderLocation</span></div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderLinkedIn))
+                {
+                    <div class="row"><span class="ico"><svg viewBox="0 0 448 512"><path d="M100 448H7V149h93v299zM53 108a54 54 0 110-108 54 54 0 010 108zM448 448h-92V302c0-35-1-79-48-79s-56 38-56 76v149h-92V149h89v41h1c12-23 42-48 87-48 93 0 110 61 110 141v165z"/></svg></span><span class="txt">@Model.HeaderLinkedIn</span></div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderWebsite))
+                {
+                    <div class="row"><span class="ico"><svg viewBox="0 0 512 512"><path d="M256 0C114 0 0 114 0 256s114 256 256 256 256-114 256-256S398 0 256 0zm163 152h-70c-8-31-19-58-33-80 43 15 79 44 103 80zM256 48c19 0 45 33 59 88H197c14-55 40-88 59-88zM48 256c0-17 2-33 6-48h82c-2 16-3 32-3 48s1 32 3 48H54c-4-15-6-31-6-48zm16 104h70c8 31 19 58 33 80-44-15-79-44-103-80zm72-208H66c24-36 59-65 103-80-14 22-25 49-33 80zm120 312c-19 0-45-33-59-88h118c-14 55-40 88-59 88zm69-136H187c-2-16-3-32-3-48s1-32 3-48h138c2 16 3 32 3 48s-1 32-3 48zm11 104c14-22 25-49 33-80h70c-24 36-60 65-103 80zm48-128c2-16 3-32 3-48s-1-32-3-48h82c4 15 6 31 6 48s-2 33-6 48h-82z"/></svg></span><span class="txt">@Model.HeaderWebsite</span></div>
+                }
+            </div>
+            @foreach (var sec in sidebarSections)
+            {
+                <div class="cvb-section-wrapper" data-section-id="@sec.Id">
+                    <div class="resume-section-title">@sec.Title</div>
+                    @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_SectionBody.cshtml", sec)
+                </div>
+            }
+        </div>
+        <!-- CONTENT -->
+        <div class="content">
+            <h1 class="cb-name">@fullName</h1>
+            @if (!string.IsNullOrWhiteSpace(Model.HeaderTitle))
+            {
+                <div class="cb-role">@Model.HeaderTitle</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.HeaderSummary))
+            {
+                <div class="cb-summary">@Html.Raw(Model.HeaderSummary.Replace("\n", "<br/>"))</div>
+            }
+            @foreach (var sec in mainSections)
+            {
+                <div class="cvb-section-wrapper" data-section-id="@sec.Id">
+                    <div class="resume-section-title">@sec.Title</div>
+                    @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_SectionBody.cshtml", sec)
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

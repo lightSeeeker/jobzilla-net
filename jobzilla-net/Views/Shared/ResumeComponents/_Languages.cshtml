@@ -1,0 +1,17 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+@foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+{
+    var lang = item.GetValue("Language");
+    var prof = item.GetValue("Proficiency");
+    if (string.IsNullOrWhiteSpace(lang)) { continue; }
+    <div class="resume-item">
+        <div class="resume-item-header">
+            <span class="resume-item-title">@lang</span>
+            @if (!string.IsNullOrWhiteSpace(prof))
+            {
+                <span class="resume-item-date">@prof</span>
+            }
+        </div>
+    </div>
+}

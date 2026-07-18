@@ -81,9 +81,9 @@
                             <p class="text-muted small mb-3">Drag to reorder or move sections between columns.</p>
                             
                             @{
-                                bool isMultiColumn = ViewBag.TemplateSlug == "modernprofessional";
+                                bool isMultiColumn = ViewBag.TemplateSlug == "classictwocolumn" || ViewBag.TemplateSlug == "corporateblue";
                                 var allSections = Model.Document?.Sections ?? new List<jobzilla_net.Application.Resumes.Dtos.ResumeSection>();
-                                var sidebarSections = allSections.Where(s => s.ColumnPlacement == "Sidebar" || (string.IsNullOrEmpty(s.ColumnPlacement) && s.SectionType.ToString() == "Skills")).OrderBy(s => s.DisplayOrder).ToList();
+                                var sidebarSections = allSections.Where(s => s.ColumnPlacement == "Sidebar" || (string.IsNullOrEmpty(s.ColumnPlacement) && (s.SectionType.ToString() == "Skills" || s.SectionType.ToString() == "Languages"))).OrderBy(s => s.DisplayOrder).ToList();
                                 var mainSections = allSections.Where(s => !sidebarSections.Contains(s)).OrderBy(s => s.DisplayOrder).ToList();
                             }
 

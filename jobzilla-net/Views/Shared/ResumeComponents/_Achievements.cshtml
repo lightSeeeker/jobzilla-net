@@ -1,0 +1,30 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+@{
+    string FormatDate(string? val, string fmt = "MMM yyyy")
+    {
+        if (string.IsNullOrWhiteSpace(val)) return "";
+        if (DateTime.TryParse(val, out var d)) return d.ToString(fmt);
+        return val;
+    }
+}
+@foreach (var item in Model.Items.OrderBy(i => i.DisplayOrder))
+{
+    var title = item.GetValue("Title");
+    var date = FormatDate(item.GetValue("Date"));
+    var desc = item.GetValue("Description")?.Replace("<", "&lt;").Replace(">", "&gt;");
+    if (string.IsNullOrWhiteSpace(title)) { continue; }
+    <div class="resume-item">
+        <div class="resume-item-header">
+            <span class="resume-item-title">@title</span>
+            @if (!string.IsNullOrWhiteSpace(date))
+            {
+                <span class="resume-item-date">@date</span>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(desc))
+        {
+            <div class="resume-item-desc">@Html.Raw(desc.Replace("\n", "<br/>"))</div>
+        }
+    </div>
+}

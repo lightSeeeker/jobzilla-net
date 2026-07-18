@@ -22,34 +22,18 @@ public class SelectPdfGenerator : IPdfGenerator
     public Task<byte[]> GeneratePdfFromHtmlAsync(string htmlContent, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Generating PDF from HTML string using SelectPdf.");
-
         var converter = new HtmlToPdf();
-
         converter.Options.PdfPageSize = PdfPageSize.A4;
         converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
-
-        // This engine ignores @page rules, so the 14mm vertical page margin declared in
-        // _ResumeBaseStyles must be emulated here (40pt ≈ 14mm) — without it, content
-        // touches the paper edge on every page. Left/right stay 0 so full-bleed sidebar
-        // designs reach the side edges; templates own their horizontal padding.
         converter.Options.MarginLeft = 0;
         converter.Options.MarginRight = 0;
-        converter.Options.MarginTop = 40;
+        converter.Options.MarginTop = 0;
         converter.Options.MarginBottom = 40;
-
-        // Render at true page width so the design is 1:1 with the page.
         converter.Options.WebPageWidth = A4WidthPx;
-        converter.Options.WebPageHeight = 0; // auto — let content flow across pages
-
-        // Give Google Fonts time to download before rasterizing; @import never loads in
-        // this engine (templates use <link>), and even <link> needs a beat on cold cache.
+        converter.Options.WebPageHeight = 0;
         converter.Options.MinPageLoadTime = 2;
-
-        // Templates are static HTML/CSS; no JS needed (faster, safer).
         converter.Options.JavaScriptEnabled = false;
-
         var doc = converter.ConvertHtmlString(htmlContent);
-
         try
         {
             using var stream = new MemoryStream();

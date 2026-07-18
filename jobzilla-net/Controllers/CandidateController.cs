@@ -405,45 +405,45 @@ public class CandidateController : Controller
     {
         var palettes = new Dictionary<string, object[]>
         {
-            ["modernprofessional"] = new object[]
+            ["atsminimal"] = new object[]
             {
-                new { name = "Navy Teal",        swatch = "#48a9a6", colors = new { __mp_sidebar_bg = "#2b3a4a", __mp_accent = "#48a9a6" } },
-                new { name = "Midnight Gold",    swatch = "#e2b04f", colors = new { __mp_sidebar_bg = "#1a1a2e", __mp_accent = "#e2b04f" } },
-                new { name = "Forest Sage",      swatch = "#7bc8a4", colors = new { __mp_sidebar_bg = "#2d4a3e", __mp_accent = "#7bc8a4" } },
-                new { name = "Slate Coral",      swatch = "#e8837a", colors = new { __mp_sidebar_bg = "#3d3d5c", __mp_accent = "#e8837a" } },
-                new { name = "Charcoal Crimson", swatch = "#c0392b", colors = new { __mp_sidebar_bg = "#2c1810", __mp_accent = "#c0392b" } },
+                new { name = "Pure Black", swatch = "#000000", colors = new { __atsm_accent = "#000000" } },
+                new { name = "Navy",       swatch = "#1a3a5c", colors = new { __atsm_accent = "#1a3a5c" } },
+                new { name = "Dark Green", swatch = "#1a4a1e", colors = new { __atsm_accent = "#1a4a1e" } },
+                new { name = "Deep Red",   swatch = "#7a0000", colors = new { __atsm_accent = "#7a0000" } },
+                new { name = "Slate",      swatch = "#2c3e50", colors = new { __atsm_accent = "#2c3e50" } },
             },
-            ["executivecorporate"] = new object[]
+            ["professionalclean"] = new object[]
             {
-                new { name = "Classic Black",  swatch = "#111111", colors = new { __ec_primary = "#111111", __ec_accent = "#444444" } },
-                new { name = "Navy Blue",      swatch = "#2980b9", colors = new { __ec_primary = "#1a3a5c", __ec_accent = "#2980b9" } },
-                new { name = "Burgundy",       swatch = "#8e1c1c", colors = new { __ec_primary = "#4a0e0e", __ec_accent = "#8e1c1c" } },
-                new { name = "Forest",         swatch = "#2d7a3a", colors = new { __ec_primary = "#1a3a1e", __ec_accent = "#2d7a3a" } },
-                new { name = "Warm Graphite",  swatch = "#7f8c8d", colors = new { __ec_primary = "#2c2c2c", __ec_accent = "#7f8c8d" } },
+                new { name = "Corporate Blue", swatch = "#2e6da4", colors = new { __pc_primary = "#1f3a5f", __pc_accent = "#2e6da4" } },
+                new { name = "Classic Black",  swatch = "#444444", colors = new { __pc_primary = "#1a1a1a", __pc_accent = "#555555" } },
+                new { name = "Burgundy",       swatch = "#8e1c1c", colors = new { __pc_primary = "#4a0e0e", __pc_accent = "#8e1c1c" } },
+                new { name = "Forest",         swatch = "#2d7a3a", colors = new { __pc_primary = "#1a3a1e", __pc_accent = "#2d7a3a" } },
+                new { name = "Teal",           swatch = "#0f766e", colors = new { __pc_primary = "#0b3d3a", __pc_accent = "#0f766e" } },
             },
-            ["atsoptimized"] = new object[]
+            ["classictwocolumn"] = new object[]
             {
-                new { name = "Pure Black",  swatch = "#000000", colors = new { __ats_primary = "#000000" } },
-                new { name = "Navy",        swatch = "#1a3a5c", colors = new { __ats_primary = "#1a3a5c" } },
-                new { name = "Dark Green",  swatch = "#1a4a1e", colors = new { __ats_primary = "#1a4a1e" } },
-                new { name = "Deep Red",    swatch = "#7a0000", colors = new { __ats_primary = "#7a0000" } },
-                new { name = "Slate",       swatch = "#2c3e50", colors = new { __ats_primary = "#2c3e50" } },
+                new { name = "Slate Blue",   swatch = "#2e6da4", colors = new { __c2_accent = "#2e6da4", __c2_sidebar_bg = "#f4f6f8" } },
+                new { name = "Teal",         swatch = "#0f766e", colors = new { __c2_accent = "#0f766e", __c2_sidebar_bg = "#eef4f3" } },
+                new { name = "Burgundy",     swatch = "#8e1c1c", colors = new { __c2_accent = "#8e1c1c", __c2_sidebar_bg = "#f7f0f0" } },
+                new { name = "Forest",       swatch = "#2d7a3a", colors = new { __c2_accent = "#2d7a3a", __c2_sidebar_bg = "#eef5ef" } },
+                new { name = "Graphite",     swatch = "#374151", colors = new { __c2_accent = "#374151", __c2_sidebar_bg = "#f2f3f5" } },
             },
-            ["creativedesigner"] = new object[]
+            ["modernaccent"] = new object[]
             {
-                new { name = "Sunset Orange",  swatch = "#ff7e5f", colors = new { __cd_header_from = "#ff7e5f", __cd_header_to = "#feb47b", __cd_accent = "#ff7e5f" } },
-                new { name = "Purple Passion", swatch = "#8e44ad", colors = new { __cd_header_from = "#8e44ad", __cd_header_to = "#a569bd", __cd_accent = "#8e44ad" } },
-                new { name = "Ocean Blue",     swatch = "#1a6fa8", colors = new { __cd_header_from = "#1a6fa8", __cd_header_to = "#3498db", __cd_accent = "#1a6fa8" } },
-                new { name = "Emerald",        swatch = "#1a7a3a", colors = new { __cd_header_from = "#1a7a3a", __cd_header_to = "#27ae60", __cd_accent = "#1a7a3a" } },
-                new { name = "Rose Gold",      swatch = "#c0392b", colors = new { __cd_header_from = "#c0392b", __cd_header_to = "#e74c3c", __cd_accent = "#c0392b" } },
+                new { name = "Emerald",   swatch = "#16a085", colors = new { __ma_accent = "#16a085" } },
+                new { name = "Indigo",    swatch = "#4f46e5", colors = new { __ma_accent = "#4f46e5" } },
+                new { name = "Coral",     swatch = "#e8583f", colors = new { __ma_accent = "#e8583f" } },
+                new { name = "Ocean",     swatch = "#0369a1", colors = new { __ma_accent = "#0369a1" } },
+                new { name = "Plum",      swatch = "#7e22ce", colors = new { __ma_accent = "#7e22ce" } },
             },
-            ["technicaldeveloper"] = new object[]
+            ["corporateblue"] = new object[]
             {
-                new { name = "VS Dark",        swatch = "#4ec9b0", colors = new { __td_bg = "#1e1e1e", __td_name = "#ce9178", __td_keyword = "#569cd6", __td_fn = "#4ec9b0", __td_section = "#c586c0" } },
-                new { name = "Monokai",        swatch = "#a6e22e", colors = new { __td_bg = "#272822", __td_name = "#f92672", __td_keyword = "#66d9ef", __td_fn = "#a6e22e", __td_section = "#fd971f" } },
-                new { name = "Dracula",        swatch = "#50fa7b", colors = new { __td_bg = "#282a36", __td_name = "#ff79c6", __td_keyword = "#8be9fd", __td_fn = "#50fa7b", __td_section = "#bd93f9" } },
-                new { name = "Solarized Dark", swatch = "#859900", colors = new { __td_bg = "#002b36", __td_name = "#268bd2", __td_keyword = "#2aa198", __td_fn = "#859900", __td_section = "#d33682" } },
-                new { name = "Nord",           swatch = "#a3be8c", colors = new { __td_bg = "#2e3440", __td_name = "#88c0d0", __td_keyword = "#81a1c1", __td_fn = "#a3be8c", __td_section = "#b48ead" } },
+                new { name = "Royal Blue", swatch = "#246bfd", colors = new { __cb_ink = "#172033", __cb_accent = "#246bfd", __cb_side_title = "#9fbeff" } },
+                new { name = "Teal Slate",  swatch = "#0ea5a4", colors = new { __cb_ink = "#132a2e", __cb_accent = "#0ea5a4", __cb_side_title = "#7fe0dd" } },
+                new { name = "Violet Night", swatch = "#7c5cff", colors = new { __cb_ink = "#1c1830", __cb_accent = "#7c5cff", __cb_side_title = "#c3b5ff" } },
+                new { name = "Crimson Ink",  swatch = "#e0455e", colors = new { __cb_ink = "#241419", __cb_accent = "#e0455e", __cb_side_title = "#ffb3bf" } },
+                new { name = "Graphite Amber", swatch = "#f0a441", colors = new { __cb_ink = "#20242b", __cb_accent = "#f0a441", __cb_side_title = "#ffd79c" } },
             },
         };
 

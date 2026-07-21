@@ -1,0 +1,115 @@
+@model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
+@{
+    Layout = null;
+    var sections = Model.GetUnifiedSections();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.HeaderName - Professional</title>
+    @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_ResumeBaseStyles.cshtml", Model)
+    <style>
+        :root {
+            --pc-primary: #1f3a5f;
+            --pc-accent: #2e6da4;
+        }
+        .resume-container {
+            font-family: var(--cvb-base-font);
+            color: #2b2b2b;
+            line-height: var(--cvb-line-height);
+            background-color: #fff;
+            @if (Model.IsExport) { <text>padding: 0;</text> } else { <text>box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 850px; margin: 40px auto; min-height: 1100px;</text> }
+        }
+        .header {
+            background-color: var(--pc-primary);
+            color: #fff;
+            padding: 26px 32px;
+            /* Capsule: inset from the edges + top spacing + rounded corners. */
+            margin: 40px 40px 24px;
+            border-radius: 18px;
+        }
+        .name { font-size: 28px; font-weight: 700; margin: 0 0 4px; letter-spacing: 0.5px; color: #fff; }
+        .role { font-size: 15px; color: #e7eef6; margin-bottom: 10px; font-weight: 500; }
+        .contact-info { font-size: 12.5px; color: #dbe6f2; }
+        .contact-info span { margin-right: 4px; }
+        .body-pad { @if (Model.IsExport) { <text>padding: 0 40px;</text> } else { <text>padding: 0 40px 40px;</text> } }
+
+        .resume-section-title {
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 700;
+            color: var(--pc-primary);
+            border-bottom: 2px solid var(--pc-accent);
+            padding-bottom: 4px;
+            margin-bottom: var(--cvb-item-margin);
+            margin-top: var(--cvb-section-margin);
+        }
+        .resume-item { margin-bottom: var(--cvb-item-margin); }
+        .resume-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .resume-item-title { font-weight: 700; font-size: 14.5px; color: #1c1c1c; }
+        .resume-item-date { font-size: 12.5px; color: #666; text-align: right; }
+        .resume-item-subtitle { font-size: 13px; color: var(--pc-accent); margin-bottom: 5px; font-weight: 600; }
+        .resume-item-desc { font-size: 13px; color: #3a3a3a; }
+        .resume-item-field { font-size: 13px; margin-bottom: 3px; }
+        .resume-field-label { font-weight: 600; color: var(--pc-primary); margin-right: 5px; }
+        .resume-link { color: var(--pc-accent); text-decoration: none; }
+
+        .resume-skills-list { display: block; }
+        .resume-skill-tag { display: inline-block; background: #eef3f9; color: var(--pc-primary); padding: 3px 10px; border-radius: 3px; font-size: 12.5px; margin: 0 6px 6px 0; }
+
+        .resume-references-grid { display: block; }
+        .resume-reference-item { display: inline-block; width: 48%; vertical-align: top; margin: 0 1% 12px 0; box-sizing: border-box; font-size: 13px; }
+        @if (Model.IsExport)
+        {
+            <text>
+            /* Top margin on every page. NOTE: SelectPdf ignores @@page — this only takes
+               effect in engines that honour it (browser print / Chromium). */
+            @@page { margin-top: 14mm; }
+            .resume-item-header { display: table; width: 100%; }
+            .resume-item-header > .resume-item-title { display: table-cell; }
+            .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
+            .resume-skill-tag { display: inline-block; }
+            </text>
+        }
+    </style>
+    @Html.Raw(Model.RenderColorVarsCss())
+</head>
+<body>
+    <div class="resume-container">
+        <div class="header">
+            <h1 class="name">@Model.HeaderName</h1>
+            @if (!string.IsNullOrWhiteSpace(Model.HeaderTitle))
+            {
+                <div class="role">@Model.HeaderTitle</div>
+            }
+            <div class="contact-info">
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderEmail)) { <span>Email: </span> <span>@Model.HeaderEmail</span> }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderPhone)) { <span>Phone: </span><span>&nbsp;•&nbsp; @Model.HeaderPhone</span> }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderLocation)) { <span>Location: </span> <span>&nbsp;•&nbsp; @Model.HeaderLocation</span> }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderLinkedIn)) { <span>Linkedin: </span><span>&nbsp;•&nbsp; @Model.HeaderLinkedIn</span> }
+                @if (!string.IsNullOrWhiteSpace(Model.HeaderWebsite)) { <span>Website: </span><span>&nbsp;•&nbsp; @Model.HeaderWebsite</span> }
+            </div>
+        </div>
+
+        <div class="body-pad">
+            @if (!string.IsNullOrWhiteSpace(Model.HeaderSummary))
+            {
+                <div class="resume-section-title" style="margin-top: 0;">Profile</div>
+                <div class="resume-item-desc" style="margin-bottom: 18px;">
+                    @Html.Raw(Model.HeaderSummary.Replace("\n", "<br/>"))
+                </div>
+            }
+
+            @foreach (var sec in sections.Where(s => s.IsVisible))
+            {
+                <div class="cvb-section-wrapper" data-section-id="@sec.Id">
+                    <div class="resume-section-title">@sec.Title</div>
+                    @await Html.PartialAsync("~/Views/Shared/ResumeComponents/_SectionBody.cshtml", sec)
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

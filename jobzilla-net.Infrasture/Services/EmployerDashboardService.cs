@@ -109,6 +109,8 @@ public class EmployerboardService : IEmployerboardService
         profile.PhoneNumber = profileDto.PhoneNumber;
         profile.Location = profileDto.Location;
         profile.Description = profileDto.Description;
+        profile.LogoPath = profileDto.LogoPath;
+        profile.BannerPath = profileDto.BannerPath;
 
         // Verify/Keep logic
         _context.EmployerProfiles.Update(profile);

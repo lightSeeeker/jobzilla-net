@@ -48,6 +48,13 @@ public class AdminResumeTemplateFormViewModel
     public AdminResumeTemplateFormDto Template { get; set; } = new();
     public bool IsEditMode { get; set; }
     public int? TemplateId { get; set; }
+
+    public IFormFile? TemplateFile { get; set; }
+    public IFormFile? PreviewImage { get; set; }
+
+    /// <summary>Existing stored paths, preserved across an edit when no new file is uploaded.</summary>
+    public string? ExistingTemplateFilePath { get; set; }
+    public string? ExistingPreviewImagePath { get; set; }
 }
 
 public class AdminSubscriptionPlansViewModel

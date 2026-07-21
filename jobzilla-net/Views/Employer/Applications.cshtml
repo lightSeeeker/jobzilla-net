@@ -36,7 +36,7 @@
                 <h4 class="panel-tittle m-a0"><i class="far fa-list-alt"></i>All Candidates</h4>
             </div>
             <div class="panel-body wt-panel-body">
-                <div class="twm-D_table p-a20 table-responsive">
+                <div class="twm-D_table p-a20 table-responsive jz-dash-table">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -53,7 +53,7 @@
                             {
                                 foreach (var app in Model.Applications.Items)
                                 {
-                                    <tr>
+                                    <tr class="jz-row-animate">
                                         <td>
                                             <div class="twm-DT-candidates-list">
                                                 <div class="twm-media">
@@ -77,19 +77,19 @@
                                             <div class="twm-jobs-category">
                                                 @if(app.Status == "Pending")
                                                 {
-                                                    <span class="twm-bg-golden">@app.Status</span>
+                                                    <span class="jz-status-review">@app.Status</span>
                                                 }
                                                 else if(app.Status == "Approved")
                                                 {
-                                                    <span class="twm-bg-green">@app.Status</span>
+                                                    <span class="jz-status-hired">@app.Status</span>
                                                 }
                                                 else if(app.Status == "Rejected")
                                                 {
-                                                    <span class="twm-bg-red">@app.Status</span>
+                                                    <span class="jz-status-rejected">@app.Status</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="twm-bg-sky">@app.Status</span>
+                                                    <span class="jz-status-shortlist">@app.Status</span>
                                                 }
                                             </div>
                                         </td>

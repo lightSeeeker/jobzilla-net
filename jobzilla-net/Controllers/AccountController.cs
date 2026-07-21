@@ -201,6 +201,97 @@ public class AccountController : Controller
         return View(model);
     }
 
+    // ── EXTERNAL / SOCIAL LOGIN ─────────────────────────────────────────────────
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLogin(string provider, string? userType = null, string? returnUrl = null)
+    {
+        var schemes = await _signInManager.GetExternalAuthenticationSchemesAsync();
+        if (!schemes.Any(s => string.Equals(s.Name, provider, StringComparison.OrdinalIgnoreCase)))
+        {
+            TempData["AuthError"] = $"{provider} sign-in is not configured yet.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+        properties.Items["userType"] = (userType == "Employer") ? "Employer" : "Candidate";
+        return Challenge(properties, provider);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+    {
+        if (remoteError != null)
+        {
+            _logger.LogWarning("External login error: {Error}", remoteError);
+            TempData["AuthError"] = $"Error from external provider: {remoteError}";
+            return RedirectToAction(nameof(Login));
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info == null)
+        {
+            TempData["AuthError"] = "Could not load external login information.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        // Already linked → sign straight in.
+        var signInResult = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+        if (signInResult.Succeeded)
+        {
+            _logger.LogInformation("{Provider} user signed in.", info.LoginProvider);
+            var existing = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            return await ExternalRedirect(existing, returnUrl);
+        }
+
+        // New external user → create (or link to an existing email) then sign in.
+        var email = info.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        var displayName = info.Principal.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                          ?? email
+                          ?? $"{info.LoginProvider} user";
+        var userType = info.AuthenticationProperties?.Items.TryGetValue("userType", out var ut) == true
+                       && ut == "Employer" ? "Employer" : "Candidate";
+
+        var user = email != null ? await _userManager.FindByEmailAsync(email) : null;
+
+        if (user == null)
+        {
+            // Some providers (e.g. Twitter) may not return an email — synthesise a stable one.
+            var safeEmail = email ?? $"{info.LoginProvider.ToLowerInvariant()}_{info.ProviderKey}@social.fursanet";
+            user = new ApplicationUser
+            {
+                UserName = safeEmail,
+                Email = safeEmail,
+                DisplayName = displayName,
+                UserType = userType,
+                IsActive = true,
+                EmailConfirmed = true
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                _logger.LogWarning("External user creation failed: {Errors}",
+                    string.Join(" ", createResult.Errors.Select(e => e.Description)));
+                TempData["AuthError"] = "Could not create an account from your social profile.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            await _userManager.AddToRoleAsync(user, userType);
+        }
+
+        await _userManager.AddLoginAsync(user, info);
+        await _signInManager.SignInAsync(user, isPersistent: false);
+        _logger.LogInformation("New {Provider} account linked for {Email}.", info.LoginProvider, user.Email);
+
+        return await ExternalRedirect(user, returnUrl);
+    }
+
     // ── LOGOUT ────────────────────────────────────────────────────────────────
 
     [HttpPost]
@@ -241,6 +332,21 @@ public class AccountController : Controller
     /// Async version for POST handlers where the User principal is not yet
     /// refreshed after SignInAsync / PasswordSignInAsync.
     /// </summary>
+    /// <summary>
+    /// Post external-login redirect: honour a local returnUrl, else route to the
+    /// role-appropriate dashboard.
+    /// </summary>
+    private async Task<IActionResult> ExternalRedirect(ApplicationUser? user, string? returnUrl)
+    {
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
+
+        if (user?.Email is not null)
+            return await RedirectToDashboardAsync(user.Email);
+
+        return RedirectToAction("Index", "Home");
+    }
+
     private async Task<IActionResult> RedirectToDashboardAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);

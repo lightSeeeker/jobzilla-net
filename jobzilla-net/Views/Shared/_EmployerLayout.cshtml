@@ -18,10 +18,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Employer Dashboard - Jobzilla</title>
+    <title>Employer Dashboard - Fursanet</title>
     
-    <link rel="icon" href="~/images/favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" type="image/x-icon" href="~/images/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="~/images/jzx/favicon.svg" />
     
     <link rel="stylesheet" type="text/css" href="~/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="~/css/font-awesome.min.css">
@@ -39,7 +38,8 @@
     <link rel="stylesheet" type="text/css" href="~/css/swiper-bundle.min.css">
     <link rel="stylesheet" type="text/css" href="~/css/style.css">
     <link rel="stylesheet" class="skin" type="text/css" href="~/css/skins-type/skin-6.css">
-    <link rel="stylesheet" type="text/css" href="~/css/switcher.css">   
+    <link rel="stylesheet" type="text/css" href="~/css/switcher.css">
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" asp-append-version="true">
 </head>
 
 <body>
@@ -61,11 +61,6 @@
                 <div class="container">
                     <!-- Left Side Content -->
                     <div class="header-left">
-                        <div class="nav-btn-wrap">
-                            <a class="nav-btn-admin" id="sidebarCollapse">
-                                <span class="fa fa-angle-left"></span>
-                            </a>                           
-                        </div>
                     </div>
                     
                     <!-- Right Side Content -->
@@ -78,7 +73,7 @@
                                             <a href="javascript:;" class="dropdown-toggle" id="ID-ACCOUNT_dropdown" data-bs-toggle="dropdown">
                                                 <div class="user-name text-black">
                                                     <span>
-                                                        <img src="@profileImage" alt="">
+                                                        <img src="@profileImage" alt="" onerror="this.onerror=null;this.src='/images/user-avtar/pic4.jpg';">
                                                     </span>@User.Identity?.Name
                                                 </div> 
                                             </a>

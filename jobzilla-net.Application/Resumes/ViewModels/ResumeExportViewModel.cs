@@ -21,9 +21,25 @@ public class ResumeExportViewModel
     // collections above when it is not null, enabling fully dynamic section rendering.
     public ResumeDocument? Document { get; set; }
 
-    public string? ProfileImagePath => string.IsNullOrWhiteSpace(Document?.ProfileImagePath) 
-        ? Profile?.ProfileImagePath 
+    public string? ProfileImagePath => string.IsNullOrWhiteSpace(Document?.ProfileImagePath)
+        ? Profile?.ProfileImagePath
         : Document.ProfileImagePath;
+
+    // ── Unified header accessors ───────────────────────────────────────────────
+    // Templates render the header from these so builder-entered personal info
+    // (stored on Document) is used when present, falling back to the parsed Profile.
+    private static string? Pick(string? primary, string? fallback) =>
+        string.IsNullOrWhiteSpace(primary) ? fallback : primary;
+
+    public string HeaderName => Pick(Document?.FullName, Profile?.FullName) ?? "Your Name";
+    public string? HeaderTitle => Pick(Document?.ProfessionalTitle, Profile?.ProfessionalTitle);
+    public string? HeaderEmail => Pick(Document?.Email, Profile?.Email);
+    public string? HeaderPhone => Pick(Document?.Phone, Profile?.PhoneNumber);
+    public string? HeaderLocation => Pick(Document?.Location, Profile?.Location);
+    public string? HeaderSummary => Pick(Document?.Summary, Profile?.Summary);
+    public string? HeaderWebsite => Document?.Website;
+    public string? HeaderLinkedIn => Document?.LinkedInUrl;
+    public string? HeaderGitHub => Document?.GitHubUrl;
 
     public string? GetProfileImageDataUri(string webRootPath)
     {

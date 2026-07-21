@@ -21,7 +21,66 @@ builder.Configuration
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Per-request display-currency context (salary conversion).
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<jobzilla_net.Services.CurrencyContext>();
+
+// ── External (social) login providers ─────────────────────────────────────
+// Each provider is registered only when its credentials are present in config
+// (appsettings "Authentication:*" or user-secrets / env vars), so the app runs
+// fine before credentials are supplied.
+var authBuilder = builder.Services.AddAuthentication();
+var authConfig = builder.Configuration.GetSection("Authentication");
+
+var google = authConfig.GetSection("Google");
+if (!string.IsNullOrWhiteSpace(google["ClientId"]))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = google["ClientId"]!;
+        options.ClientSecret = google["ClientSecret"]!;
+    });
+}
+
+var facebook = authConfig.GetSection("Facebook");
+if (!string.IsNullOrWhiteSpace(facebook["AppId"]))
+{
+    authBuilder.AddFacebook(options =>
+    {
+        options.AppId = facebook["AppId"]!;
+        options.AppSecret = facebook["AppSecret"]!;
+    });
+}
+
+var twitter = authConfig.GetSection("Twitter");
+if (!string.IsNullOrWhiteSpace(twitter["ApiKey"]))
+{
+    authBuilder.AddTwitter(options =>
+    {
+        options.ConsumerKey = twitter["ApiKey"]!;
+        options.ConsumerSecret = twitter["ApiSecret"]!;
+        options.RetrieveUserDetails = true;
+    });
+}
+
+var linkedIn = authConfig.GetSection("LinkedIn");
+if (!string.IsNullOrWhiteSpace(linkedIn["ClientId"]))
+{
+    authBuilder.AddLinkedIn(options =>
+    {
+        options.ClientId = linkedIn["ClientId"]!;
+        options.ClientSecret = linkedIn["ClientSecret"]!;
+    });
+}
 
 var app = builder.Build();
 
@@ -29,6 +88,7 @@ var app = builder.Build();
 await DatabaseInitializer.InitializeAsync(app.Services);
 await IdentitySeeder.SeedRolesAsync(app.Services);
 await jobzilla_net.Infrasture.Seed.ContentPageSeeder.SeedAsync(app.Services);
+await jobzilla_net.Infrasture.Seed.BlogCategorySeeder.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -42,8 +102,17 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Resolve the visitor's display currency once per request (cookie or geo).
+app.Use(async (ctx, next) =>
+{
+    await ctx.RequestServices.GetRequiredService<jobzilla_net.Services.CurrencyContext>().EnsureInitializedAsync();
+    await next();
+});
 
 app.MapStaticAssets();
 

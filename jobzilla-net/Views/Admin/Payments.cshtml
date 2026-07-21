@@ -75,7 +75,7 @@
                     {
                         <tr>
                             <td>@payment.Reference</td>
-                            <td><strong>${@payment.Amount.ToString("0.00")}</strong></td>
+                            <td><strong>$@payment.Amount.ToString("0.00")</strong></td>
                             <td>@payment.TransactionDateUtc.ToString("MMM dd, yyyy")</td>
                             <td>
                                 <span class="twm-bg-@(payment.Status.ToLower())">@payment.Status</span>

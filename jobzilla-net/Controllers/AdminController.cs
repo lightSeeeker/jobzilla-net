@@ -1,7 +1,11 @@
 using jobzilla_net.Application.Admin;
 using jobzilla_net.Application.Admin.Dtos;
+using jobzilla_net.Application.Candidates.Dtos;
 using jobzilla_net.Application.Common.Interfaces;
 using jobzilla_net.Application.Jobs;
+using jobzilla_net.Application.Resumes.Dtos;
+using jobzilla_net.Application.Resumes.Interfaces;
+using jobzilla_net.Application.Resumes.ViewModels;
 using jobzilla_net.Infrasture.Identity;
 using jobzilla_net.Models.Account;
 using jobzilla_net.Models.AdminDash;
@@ -23,6 +27,9 @@ public class AdminController : Controller
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHomePageContentService _homePageContentService;
+    private readonly IResumeHtmlComposer _resumeComposer;
+    private readonly IPdfGenerator _pdfGenerator;
+    private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         IAdminService adminService,
@@ -31,7 +38,10 @@ public class AdminController : Controller
         IWebHostEnvironment webHostEnvironment,
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
-        IHomePageContentService homePageContentService)
+        IHomePageContentService homePageContentService,
+        IResumeHtmlComposer resumeComposer,
+        IPdfGenerator pdfGenerator,
+        ILogger<AdminController> logger)
     {
         _adminService = adminService;
         _jobService = jobService;
@@ -40,6 +50,9 @@ public class AdminController : Controller
         _signInManager = signInManager;
         _userManager = userManager;
         _homePageContentService = homePageContentService;
+        _resumeComposer = resumeComposer;
+        _pdfGenerator = pdfGenerator;
+        _logger = logger;
     }
 
     private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
@@ -290,6 +303,15 @@ public class AdminController : Controller
         return View(viewModel);
     }
 
+    // Only HTML templates (with placeholder tokens) can be uploaded from the admin
+    // panel. They are rendered by string substitution, never executed, so untrusted
+    // uploads are safe — unlike Razor views, which the 5 built-in templates use.
+    private const string TemplateUploadDir = "uploads/resume-templates";
+    private const string PreviewUploadDir = "uploads/resume-templates/previews";
+    private const long MaxTemplateBytes = 2 * 1024 * 1024;   // 2 MB
+    private const long MaxPreviewBytes = 2 * 1024 * 1024;    // 2 MB
+    private static readonly string[] AllowedPreviewExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
     [HttpGet]
     public async Task<IActionResult> ResumeTemplateForm(int? id)
     {
@@ -303,17 +325,21 @@ public class AdminController : Controller
 
             viewModel.TemplateId = id;
             viewModel.IsEditMode = true;
+            viewModel.ExistingTemplateFilePath = template.TemplateFilePath;
+            viewModel.ExistingPreviewImagePath = template.PreviewImagePath;
             viewModel.Template = new AdminResumeTemplateFormDto
             {
                 Name = template.Name,
                 Description = template.Description,
                 Category = template.Category,
-                TemplateFilePath = "",
+                TemplateFilePath = template.TemplateFilePath,
+                PreviewImagePath = template.PreviewImagePath,
                 IsActive = template.IsActive,
                 IsPremium = template.IsPremium,
                 Price = template.Price,
                 DiscountPrice = template.DiscountPrice,
-                TemplateType = template.TemplateType
+                TemplateType = template.TemplateType,
+                Source = template.Source
             };
         }
 
@@ -323,23 +349,72 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> ResumeTemplateForm(AdminResumeTemplateFormViewModel viewModel)
     {
+        // Built-in (System) templates are Razor views; only their metadata is editable.
+        // Uploaded HTML files apply to Custom templates and new templates.
+        var isSystem = viewModel.IsEditMode && viewModel.Template.Source == Core.Enums.ResumeTemplateSource.System;
+
+        // A new HTML file is required when creating a Custom template; on edit the existing file is kept.
+        if (!viewModel.IsEditMode && viewModel.TemplateFile == null)
+            ModelState.AddModelError(nameof(viewModel.TemplateFile), "A template HTML file is required.");
+
+        if (!isSystem && viewModel.TemplateFile != null)
+        {
+            if (Path.GetExtension(viewModel.TemplateFile.FileName).ToLowerInvariant() != ".html")
+                ModelState.AddModelError(nameof(viewModel.TemplateFile), "Only .html template files are allowed.");
+            if (viewModel.TemplateFile.Length > MaxTemplateBytes)
+                ModelState.AddModelError(nameof(viewModel.TemplateFile), "Template file must be 2 MB or smaller.");
+        }
+
+        if (viewModel.PreviewImage != null)
+        {
+            if (!AllowedPreviewExtensions.Contains(Path.GetExtension(viewModel.PreviewImage.FileName).ToLowerInvariant()))
+                ModelState.AddModelError(nameof(viewModel.PreviewImage), "Preview image must be JPG, PNG, GIF, or WEBP.");
+            if (viewModel.PreviewImage.Length > MaxPreviewBytes)
+                ModelState.AddModelError(nameof(viewModel.PreviewImage), "Preview image must be 2 MB or smaller.");
+        }
+
         if (!ModelState.IsValid)
             return View(viewModel);
 
         try
         {
+            // System templates keep their Razor view path; a new upload is ignored for them.
+            var templateFilePath = (!isSystem && viewModel.TemplateFile != null)
+                ? await SaveUploadAsync(viewModel.TemplateFile, TemplateUploadDir, ".html")
+                : viewModel.ExistingTemplateFilePath ?? string.Empty;
+
+            var previewImagePath = viewModel.PreviewImage != null
+                ? await SaveUploadAsync(viewModel.PreviewImage, PreviewUploadDir, Path.GetExtension(viewModel.PreviewImage.FileName).ToLowerInvariant())
+                : viewModel.ExistingPreviewImagePath;
+
+            var dto = new AdminResumeTemplateFormDto
+            {
+                Name = viewModel.Template.Name,
+                Description = viewModel.Template.Description,
+                Category = viewModel.Template.Category,
+                TemplateType = viewModel.Template.TemplateType,
+                IsActive = viewModel.Template.IsActive,
+                IsPremium = viewModel.Template.IsPremium,
+                Price = viewModel.Template.IsPremium ? viewModel.Template.Price : 0m,
+                DiscountPrice = viewModel.Template.IsPremium ? viewModel.Template.DiscountPrice : null,
+                TemplateFilePath = templateFilePath,
+                PreviewImagePath = previewImagePath,
+                Source = isSystem ? Core.Enums.ResumeTemplateSource.System : Core.Enums.ResumeTemplateSource.Custom
+            };
+
             if (viewModel.IsEditMode && viewModel.TemplateId.HasValue)
             {
-                var result = await _adminService.UpdateResumeTemplateAsync(viewModel.TemplateId.Value, viewModel.Template, GetUserId());
+                var result = await _adminService.UpdateResumeTemplateAsync(viewModel.TemplateId.Value, dto, GetUserId());
                 if (result)
                 {
                     TempData["SuccessMessage"] = "Template updated successfully";
                     return RedirectToAction(nameof(ResumeTemplates));
                 }
+                TempData["ErrorMessage"] = "Template not found.";
             }
             else
             {
-                var templateId = await _adminService.CreateResumeTemplateAsync(viewModel.Template, GetUserId());
+                await _adminService.CreateResumeTemplateAsync(dto, GetUserId());
                 TempData["SuccessMessage"] = "Template created successfully";
                 return RedirectToAction(nameof(ResumeTemplates));
             }
@@ -352,12 +427,37 @@ public class AdminController : Controller
         return View(viewModel);
     }
 
+    private async Task<string> SaveUploadAsync(IFormFile file, string relativeDir, string extension)
+    {
+        var absoluteDir = Path.Combine(_webHostEnvironment.WebRootPath, relativeDir.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(absoluteDir);
+
+        var fileName = $"{Guid.NewGuid():N}{extension}";
+        var absolutePath = Path.Combine(absoluteDir, fileName);
+
+        await using (var stream = new FileStream(absolutePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return $"{relativeDir}/{fileName}";
+    }
+
     [HttpPost]
     public async Task<IActionResult> DeleteResumeTemplate(int id)
     {
+        var template = await _adminService.GetResumeTemplateByIdAsync(id);
+        if (template?.Source == Core.Enums.ResumeTemplateSource.System)
+        {
+            TempData["ErrorMessage"] = "Built-in templates cannot be deleted. Disable it instead.";
+            return RedirectToAction(nameof(ResumeTemplates));
+        }
+
         var result = await _adminService.DeleteResumeTemplateAsync(id, GetUserId());
         if (result)
         {
+            DeleteWebRootFile(template?.TemplateFilePath);
+            DeleteWebRootFile(template?.PreviewImagePath);
             TempData["SuccessMessage"] = "Template deleted successfully";
         }
         else
@@ -366,6 +466,119 @@ public class AdminController : Controller
         }
 
         return RedirectToAction(nameof(ResumeTemplates));
+    }
+
+    private void DeleteWebRootFile(string? relativePath)
+    {
+        if (string.IsNullOrWhiteSpace(relativePath)) return;
+        var absolute = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar));
+        if (System.IO.File.Exists(absolute)) System.IO.File.Delete(absolute);
+    }
+
+    // Renders the full CV design for a template, filled with Lorem-Ipsum sample data,
+    // so admins see how the layout looks. Returned as raw HTML for the preview iframe.
+    [HttpGet]
+    public async Task<IActionResult> TemplatePreview(int id)
+    {
+        var template = await _adminService.GetResumeTemplateByIdAsync(id);
+        if (template == null || string.IsNullOrWhiteSpace(template.TemplateFilePath))
+            return Content("<html><body></body></html>", "text/html");
+
+        var dto = new ResumeTemplateDto
+        {
+            Id = template.Id,
+            Name = template.Name,
+            TemplateFilePath = template.TemplateFilePath,
+            PreviewImagePath = template.PreviewImagePath,
+            Source = template.Source
+        };
+
+        var html = await _resumeComposer.ComposeAsync(dto, BuildSampleResumeModel(id));
+        return Content(html, "text/html");
+    }
+
+    // Isolated PDF test: renders one template (with sample data) straight through the
+    // IPdfGenerator (in-process SelectPdf) and returns the PDF. Use it to
+    // verify the PDF engine end-to-end without touching the real candidate export flow.
+    [HttpGet]
+    public async Task<IActionResult> TemplatePreviewPdf(int id, CancellationToken ct)
+    {
+        var template = await _adminService.GetResumeTemplateByIdAsync(id);
+        if (template == null || string.IsNullOrWhiteSpace(template.TemplateFilePath))
+            return NotFound("Template not found or has no layout file.");
+
+        var dto = new ResumeTemplateDto
+        {
+            Id = template.Id,
+            Name = template.Name,
+            TemplateFilePath = template.TemplateFilePath,
+            PreviewImagePath = template.PreviewImagePath,
+            Source = template.Source
+        };
+
+        var model = BuildSampleResumeModel(id);
+        model.IsExport = true;
+
+        try
+        {
+            var html = await _resumeComposer.ComposeAsync(dto, model, ct);
+            var pdf = await _pdfGenerator.GeneratePdfFromHtmlAsync(html, ct);
+            return File(pdf, "application/pdf", $"Test_{template.Name}.pdf");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Isolated PDF test failed for template {TemplateId}", id);
+            return Content($"PDF generation failed: {ex.Message}", "text/plain");
+        }
+    }
+
+    // Static placeholder CV data used only for admin template previews.
+    private static ResumeExportViewModel BuildSampleResumeModel(int templateId)
+    {
+        const string lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.";
+
+        return new ResumeExportViewModel
+        {
+            TemplateId = templateId,
+            IsExport = false,
+            Profile = new CandidateProfileDto
+            {
+                FullName = "Jordan Doe",
+                ProfessionalTitle = "Senior Software Engineer",
+                Email = "jordan.doe@example.com",
+                PhoneNumber = "+1 555 012 3456",
+                Location = "Doha, Qatar",
+                Summary = lorem,
+                ExperienceYears = 8
+            },
+            SocialLinks = new()
+            {
+                new() { PlatformName = "LinkedIn", Url = "https://linkedin.com/in/loremipsum" },
+                new() { PlatformName = "GitHub", Url = "https://github.com/loremipsum" }
+            },
+            Skills = new() { "Lorem Ipsum", "Dolor Sit", "Amet Consectetur", "Adipiscing", "Tempor Labore", "Magna Aliqua" },
+            Experiences = new()
+            {
+                new() { JobTitle = "Lead Developer", CompanyName = "Ipsum Technologies", Location = "Doha, QA", StartDate = new DateTime(2021, 1, 1), Description = lorem },
+                new() { JobTitle = "Software Engineer", CompanyName = "Dolor Systems", Location = "Dubai, AE", StartDate = new DateTime(2017, 6, 1), EndDate = new DateTime(2020, 12, 1), Description = lorem }
+            },
+            Educations = new()
+            {
+                new() { InstitutionName = "Lorem University", Degree = "B.Sc.", FieldOfStudy = "Computer Science", StartDate = new DateTime(2013, 9, 1), EndDate = new DateTime(2017, 5, 1) }
+            },
+            Certifications = new()
+            {
+                new() { Name = "Certified Lorem Professional", IssuingOrganization = "Ipsum Institute", IssueDate = new DateTime(2022, 3, 1), CredentialUrl = "https://example.com/cert" }
+            },
+            Projects = new()
+            {
+                new() { Name = "Ipsum Platform", Description = lorem, ProjectUrl = "https://example.com", StartDate = new DateTime(2022, 1, 1), EndDate = new DateTime(2023, 1, 1) }
+            },
+            References = new()
+            {
+                new() { ReferenceName = "Alex Amet", Designation = "Engineering Manager", Company = "Ipsum Technologies", Phone = "+1 555 987 6543", Email = "alex.amet@example.com" }
+            }
+        };
     }
 
     [HttpPost]

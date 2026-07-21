@@ -39,7 +39,7 @@
                             @if (!string.IsNullOrEmpty(Model.Profile.LogoPath))
                             {
                                 <div class="mb-3">
-                                    <img src="@Model.Profile.LogoPath" alt="Company Logo" style="max-width: 150px; border-radius: 8px;" />
+                                    <img src="@Model.Profile.LogoPath" alt="Company Logo" style="max-width: 150px; border-radius: 8px;" onerror="this.onerror=null;this.src='/images/jzx/logo.svg';" />
                                 </div>
                             }
                             <input type="file" asp-for="LogoImage" class="form-control" accept="image/*" />

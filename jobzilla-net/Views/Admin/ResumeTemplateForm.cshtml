@@ -64,11 +64,40 @@
                         <span asp-validation-for="Template.TemplateType" class="text-danger"></span>
                     </div>
 
+                    @{
+                        var isSystemTemplate = Model.IsEditMode && Model.Template.Source == jobzilla_net.Core.Enums.ResumeTemplateSource.System;
+                    }
+
                     <!-- Template File Upload -->
+                    @if (isSystemTemplate)
+                    {
+                        <div class="form-group mb-3">
+                            <label>Template File</label>
+                            <div class="alert alert-secondary mb-0">
+                                <i class="fa fa-lock"></i> This is a <strong>built-in</strong> template rendered by the application. Its layout file cannot be replaced — you can edit its details below.
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group mb-3">
+                            <label>Template File @(Model.IsEditMode ? "" : "*")</label>
+                            <input type="file" asp-for="TemplateFile" class="form-control" accept=".html" />
+                            <span asp-validation-for="TemplateFile" class="text-danger"></span>
+                            <small class="text-muted d-block">Only <strong>.html</strong> files are accepted (max 2&nbsp;MB). The HTML is filled with candidate data at render time using the placeholder tokens listed on the right — it is never executed.</small>
+                            @if (Model.IsEditMode && !string.IsNullOrEmpty(Model.ExistingTemplateFilePath))
+                            {
+                                <small class="text-success d-block mt-1"><i class="fa fa-check"></i> Current file: @System.IO.Path.GetFileName(Model.ExistingTemplateFilePath). Leave empty to keep it.</small>
+                            }
+                        </div>
+                    }
+
+                    <!-- Preview Image Upload -->
                     <div class="form-group mb-3">
-                        <label>Template File *</label>
-                        <input type="file" name="templateFile" class="form-control" accept=".pdf,.docx,.html" />
-                        <small class="text-muted">Accepted formats: PDF, DOCX, HTML</small>
+                        <label>Preview Image</label>
+                        <input type="file" asp-for="PreviewImage" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                        <span asp-validation-for="PreviewImage" class="text-danger"></span>
+                        <small class="text-muted">Optional thumbnail shown in listings (JPG, PNG, GIF, WEBP; max 2&nbsp;MB).</small>
                     </div>
 
                     <hr class="my-4" />
@@ -119,10 +148,13 @@
                     </div>
 
                     <!-- Hidden Fields -->
+                    <input type="hidden" asp-for="IsEditMode" />
+                    <input type="hidden" asp-for="ExistingTemplateFilePath" />
+                    <input type="hidden" asp-for="ExistingPreviewImagePath" />
+                    <input type="hidden" asp-for="Template.Source" />
                     @if (Model.IsEditMode)
                     {
                         <input type="hidden" asp-for="TemplateId" />
-                        <input type="hidden" asp-for="IsEditMode" />
                     }
                 </div>
 
@@ -133,12 +165,55 @@
                             <h5 class="m-a0">Preview</h5>
                         </div>
                         <div class="panel-body wt-panel-body p-a20">
-                            <div class="preview-box bg-light p-4 rounded text-center" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
-                                <div>
-                                    <i class="fa fa-file-pdf-o" style="font-size: 60px; color: #ccc;"></i>
-                                    <p class="mt-3 text-muted">Template Preview</p>
+                            @if (Model.IsEditMode && Model.TemplateId.HasValue)
+                            {
+                                <p class="text-muted small mb-2">Live preview of the full CV design, filled with sample (Lorem Ipsum) data.</p>
+                                <div style="width: 336px; max-width: 100%; height: 476px; overflow: hidden; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                    <iframe src="@Url.Action("TemplatePreview", "Admin", new { id = Model.TemplateId })"
+                                            style="width: 800px; height: 1130px; border: none; transform: scale(0.42); transform-origin: top left;"
+                                            scrolling="no" loading="lazy" title="Template preview"></iframe>
                                 </div>
-                            </div>
+                                <a href="@Url.Action("TemplatePreview", "Admin", new { id = Model.TemplateId })" target="_blank" class="site-button outline w-100 mt-3">
+                                    <i class="fa fa-expand"></i> Open full preview
+                                </a>
+                                <a href="@Url.Action("TemplatePreviewPdf", "Admin", new { id = Model.TemplateId })" target="_blank" class="site-button w-100 mt-2">
+                                    <i class="fa fa-file-pdf"></i> Test PDF (current engine)
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="preview-box bg-light p-4 rounded text-center" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                                    <div>
+                                        <i class="fa fa-file-code" style="font-size: 60px; color: #ccc;"></i>
+                                        <p class="mt-3 text-muted">Save the template to see a live preview.</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Placeholder Token Reference -->
+                    <div class="panel panel-default mt-3">
+                        <div class="panel-heading wt-panel-heading p-a20">
+                            <h5 class="m-a0">Placeholder Tokens</h5>
+                        </div>
+                        <div class="panel-body wt-panel-body p-a20">
+                            <p class="text-muted small mb-2">Use these tokens in your HTML. They are replaced with the candidate's data.</p>
+                            <p class="small mb-1"><strong>Personal:</strong></p>
+                            <code class="small d-block mb-2">{{FullName}} {{Title}} {{Email}} {{Phone}} {{Location}} {{Summary}} {{ProfileImage}}</code>
+                            <p class="small mb-1"><strong>Repeating sections</strong> (loop over items):</p>
+<pre class="small bg-light p-2 rounded" style="white-space: pre-wrap;">{{#Experience}}
+  {{JobTitle}} @@ {{CompanyName}}
+  {{StartDate}} - {{EndDate}}
+  {{Description}}
+{{/Experience}}
+
+{{#Education}} {{Degree}}, {{InstitutionName}} {{/Education}}
+{{#Skills}} {{Name}} {{/Skills}}
+{{#Certifications}} {{Name}}, {{IssuingOrganization}} {{/Certifications}}
+{{#Projects}} {{Name}} — {{Description}} {{/Projects}}
+{{#References}} {{ReferenceName}}, {{Company}} {{/References}}</pre>
+                            <small class="text-muted">Use <code>{{SectionTitle}}</code> inside a section block for its heading. Unknown tokens render empty.</small>
                         </div>
                     </div>
 
@@ -169,7 +244,7 @@
                                         <span class="badge bg-warning">Premium</span>
                                         @if (Model.Template.Price > 0)
                                         {
-                                            <span class="ms-2">${Model.Template.Price.ToString("0.00")}</span>
+                                            <span class="ms-2">$@Model.Template.Price.ToString("0.00")</span>
                                         }
                                     }
                                     else

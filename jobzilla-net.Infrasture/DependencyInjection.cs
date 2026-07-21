@@ -63,6 +63,14 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());
 
+        // ── Currency conversion (live FX + IP geo, cached) ───────────────────
+        services.AddMemoryCache();
+        services.AddHttpClient<ICurrencyService, jobzilla_net.Infrasture.Services.CurrencyService>(c =>
+        {
+            c.Timeout = TimeSpan.FromSeconds(6);
+            c.DefaultRequestHeaders.UserAgent.ParseAdd("Fursanet/1.0");
+        });
+
         // ── Application services ──────────────────────────────────────────────
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<ICandidateService, CandidateService>();
@@ -79,7 +87,11 @@ public static class DependencyInjection
         services.AddScoped<IResumeParsingOrchestrator, ResumeParsingOrchestrator>();
         services.AddScoped<IResumeBuilderService, ResumeBuilderService>();
         services.AddScoped<ITemplateRenderer, RazorTemplateRenderer>();
+        services.AddScoped<IResumeHtmlComposer, ResumeHtmlComposer>();
+
+        // PDF generated in-process via SelectPdf — no external service or Docker.
         services.AddScoped<IPdfGenerator, SelectPdfGenerator>();
+
         services.AddScoped<IResumeExportService, ResumeExportService>();
 
         return services;

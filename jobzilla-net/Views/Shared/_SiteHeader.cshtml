@@ -24,7 +24,7 @@
                     <div class="logo-header">
                         <div class="logo-header-inner logo-header-one">
                             <a href="@Url.Action("Index", "Home")">
-                                <img src="~/images/logo-dark.png" alt="">
+                                <img src="~/images/jzx/logo.svg" alt="">
                             </a>
                         </div>
                     </div>
@@ -89,9 +89,7 @@
                     <!-- Header Right Section-->
                     <div class="extra-nav header-2-nav">
                         <div class="extra-cell">
-                            <div class="header-search">
-                                <a href="#search" class="header-search-icon"><i class="feather-search"></i></a>
-                            </div>
+                            <partial name="_CurrencySwitcher" />
                         </div>
                         <div class="extra-cell">
                             <div class="header-nav-btn-section">
@@ -115,7 +113,7 @@
                                 {
                                     <div class="twm-nav-btn-left" style="margin-left: 15px;">
                                         <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
-                                            <button type="submit" class="btn twm-nav-sign-up btn-link border-0" style="padding: 10px 20px; font-weight: 500;">
+                                            <button type="submit" class="btn twm-nav-sign-up twm-nav-logout btn-link border-0" style="padding: 10px 20px; font-weight: 500;">
                                                 <i class="feather-log-out"></i> Logout
                                             </button>
                                         </form>

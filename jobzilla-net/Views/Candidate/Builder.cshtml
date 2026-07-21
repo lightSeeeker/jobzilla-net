@@ -1022,11 +1022,15 @@
 
     function openDrawer() {
         const drawer = document.getElementById('cvb-add-section-drawer');
-        drawer.style.display = '';
         _drawerOverlay = document.createElement('div');
         _drawerOverlay.className = 'cvb-drawer-overlay';
         _drawerOverlay.addEventListener('click', closeDrawer);
         document.body.appendChild(_drawerOverlay);
+        // Reparent the drawer to <body> so it escapes the .twm-right-section-panel
+        // backdrop-filter stacking context (which otherwise buries this fixed
+        // drawer beneath the overlay). Appended after the overlay so it paints on top.
+        document.body.appendChild(drawer);
+        drawer.style.display = '';
     }
 
     function closeDrawer() {

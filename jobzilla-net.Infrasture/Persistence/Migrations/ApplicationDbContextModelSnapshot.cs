@@ -1358,6 +1358,9 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
+
                     b.Property<string>("TemplateFilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1376,72 +1379,77 @@ namespace jobzilla_net.Infrasture.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            Category = "Professional",
+                            Category = "ATS Friendly",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "A clean, balanced layout with subtle colors suitable for modern professionals.",
+                            Description = "Single-column, graphics-free layout built to pass cleanly through applicant tracking systems.",
                             IsActive = true,
                             IsDeleted = false,
                             IsPremium = false,
-                            Name = "Modern Professional",
+                            Name = "ATS Minimal",
                             Price = 0m,
-                            TemplateFilePath = "ModernProfessional",
-                            TemplateType = "Modern"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = "Executive",
-                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Traditional and sophisticated, perfect for senior corporate roles.",
-                            IsActive = true,
-                            IsDeleted = false,
-                            IsPremium = true,
-                            Name = "Executive Corporate",
-                            Price = 29.99m,
-                            TemplateFilePath = "ExecutiveCorporate",
-                            TemplateType = "Corporate"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Category = "ATS Friendly",
-                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Strictly single column, text-focused format designed to pass cleanly through tracking systems.",
-                            IsActive = true,
-                            IsDeleted = false,
-                            IsPremium = true,
-                            Name = "ATS Optimized",
-                            Price = 19.99m,
-                            TemplateFilePath = "AtsOptimized",
+                            Source = 0,
+                            TemplateFilePath = "AtsMinimal",
                             TemplateType = "ATS"
                         },
                         new
                         {
-                            Id = 4,
-                            Category = "Creative",
+                            Id = 2,
+                            Category = "Professional",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Bold typography and vibrant accents for creative and design-focused roles.",
+                            Description = "Clean single-column resume with a solid accent header — a safe, polished all-rounder.",
                             IsActive = true,
                             IsDeleted = false,
-                            IsPremium = true,
-                            Name = "Creative Designer",
-                            Price = 39.99m,
-                            TemplateFilePath = "CreativeDesigner",
-                            TemplateType = "Creative"
+                            IsPremium = false,
+                            Name = "Professional",
+                            Price = 0m,
+                            Source = 0,
+                            TemplateFilePath = "ProfessionalClean",
+                            TemplateType = "Professional"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = "Professional",
+                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Two-column layout with a tinted sidebar for contact, skills and languages beside your experience.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            IsPremium = false,
+                            Name = "Classic Two-Column",
+                            Price = 0m,
+                            Source = 0,
+                            TemplateFilePath = "ClassicTwoColumn",
+                            TemplateType = "TwoColumn"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Category = "Modern",
+                            CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Contemporary single-column design with accent headings and a subtle timeline accent bar.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            IsPremium = false,
+                            Name = "Modern",
+                            Price = 0m,
+                            Source = 0,
+                            TemplateFilePath = "ModernAccent",
+                            TemplateType = "Modern"
                         },
                         new
                         {
                             Id = 5,
-                            Category = "Technical",
+                            Category = "Professional",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Clean and structured with tech-focused elements, resembling technical documentation.",
+                            Description = "Two-column layout with a full-height dark sidebar and blue accents for a corporate, executive feel.",
                             IsActive = true,
                             IsDeleted = false,
-                            IsPremium = true,
-                            Name = "Technical Developer",
-                            Price = 24.99m,
-                            TemplateFilePath = "TechnicalDeveloper",
-                            TemplateType = "Technical"
+                            IsPremium = false,
+                            Name = "Corporate",
+                            Price = 0m,
+                            Source = 0,
+                            TemplateFilePath = "CorporateBlue",
+                            TemplateType = "TwoColumn"
                         });
                 });
 

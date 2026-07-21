@@ -34,7 +34,7 @@
         <h4 class="panel-tittle m-a0"><i class="fa fa-suitcase"></i> Job Details</h4>
     </div>
     <div class="panel-body wt-panel-body p-a20 m-b30 ">
-        <div class="twm-D_table p-a20 table-responsive">
+        <div class="twm-D_table p-a20 table-responsive jz-dash-table">
             <table class="table table-bordered twm-bookmark-list-wrap">
                 <thead>
                     <tr>
@@ -50,7 +50,7 @@
                     {
                         foreach (var job in Model.PostedJobs.Items)
                         {
-                            <tr>
+                            <tr class="jz-row-animate">
                                 <td>
                                     <div class="twm-bookmark-list">
                                         <div class="twm-mid-content">
@@ -68,11 +68,11 @@
                                 <td>
                                     @if(job.Status == "Active")
                                     {
-                                        <span class="text-clr-green2">Active</span>
+                                        <span class="jz-status-hired">Active</span>
                                     }
                                     else
                                     {
-                                        <span class="text-clr-red">Closed</span>
+                                        <span class="jz-status-rejected">Closed</span>
                                     }
                                 </td>
                                 <td>
@@ -104,7 +104,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center">No jobs posted yet.</td>
+                            <td colspan="5" class="text-center">No jobs posted yet.</td>
                         </tr>
                     }
                 </tbody>

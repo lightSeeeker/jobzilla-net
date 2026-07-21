@@ -1,0 +1,29 @@
+@using jobzilla_net.Application.Resumes.Dtos
+@model ResumeSection
+@*
+    Central section dispatcher. Templates call this instead of interpolating
+    _{SectionType}.cshtml directly, so an unmapped/future type falls back to the
+    generic renderer (_Custom) instead of throwing a missing-view exception.
+*@
+@{
+    var partial = Model.SectionType switch
+    {
+        ResumeBuilderSectionType.Experience     => "_Experience",
+        ResumeBuilderSectionType.Education       => "_Education",
+        ResumeBuilderSectionType.Skills          => "_Skills",
+        ResumeBuilderSectionType.Certifications  => "_Certifications",
+        ResumeBuilderSectionType.Projects        => "_Projects",
+        ResumeBuilderSectionType.References       => "_References",
+        ResumeBuilderSectionType.Awards          => "_Awards",
+        ResumeBuilderSectionType.Languages       => "_Languages",
+        ResumeBuilderSectionType.Publications    => "_Publications",
+        ResumeBuilderSectionType.Volunteer       => "_Volunteer",
+        ResumeBuilderSectionType.Achievements    => "_Achievements",
+        ResumeBuilderSectionType.PersonalInfo    => null,
+        _                                        => "_Custom",
+    };
+}
+@if (partial != null)
+{
+    @await Html.PartialAsync($"~/Views/Shared/ResumeComponents/{partial}.cshtml", Model)
+}

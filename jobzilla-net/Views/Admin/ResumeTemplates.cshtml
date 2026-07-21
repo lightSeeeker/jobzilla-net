@@ -27,7 +27,7 @@
 <!-- Templates Table -->
 <div class="panel panel-default">
     <div class="panel-heading wt-panel-heading p-a20">
-        <h4 class="panel-tittle m-a0"><i class="fa fa-file-pdf-o"></i> Templates List</h4>
+        <h4 class="panel-tittle m-a0"><i class="fa fa-file-pdf"></i> Templates List</h4>
     </div>
     <div class="panel-body wt-panel-body p-a20">
         <div class="twm-D_table p-a20 table-responsive">
@@ -36,6 +36,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Category</th>
+                        <th>Source</th>
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
@@ -58,11 +59,21 @@
                             <td>
                                 <span class="badge bg-info">@template.Category</span>
                             </td>
+                            <td>
+                                @if (template.Source == jobzilla_net.Core.Enums.ResumeTemplateSource.System)
+                                {
+                                    <span class="badge bg-secondary">Built-in</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">Uploaded</span>
+                                }
+                            </td>
                             <td>@template.TemplateType</td>
                             <td>
                                 @if (template.IsPremium)
                                 {
-                                    <span class="text-danger">${@template.Price.ToString("0.00")}</span>
+                                    <span class="text-danger">$@template.Price.ToString("0.00")</span>
                                     @if (template.DiscountPrice.HasValue)
                                     {
                                         <br />
@@ -96,14 +107,17 @@
                                                 </button>
                                             </form>
                                         </li>
-                                        <li>
-                                            <form asp-controller="Admin" asp-action="DeleteResumeTemplate" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
-                                                <input type="hidden" name="id" value="@template.Id" />
-                                                <button type="submit" class="border-0 bg-transparent p-0" title="Delete">
-                                                    <span class="far fa-trash-alt"></span>
-                                                </button>
-                                            </form>
-                                        </li>
+                                        @if (template.Source != jobzilla_net.Core.Enums.ResumeTemplateSource.System)
+                                        {
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="DeleteResumeTemplate" method="post" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                                    <input type="hidden" name="id" value="@template.Id" />
+                                                    <button type="submit" class="border-0 bg-transparent p-0" title="Delete">
+                                                        <span class="far fa-trash-alt"></span>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        }
                                     </ul>
                                 </div>
                             </td>

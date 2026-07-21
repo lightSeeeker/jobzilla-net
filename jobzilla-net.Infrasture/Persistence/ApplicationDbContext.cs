@@ -215,11 +215,50 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             new ResumeTemplate
             {
                 Id = 1,
-                Name = "Modern Professional",
-                Description = "A clean, balanced layout with subtle colors suitable for modern professionals.",
-                TemplateFilePath = "ModernProfessional",
+                Name = "ATS Minimal",
+                Description = "Single-column, graphics-free layout built to pass cleanly through applicant tracking systems.",
+                TemplateFilePath = "AtsMinimal",
+                IsActive = true,
+                Category = "ATS Friendly",
+                IsPremium = false,
+                Price = 0m,
+                TemplateType = "ATS",
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 2,
+                Name = "Professional",
+                Description = "Clean single-column resume with a solid accent header — a safe, polished all-rounder.",
+                TemplateFilePath = "ProfessionalClean",
                 IsActive = true,
                 Category = "Professional",
+                IsPremium = false,
+                Price = 0m,
+                TemplateType = "Professional",
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 3,
+                Name = "Classic Two-Column",
+                Description = "Two-column layout with a tinted sidebar for contact, skills and languages beside your experience.",
+                TemplateFilePath = "ClassicTwoColumn",
+                IsActive = true,
+                Category = "Professional",
+                IsPremium = false,
+                Price = 0m,
+                TemplateType = "TwoColumn",
+                CreatedAtUtc = SeedDate
+            },
+            new ResumeTemplate
+            {
+                Id = 4,
+                Name = "Modern",
+                Description = "Contemporary single-column design with accent headings and a subtle timeline accent bar.",
+                TemplateFilePath = "ModernAccent",
+                IsActive = true,
+                Category = "Modern",
                 IsPremium = false,
                 Price = 0m,
                 TemplateType = "Modern",
@@ -227,54 +266,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
             },
             new ResumeTemplate
             {
-                Id = 2,
-                Name = "Executive Corporate",
-                Description = "Traditional and sophisticated, perfect for senior corporate roles.",
-                TemplateFilePath = "ExecutiveCorporate",
-                IsActive = true,
-                Category = "Executive",
-                IsPremium = true,
-                Price = 29.99m,
-                TemplateType = "Corporate",
-                CreatedAtUtc = SeedDate
-            },
-            new ResumeTemplate
-            {
-                Id = 3,
-                Name = "ATS Optimized",
-                Description = "Strictly single column, text-focused format designed to pass cleanly through tracking systems.",
-                TemplateFilePath = "AtsOptimized",
-                IsActive = true,
-                Category = "ATS Friendly",
-                IsPremium = true,
-                Price = 19.99m,
-                TemplateType = "ATS",
-                CreatedAtUtc = SeedDate
-            },
-            new ResumeTemplate
-            {
-                Id = 4,
-                Name = "Creative Designer",
-                Description = "Bold typography and vibrant accents for creative and design-focused roles.",
-                TemplateFilePath = "CreativeDesigner",
-                IsActive = true,
-                Category = "Creative",
-                IsPremium = true,
-                Price = 39.99m,
-                TemplateType = "Creative",
-                CreatedAtUtc = SeedDate
-            },
-            new ResumeTemplate
-            {
                 Id = 5,
-                Name = "Technical Developer",
-                Description = "Clean and structured with tech-focused elements, resembling technical documentation.",
-                TemplateFilePath = "TechnicalDeveloper",
+                Name = "Corporate",
+                Description = "Two-column layout with a full-height dark sidebar and blue accents for a corporate, executive feel.",
+                TemplateFilePath = "CorporateBlue",
                 IsActive = true,
-                Category = "Technical",
-                IsPremium = true,
-                Price = 24.99m,
-                TemplateType = "Technical",
+                Category = "Professional",
+                IsPremium = false,
+                Price = 0m,
+                TemplateType = "TwoColumn",
                 CreatedAtUtc = SeedDate
             });
     }

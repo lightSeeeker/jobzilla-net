@@ -41,7 +41,7 @@
                                                         @if (!string.IsNullOrEmpty(Model.Profile.ProfileImagePath))
                                                         {
                                                             <div class="mb-3">
-                                                                <img src="@Model.Profile.ProfileImagePath" alt="Profile Picture" style="max-width: 150px; border-radius: 8px;" />
+                                                                <img src="@Model.Profile.ProfileImagePath" alt="Profile Picture" style="max-width: 150px; border-radius: 8px;" onerror="this.onerror=null;this.src='/images/user-avtar/pic4.jpg';" />
                                                             </div>
                                                         }
                                                         <input type="file" asp-for="ProfileImage" class="form-control" accept="image/*" />

@@ -1,5 +1,6 @@
 ﻿@model jobzilla_net.Models.Candidates.CandidateSearchViewModel
 @using jobzilla_net.Application.Candidates.Dtos
+@inject jobzilla_net.Services.CurrencyContext Ccy
 @{
     ViewData["Title"] = "Candidate List";
 }
@@ -181,7 +182,7 @@
                         @foreach (CandidateSummaryDto candidate in Model.Result.Items)
                         {
                             var salaryText = candidate.ExpectedSalary.HasValue
-                                ? candidate.ExpectedSalary.Value.ToString("C0")
+                                ? Ccy.Format(candidate.ExpectedSalary.Value)
                                 : "Negotiable";
 
                             var expText = candidate.ExperienceYears.HasValue

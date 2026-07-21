@@ -111,11 +111,9 @@ All JavaScript fuctions Start
 
 // > Main menu sticky on top  when scroll down function by = custom.js ========== //		
 	function sticky_header(){
-		if(jQuery('.sticky-header').length){
-			var sticky = new Waypoint.Sticky({
-			  element: jQuery('.sticky-header')
-			});
-		}
+		// Header stickiness is handled purely in CSS (position:fixed).
+		// The old Waypoint.Sticky only wrapped the element without ever
+		// applying fixed positioning, so it scrolled away — disabled.
 	}
 
 // > Sidebar sticky  when scroll down function by = theia-sticky-sidebar.js ========== //		
@@ -1544,3 +1542,210 @@ jQuery(window).on('scroll', function () {
 
 	
 })(window.jQuery);
+/* =====================================
+   Modernized Header — scroll progress + header scroll state
+====================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Scroll progress bar
+    var progress = document.createElement('div');
+    progress.id = 'jz-scroll-progress';
+    document.body.insertBefore(progress, document.body.firstChild);
+
+    var header = document.querySelector('.site-header');
+
+    function onScroll() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        progress.style.width = pct + '%';
+
+        // 2. Header scroll class
+        if (header) {
+            if (scrollTop > 20) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+    }
+
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+});
+
+/* =====================================
+   Dashboard — sidebar collapse + row entrance
+====================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Sidebar collapse toggle
+    var toggles = document.querySelectorAll('#jzSidebarToggle, #sidebarCollapse');
+    toggles.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.body.classList.toggle('jz-sidebar-collapsed');
+        });
+    });
+
+    // 2. Staggered row entrance via IntersectionObserver
+    var rows = document.querySelectorAll('.jz-row-animate');
+    if (rows.length) {
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries, obs) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        var row = entry.target;
+                        var idx = parseInt(row.getAttribute('data-row-index') || '0', 10);
+                        setTimeout(function () {
+                            row.classList.add('jz-row-visible');
+                        }, idx * 50);
+                        obs.unobserve(row);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            rows.forEach(function (row, i) {
+                row.setAttribute('data-row-index', i);
+                observer.observe(row);
+            });
+        } else {
+            rows.forEach(function (row) { row.classList.add('jz-row-visible'); });
+        }
+    }
+});
+
+/* =====================================
+   Global polish — back-to-top + lazy images
+====================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    // Back to top
+    var backTop = document.createElement('button');
+    backTop.className = 'jz-back-top';
+    backTop.setAttribute('aria-label', 'Back to top');
+    backTop.innerHTML = '<i class="feather-arrow-up"></i>';
+    document.body.appendChild(backTop);
+
+    window.addEventListener('scroll', function () {
+        var y = window.scrollY || document.documentElement.scrollTop;
+        if (y > 300) {
+            backTop.classList.add('visible');
+        } else {
+            backTop.classList.remove('visible');
+        }
+    });
+
+    backTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Image lazy-load fade
+    var lazyImgs = document.querySelectorAll('img.jz-lazy');
+    if (lazyImgs.length) {
+        if ('IntersectionObserver' in window) {
+            var imgObserver = new IntersectionObserver(function (entries, obs) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('loaded');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '0px 0px 100px 0px' });
+            lazyImgs.forEach(function (img) { imgObserver.observe(img); });
+        } else {
+            lazyImgs.forEach(function (img) { img.classList.add('loaded'); });
+        }
+    }
+});
+
+/* =====================================
+   Scroll reveal + page transition + card tilt
+====================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    var revealEls = document.querySelectorAll('.jz-reveal, .jz-reveal-left, .jz-reveal-scale');
+
+    // Step 1/2 — Scroll reveal via IntersectionObserver (with fallback)
+    try {
+        if (!('IntersectionObserver' in window)) { throw new Error('no IO'); }
+        var revealObserver = new IntersectionObserver(function (entries, obs) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) { return; }
+                var el = entry.target;
+                var delay = parseInt(el.getAttribute('data-reveal-delay') || '', 10);
+                if (isNaN(delay)) {
+                    // auto-stagger by position among reveal siblings (cap 500ms)
+                    var siblings = el.parentNode ? el.parentNode.children : [];
+                    var idx = Array.prototype.indexOf.call(siblings, el);
+                    delay = Math.min(idx * 80, 500);
+                } else {
+                    delay = Math.max(0, Math.min(delay, 500));
+                }
+                setTimeout(function () { el.classList.add('is-visible'); }, delay);
+                obs.unobserve(el);
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        revealEls.forEach(function (el) { revealObserver.observe(el); });
+    } catch (e) {
+        // Fallback: reveal everything
+        revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+    }
+
+    // Step 3 — Page transition overlay
+    var overlay = document.getElementById('jz-page-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+
+        document.addEventListener('click', function (e) {
+            var link = e.target.closest ? e.target.closest('a') : null;
+            if (!link) { return; }
+            var href = link.getAttribute('href');
+            if (!href) { return; }
+
+            // Skip anchors, new tabs, downloads, non-navigations, modifier clicks
+            if (link.target === '_blank' || link.hasAttribute('download')) { return; }
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) { return; }
+            if (href.charAt(0) === '#' || href.indexOf('javascript:') === 0 ||
+                href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0 ||
+                link.getAttribute('data-bs-toggle')) { return; }
+
+            // Same-origin only
+            var dest;
+            try { dest = new URL(href, window.location.href); } catch (err) { return; }
+            if (dest.origin !== window.location.origin) { return; }
+            if (dest.href === window.location.href) { return; }
+
+            e.preventDefault();
+            overlay.classList.add('active');
+            setTimeout(function () { window.location.href = dest.href; }, 250);
+        });
+    }
+});
+
+// Handle browser back/forward — clear overlay if page restored from bfcache
+window.onpageshow = function (event) {
+    var overlay = document.getElementById('jz-page-overlay');
+    if (overlay) { overlay.classList.remove('active'); }
+};
+
+/* Step 4 — Card hover tilt (desktop / fine pointer only) */
+document.addEventListener('DOMContentLoaded', function () {
+    if (!window.matchMedia || !window.matchMedia('(pointer: fine)').matches) { return; }
+
+    var cards = document.querySelectorAll('.twm-jobs-list-style1, .twm-jobs-grid-style1');
+    cards.forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+            var rect = card.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var dx = (e.clientX - cx) / (rect.width / 2);
+            var dy = (e.clientY - cy) / (rect.height / 2);
+            var rotY = Math.max(-4, Math.min(4, dx * 4));
+            var rotX = Math.max(-4, Math.min(4, -dy * 4));
+            card.style.transition = 'transform 0.05s linear';
+            card.style.transform = 'perspective(800px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+        });
+        card.addEventListener('mouseleave', function () {
+            card.style.transition = 'transform 0.3s ease';
+            card.style.transform = '';
+        });
+    });
+});

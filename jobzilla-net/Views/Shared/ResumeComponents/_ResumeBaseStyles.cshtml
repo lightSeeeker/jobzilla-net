@@ -1,8 +1,10 @@
 @model jobzilla_net.Application.Resumes.ViewModels.ResumeExportViewModel
 
-<style>
-@@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500&family=Lora:wght@400;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap');
+@* <link>, not @import — the SelectPdf engine never resolves @import'ed fonts and
+   silently falls back to Arial; it does load fonts referenced via <link>. *@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Roboto+Mono:wght@400;500&family=Lora:wght@400;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" />
 
+<style>
     :root {
         --cvb-base-font: 'Inter', sans-serif;
         --cvb-line-height: 1.6;
@@ -19,21 +21,19 @@
         print-color-adjust: exact;
     }
     
-    /* PDF page-break handling to prevent awkward cuts across A4 pages */
+    /* Keep entries whole and headings attached to their content across A4 page breaks. */
     .resume-item {
         page-break-inside: avoid;
         break-inside: avoid;
-        display: block; /* Required for page-break-inside to work reliably */
+        display: block;
     }
     .resume-section-title {
         page-break-after: avoid;
         break-after: avoid;
-        page-break-inside: avoid;
     }
     .resume-item-header {
         page-break-after: avoid;
         break-after: avoid;
-        page-break-inside: avoid;
     }
     .resume-skills-list, .resume-references-grid {
         page-break-inside: avoid;
@@ -44,13 +44,17 @@
     @if (Model.IsExport)
     {
         <text>
+        /* Uniform page margins on EVERY page (top spacing on continuation pages,
+           consistent single-column spacing). Left/right = 0 so full-bleed designs
+           reach the side edges; each template owns its horizontal padding. Chromium
+           engines honour this rule; SelectPdf ignores it, so SelectPdfGenerator
+           sets the equivalent 40pt top/bottom margins itself. */
+        @@page { size: A4; margin: 14mm 0; }
+
         .resume-container {
             width: 100%;
             max-width: 100%;
             margin: 0;
-            background: #fff;
-            overflow: hidden;
-            min-height: 296mm;
             box-sizing: border-box;
         }
         </text>
@@ -61,7 +65,6 @@
         .resume-container {
             margin: 0 auto;
             background: #fff;
-            overflow: hidden;
             box-sizing: border-box;
             /* Box shadows and padding differ by template */
         }
@@ -69,6 +72,8 @@
     }
 </style>
 
+@if (!Model.IsExport)
+{
 <script>
     // Universal listener for real-time color updates in the Preview Editor
     window.addEventListener('message', function (e) {
@@ -100,3 +105,4 @@
         }
     });
 </script>
+}

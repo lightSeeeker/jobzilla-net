@@ -24,8 +24,10 @@
         .header {
             background-color: var(--pc-primary);
             color: #fff;
-            padding: 26px 40px;
-            margin-bottom: 24px;
+            padding: 26px 32px;
+            /* Capsule: inset from the edges + top spacing + rounded corners. */
+            margin: 40px 40px 24px;
+            border-radius: 18px;
         }
         .name { font-size: 28px; font-weight: 700; margin: 0 0 4px; letter-spacing: 0.5px; color: #fff; }
         .role { font-size: 15px; color: #e7eef6; margin-bottom: 10px; font-weight: 500; }
@@ -62,6 +64,9 @@
         @if (Model.IsExport)
         {
             <text>
+            /* Top margin on every page. NOTE: SelectPdf ignores @@page — this only takes
+               effect in engines that honour it (browser print / Chromium). */
+            @@page { margin-top: 14mm; }
             .resume-item-header { display: table; width: 100%; }
             .resume-item-header > .resume-item-title { display: table-cell; }
             .resume-item-header > .resume-item-date  { display: table-cell; text-align: right; white-space: nowrap; padding-left: 12px; }
